@@ -22,6 +22,7 @@
 - [Beräkningslogik](#beräkningslogik)
 - [Säkerhet & RLS](#säkerhet--rls)
 - [Responsiv design & PWA](#responsiv-design--pwa)
+- [Demo-läge](#demo-läge)
 - [Komma igång](#komma-igång)
 - [Miljövariabler](#miljövariabler)
 - [Supabase — setup](#supabase--setup)
@@ -50,6 +51,7 @@ Appen är byggd som en **Progressive Web App** och kan installeras direkt från 
 | **Google-inloggning** | OAuth via Supabase Auth — inga lösenord att hantera |
 | **PWA / Hemskärm** | Installerbar som app på iOS och Android |
 | **Responsiv** | Bottom nav + FAB på mobil, sidebar + sidopanel på desktop |
+| **Demo-läge** | Utforska appen utan konto — hårdkodad data, inga Supabase-anrop |
 
 ---
 
@@ -375,6 +377,46 @@ Breakpoint: `md` (768 px). Under = mobil, över = desktop.
 1. Öppna appen i Safari
 2. Tryck dela-knappen → "Lägg till på hemskärmen"
 3. Appen startar i standalone-läge med Subtrack-ikon och blå statusbar
+
+---
+
+## Demo-läge
+
+Inloggningssidan erbjuder en "Utforska demo"-knapp för den som vill prova appen utan att skapa ett konto eller konfigurera Supabase.
+
+### Vad ingår i demon
+
+| Abonnemang | Kategori | Kostnad | Status |
+|---|---|---|---|
+| Netflix | Streaming | 189 kr/mån | Aktiv — prishistorik i 3 steg |
+| Spotify | Musik | 119 kr/mån | Aktiv — prishistorik i 2 steg |
+| Adobe Creative Cloud | Mjukvara | 634 kr/mån | Aktiv |
+| iCloud+ 50 GB | Lagring | 12 kr/mån | Aktiv |
+| GitHub Pro | Mjukvara | 99 kr/mån | Aktiv |
+| Microsoft 365 | Produktivitet | 1 149 kr/år | Aktiv |
+| Headspace | Hälsa | 79 kr/mån | Pausad |
+| HBO Max | Streaming | 89 kr/mån | Avslutad |
+
+Startdatumen är valda så att notiser-vyn visar flera kommande förnyelser (2–18 dagar) och historikposter.
+
+### Hur det fungerar tekniskt
+
+Demo-läget kräver inga ändringar i Supabase-konfigurationen och gör inga nätverksanrop alls.
+
+```
+src/lib/demoData.ts          — hårdkodad data (subscriptions, categories, price_history)
+src/contexts/DemoContext.tsx — isDemoMode, enterDemo(), exitDemo()
+```
+
+**Flöde när användaren klickar "Utforska demo":**
+
+1. `enterDemo()` injicerar exempeldatan i React Query-cachen via `queryClient.setQueryData`
+2. Datahookarna (`useSubscriptions`, `useCategories`) har `enabled: !isDemoMode` — inga Supabase-anrop sker
+3. Auth-vakten i `AppLayout` kontrollerar `isDemoMode` och låter användaren passera utan session
+4. Alla mutationer (lägg till, redigera, ta bort) uppdaterar enbart React Query-cachen med `setQueryData`
+5. En amber-banner indikerar demo-läget; "Logga in"-knappen i topbaren anropar `exitDemo()` som rensar cachen och skickar tillbaka till `/login`
+
+Data lever enbart i minnet — inget sparas i `localStorage` eller cookies. Stäng fliken och allt är borta.
 
 ---
 

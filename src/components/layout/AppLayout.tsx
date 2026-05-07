@@ -4,6 +4,7 @@ import TopBar from './TopBar'
 import Sidebar from './Sidebar'
 import BottomNav from './BottomNav'
 import { useAuth } from '../../hooks/useAuth'
+import { useDemoContext } from '../../contexts/DemoContext'
 import AddSubscriptionModal from '../subscriptions/AddSubscriptionModal'
 
 interface LayoutContextValue {
@@ -18,9 +19,10 @@ export function useLayout() {
 
 export default function AppLayout() {
   const { user, loading } = useAuth()
+  const { isDemoMode } = useDemoContext()
   const [showAdd, setShowAdd] = useState(false)
 
-  if (loading) {
+  if (loading && !isDemoMode) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB]">
         <span className="text-[13px] text-[#9CA3AF]">Laddar…</span>
@@ -28,7 +30,7 @@ export default function AppLayout() {
     )
   }
 
-  if (!user) {
+  if (!user && !isDemoMode) {
     return <Navigate to="/login" replace />
   }
 
@@ -46,6 +48,14 @@ export default function AppLayout() {
             + Lägg till
           </button>
         } />
+
+        {isDemoMode && (
+          <div className="bg-[#FFFBEB] border-b border-[#FDE68A] px-4 py-2 text-center shrink-0">
+            <p className="text-[12px] text-[#92400E]">
+              Demo-läge — du tittar på exempeldata. Ändringar sparas inte.
+            </p>
+          </div>
+        )}
 
         <div className="flex flex-1 overflow-hidden">
           <aside className="hidden md:block w-[188px] shrink-0 border-r border-[#E5E7EB] bg-white">

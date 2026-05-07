@@ -1,4 +1,4 @@
-import { Database, Shield, Server, Smartphone, Globe, Code2, Layers, Calculator, Bell, RefreshCw, Lock } from 'lucide-react'
+import { Database, Shield, Server, Smartphone, Globe, Code2, Layers, Calculator, Bell, RefreshCw, Lock, MonitorPlay } from 'lucide-react'
 
 export default function About() {
   return (
@@ -55,6 +55,10 @@ export default function About() {
           <FeatureCard
             title="Google-inloggning"
             description="Autentisering via Google OAuth — inga separata lösenord att hantera. Profil­bild och namn hämtas automatiskt från Google-kontot."
+          />
+          <FeatureCard
+            title="Demo-läge"
+            description="Prova appen utan att skapa ett konto. Hårdkodad exempeldata med 8 abonnemang, prishistorik och kommande förnyelser. Alla skrivoperationer fungerar men sparas bara i minnet."
           />
         </div>
       </section>
@@ -328,6 +332,58 @@ export default function About() {
         </div>
       </section>
 
+      {/* Demo-läge */}
+      <section>
+        <SectionHeader icon={<MonitorPlay size={16} strokeWidth={2} />} title="Demo-läge" />
+        <p className="text-[13px] text-[#374151] leading-relaxed mt-3 mb-4">
+          Inloggningssidan erbjuder ett demo-läge för den som vill utforska appen utan att skapa ett konto. All data är hårdkodad och ingen Supabase-trafik sker överhuvudtaget — varken läsning eller skrivning. Läggs ett abonnemang till i demo-läget syns det direkt, men försvinner när fliken stängs.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          <div className="bg-[#F9FAFB] rounded-[10px] border border-[#E5E7EB] p-4">
+            <p className="text-[12px] font-semibold text-[#111827] mb-2">Exempeldata som ingår</p>
+            <ul className="space-y-1 text-[12px] text-[#6B7280]">
+              <li>Netflix — prishistorik i tre steg (99 → 139 → 189 kr)</li>
+              <li>Spotify — prishistorik i två steg (99 → 119 kr)</li>
+              <li>Adobe Creative Cloud — 634 kr/mån</li>
+              <li>iCloud+ 50 GB — 12 kr/mån</li>
+              <li>GitHub Pro — 99 kr/mån</li>
+              <li>Microsoft 365 — 1 149 kr/år (familjeplan)</li>
+              <li>Headspace — pausad</li>
+              <li>HBO Max — avslutad</li>
+            </ul>
+          </div>
+          <div className="bg-[#F9FAFB] rounded-[10px] border border-[#E5E7EB] p-4">
+            <p className="text-[12px] font-semibold text-[#111827] mb-2">6 kategorier med färger</p>
+            <ul className="space-y-1 text-[12px] text-[#6B7280]">
+              <li><span className="inline-block w-2 h-2 rounded-full bg-[#EF4444] mr-1.5" />Streaming</li>
+              <li><span className="inline-block w-2 h-2 rounded-full bg-[#8B5CF6] mr-1.5" />Musik</li>
+              <li><span className="inline-block w-2 h-2 rounded-full bg-[#0EA5E9] mr-1.5" />Lagring</li>
+              <li><span className="inline-block w-2 h-2 rounded-full bg-[#F59E0B] mr-1.5" />Mjukvara</li>
+              <li><span className="inline-block w-2 h-2 rounded-full bg-[#10B981] mr-1.5" />Produktivitet</li>
+              <li><span className="inline-block w-2 h-2 rounded-full bg-[#EC4899] mr-1.5" />Hälsa</li>
+            </ul>
+          </div>
+        </div>
+        <div className="bg-[#F9FAFB] rounded-[10px] border border-[#E5E7EB] p-4 space-y-3 text-[13px] text-[#374151]">
+          <p className="font-medium text-[#111827]">Teknisk implementation</p>
+          <p>Demo-läget styrs av <code className="bg-[#F3F4F6] px-1.5 py-0.5 rounded text-[12px]">DemoContext</code> (<code className="bg-[#F3F4F6] px-1.5 py-0.5 rounded text-[12px]">src/contexts/DemoContext.tsx</code>) som exponerar <code className="bg-[#F3F4F6] px-1.5 py-0.5 rounded text-[12px]">isDemoMode</code>, <code className="bg-[#F3F4F6] px-1.5 py-0.5 rounded text-[12px]">enterDemo()</code> och <code className="bg-[#F3F4F6] px-1.5 py-0.5 rounded text-[12px]">exitDemo()</code>. Vid aktivering injiceras hårdkodad data direkt i React Query-cachen via <code className="bg-[#F3F4F6] px-1.5 py-0.5 rounded text-[12px]">queryClient.setQueryData</code>.</p>
+          <ul className="space-y-1.5 list-none">
+            {[
+              'Datahookarna (useSubscriptions, useCategories) sätter enabled: !isDemoMode — inga Supabase-anrop görs',
+              'Alla mutationer (lägg till, redigera, ta bort) uppdaterar React Query-cachen direkt med setQueryData',
+              'Auth-vakten i AppLayout låter demo-användare passera utan inloggad session',
+              'En amber-banner i topbaren indikerar tydligt att man är i demo-läge',
+              'exitDemo() rensar hela cachen och den reaktiva auth-vakten skickar tillbaka till login',
+            ].map((item, i) => (
+              <li key={i} className="flex gap-2">
+                <span className="text-[#1B4FD8] font-semibold shrink-0">·</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
       {/* Designsystem */}
       <section>
         <SectionHeader icon={<Globe size={16} strokeWidth={2} />} title="Designsystem" />
@@ -340,9 +396,9 @@ export default function About() {
           <ColorSwatch hex="#6B7280" label="Text sekundär" />
           <ColorSwatch hex="#E5E7EB" label="Kantlinje" />
           <ColorSwatch hex="#F9FAFB" label="Bakgrund" />
-          <ColorSwatch hex="#166534" label="Aktiv/grön" textLight={false} bg="#F0FDF4" />
-          <ColorSwatch hex="#92400E" label="Varning/amber" textLight={false} bg="#FFFBEB" />
-          <ColorSwatch hex="#B91C1C" label="Fel/röd" textLight={false} bg="#FEF2F2" />
+          <ColorSwatch hex="#166534" label="Aktiv/grön" bg="#F0FDF4" />
+          <ColorSwatch hex="#92400E" label="Varning/amber" bg="#FFFBEB" />
+          <ColorSwatch hex="#B91C1C" label="Fel/röd" bg="#FEF2F2" />
         </div>
         <p className="text-[12px] text-[#9CA3AF] mt-3">Typsnitt: Inter (Google Fonts) · Vikter: 400, 500, 600 · Tracking: −0.3px till −0.5px på rubriker ≥ 18px</p>
       </section>
@@ -456,7 +512,7 @@ function DeployRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-function ColorSwatch({ hex, label, textLight = true, bg }: { hex: string; label: string; textLight?: boolean; bg?: string }) {
+function ColorSwatch({ hex, label, bg }: { hex: string; label: string; bg?: string }) {
   const background = bg ?? hex
   return (
     <div className="rounded-[8px] overflow-hidden border border-[#E5E7EB]">

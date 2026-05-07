@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react'
 import { useAuth } from '../../hooks/useAuth'
+import { useDemoContext } from '../../contexts/DemoContext'
 import { Wallet } from 'lucide-react'
 
 interface TopBarProps {
@@ -8,6 +9,8 @@ interface TopBarProps {
 
 export default function TopBar({ action }: TopBarProps) {
   const { user } = useAuth()
+  const { isDemoMode, exitDemo } = useDemoContext()
+
   return (
     <header
       className="bg-white border-b border-[#E5E7EB] shrink-0"
@@ -22,21 +25,38 @@ export default function TopBar({ action }: TopBarProps) {
           </span>
         </div>
 
-        {/* Right side: desktop shows user + action, mobile shows notification dot */}
+        {/* Right side */}
         <div className="ml-auto flex items-center gap-3">
-          {/* Notification dot (mobile only) */}
-          <div className="md:hidden w-2 h-2 rounded-full bg-[#1B4FD8]" />
+          {isDemoMode ? (
+            <>
+              <span className="hidden md:inline text-[11px] font-medium text-[#92400E] bg-[#FFFBEB] border border-[#FDE68A] px-2 py-0.5 rounded-[4px]">
+                Demo
+              </span>
+              <button
+                type="button"
+                onClick={exitDemo}
+                className="bg-[#1B4FD8] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium transition-all duration-150 ease-out hover:bg-[#1a46c2]"
+              >
+                Logga in
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Notification dot (mobile only) */}
+              <div className="md:hidden w-2 h-2 rounded-full bg-[#1B4FD8]" />
 
-          {/* Desktop: avatar + name */}
-          <div className="hidden md:flex items-center gap-2">
-            <Avatar user={user} size={28} />
-            <span className="text-[13px] text-[#6B7280]">
-              {user?.user_metadata?.full_name ?? user?.email ?? ''}
-            </span>
-          </div>
+              {/* Desktop: avatar + name */}
+              <div className="hidden md:flex items-center gap-2">
+                <Avatar user={user} size={28} />
+                <span className="text-[13px] text-[#6B7280]">
+                  {user?.user_metadata?.full_name ?? user?.email ?? ''}
+                </span>
+              </div>
 
-          {/* Page action (e.g. "+ Lägg till" on dashboard) */}
-          {action && <div className="hidden md:block">{action}</div>}
+              {/* Page action (e.g. "+ Lägg till") */}
+              {action && <div className="hidden md:block">{action}</div>}
+            </>
+          )}
         </div>
       </div>
     </header>
