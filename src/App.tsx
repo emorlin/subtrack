@@ -5,6 +5,8 @@ import Dashboard from './pages/Dashboard'
 import Cost from './pages/Cost'
 import Notifications from './pages/Notifications'
 import Settings from './pages/Settings'
+import Login from './pages/Login'
+import AuthCallback from './pages/AuthCallback'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,6 +22,8 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route element={<AppLayout />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/cost" element={<Cost />} />

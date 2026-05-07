@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Subscription, SubscriptionFormData } from '../types'
-import { mockSubscriptions } from '../lib/mockData'
 import { supabase } from '../lib/supabase'
 
 const QUERY_KEY = ['subscriptions']
@@ -14,13 +13,9 @@ export function useSubscriptions() {
         .select('*, category:categories(*), price_history(*)')
         .order('created_at', { ascending: true })
 
-      if (error) {
-        // No live connection yet — return mock data
-        return mockSubscriptions
-      }
+      if (error) throw error
       return data as Subscription[]
     },
-    placeholderData: mockSubscriptions,
   })
 }
 

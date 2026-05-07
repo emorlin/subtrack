@@ -1,9 +1,10 @@
 import { createContext, useContext, useState } from 'react'
 import type { ReactNode } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, Navigate } from 'react-router-dom'
 import TopBar from './TopBar'
 import Sidebar from './Sidebar'
 import BottomNav from './BottomNav'
+import { useAuth } from '../../hooks/useAuth'
 
 interface LayoutContextValue {
   setAction: (node: ReactNode) => void
@@ -20,8 +21,21 @@ export function useLayout() {
 }
 
 export default function AppLayout() {
+  const { user, loading } = useAuth()
   const [action, setAction] = useState<ReactNode>(null)
   const [mobileAddButton, setMobileAddButton] = useState<ReactNode>(null)
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB]">
+        <span className="text-[13px] text-[#9CA3AF]">Laddar…</span>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />
+  }
 
   return (
     <LayoutContext.Provider value={{ setAction, setMobileAddButton }}>

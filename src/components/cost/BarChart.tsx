@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import type { Subscription } from '../../types'
+import { toMonthlyAmount } from '../../lib/calculations'
 
 const MONTH_LABELS = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec']
 
@@ -14,18 +16,47 @@ interface BarChartProps {
   onHover?: (bar: MonthBar | null) => void
 }
 
-export function buildMonthBars(monthlyAmount: number): MonthBar[] {
+export function isActiveInMonth(sub: Subscription, year: number, month: number): boolean {
+  const monthStart = new Date(year, month - 1, 1)
+  const monthEnd = new Date(year, month, 0)
+
+  const start = new Date(sub.start_date)
+  if (start > monthEnd) return false
+
+  if (sub.end_date) {
+    const end = new Date(sub.end_date)
+    if (end < monthStart) return false
+  } else if (sub.status === 'cancelled') {
+    // Use updated_at as proxy for when it was cancelled
+    const cancelledAt = new Date(sub.updated_at)
+    if (cancelledAt < monthStart) return false
+  }
+
+  return true
+}
+
+export function buildMonthBars(subscriptions: Subscription[], year: number): MonthBar[] {
   const now = new Date()
+  const currentYear = now.getFullYear()
   const currentMonth = now.getMonth() + 1
 
   return MONTH_LABELS.map((label, i) => {
     const month = i + 1
-    return {
-      month,
-      label,
-      amount: monthlyAmount,
-      state: month < currentMonth ? 'past' : month === currentMonth ? 'current' : 'future',
+
+    const amount = subscriptions
+      .filter((s) => isActiveInMonth(s, year, month))
+      .reduce((sum, s) => sum + toMonthlyAmount(s.amount, s.interval, s.interval_count), 0)
+
+    let state: MonthBar['state']
+    if (year < currentYear || (year === currentYear && month < currentMonth)) {
+      state = 'past'
+    } else if (year === currentYear && month === currentMonth) {
+      state = 'current'
+    } else {
+      state = 'future'
     }
+
+    return { month, label, amount, state }
   })
 }
 
@@ -48,7 +79,7 @@ export default function BarChart({ bars, onHover }: BarChartProps) {
     <div className="flex items-end gap-1">
       {bars.map((bar) => {
         const isHovered = hoveredMonth === bar.month
-        const barH = Math.max(Math.round((bar.amount / max) * chartHeight), 4)
+        const barH = Math.max(Math.round((bar.amount / max) * chartHeight), bar.amount > 0 ? 4 : 2)
         const color =
           bar.state === 'current' ? 'bg-[#1B4FD8]'
           : bar.state === 'past'  ? 'bg-[#BFDBFE]'

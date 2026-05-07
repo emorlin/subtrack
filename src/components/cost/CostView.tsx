@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import BarChart, { buildMonthBars } from './BarChart'
+import BarChart, { buildMonthBars, isActiveInMonth } from './BarChart'
 import type { MonthBar } from './BarChart'
 import CategoryBreakdown from './CategoryBreakdown'
 import { useSubscriptions } from '../../hooks/useSubscriptions'
@@ -21,17 +21,33 @@ export default function CostView() {
   const currentMonth = now.getMonth()     // 0-indexed
   const currentYear = now.getFullYear()
 
-  const active = subscriptions.filter((s) => s.status === 'active')
+  const [selectedYear, setSelectedYear] = useState(currentYear)
 
-  const monthlyTotal = active.reduce(
-    (sum, s) => sum + toMonthlyAmount(s.amount, s.interval, s.interval_count),
-    0
-  )
+  // Earliest year any subscription started
+  const minYear = subscriptions.length > 0
+    ? Math.min(...subscriptions.map((s) => new Date(s.start_date).getFullYear()))
+    : currentYear
 
-  const ytd = monthlyTotal * (currentMonth + 1)
-  const forecast = monthlyTotal * 12
+  const bars = buildMonthBars(subscriptions, selectedYear)
 
-  const mostExpensive = active.reduce<typeof active[0] | null>(
+  // Metrics derived from bars
+  const nonFutureBars = bars.filter((b) => b.state !== 'future')
+  const ytd = nonFutureBars.reduce((sum, b) => sum + b.amount, 0)
+  const yearTotal = bars.reduce((sum, b) => sum + b.amount, 0)
+  const monthlyAvg = yearTotal / 12
+
+  const isCurrentYear = selectedYear === currentYear
+  const isPastYear = selectedYear < currentYear
+
+  const ytdLabel = isCurrentYear
+    ? `${cap(MONTH_LABELS[0])}-${MONTH_LABELS[currentMonth]} ${selectedYear}`
+    : `${selectedYear} totalt`
+
+  const forecastLabel = isPastYear ? 'Helår totalt' : 'Prognos helår'
+
+  // Most expensive active subscription (always current)
+  const activeNow = subscriptions.filter((s) => s.status === 'active')
+  const mostExpensive = activeNow.reduce<typeof activeNow[0] | null>(
     (top, s) =>
       !top ||
       toMonthlyAmount(s.amount, s.interval, s.interval_count) >
@@ -41,34 +57,34 @@ export default function CostView() {
     null
   )
 
+  // Right column: use hovered bar, fall back to current month bar
+  const displayBar = hoveredBar ?? bars.find((b) => b.state === 'current') ?? bars[nonFutureBars.length - 1] ?? bars[0]
+  const displayMonthLabel = cap(displayBar.label)
+  const displayAmount = Math.round(displayBar.amount).toLocaleString('sv-SE')
+
+  // Category breakdown for the displayed month
+  const subsInDisplayMonth = subscriptions.filter((s) =>
+    isActiveInMonth(s, selectedYear, displayBar.month)
+  )
   const categoryRows = categories
     .map((cat) => ({
       id: cat.id,
       name: cat.name,
       color_hex: cat.color_hex,
-      amount: active
+      amount: subsInDisplayMonth
         .filter((s) => s.category_id === cat.id)
         .reduce((sum, s) => sum + toMonthlyAmount(s.amount, s.interval, s.interval_count), 0),
     }))
     .filter((r) => r.amount > 0)
     .sort((a, b) => b.amount - a.amount)
 
-  const bars = buildMonthBars(monthlyTotal)
-
-  // Right column: use hovered bar, fall back to current month
-  const displayBar = hoveredBar ?? bars.find((b) => b.state === 'current') ?? bars[currentMonth]
-  const displayMonthLabel = cap(displayBar.label)
-  const displayAmount = Math.round(displayBar.amount).toLocaleString('sv-SE')
-
-  const ytdLabel = `${cap(MONTH_LABELS[0])}-${MONTH_LABELS[currentMonth]} ${currentYear}`
-
   return (
     <div className="p-4 md:p-6 space-y-4">
       {/* Metric cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <MetricCard label={ytdLabel} value={`${Math.round(ytd).toLocaleString('sv-SE')} kr`} accent />
-        <MetricCard label="Prognos helår" value={`${Math.round(forecast).toLocaleString('sv-SE')} kr`} />
-        <MetricCard label="Snitt / mån" value={`${Math.round(monthlyTotal).toLocaleString('sv-SE')} kr`} />
+        <MetricCard label={forecastLabel} value={`${Math.round(yearTotal).toLocaleString('sv-SE')} kr`} />
+        <MetricCard label="Snitt / mån" value={`${Math.round(monthlyAvg).toLocaleString('sv-SE')} kr`} />
         <MetricCard label="Dyraste tjänst" value={mostExpensive?.name ?? '—'} />
       </div>
 
@@ -78,9 +94,33 @@ export default function CostView() {
 
           {/* Bar chart */}
           <div className="flex-1 min-w-0">
-            <p className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase mb-3">
-              Månadsvis, {currentYear}
-            </p>
+            {/* Chart header with year nav */}
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase">
+                Månadsvis
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => setSelectedYear((y) => y - 1)}
+                  disabled={selectedYear <= minYear}
+                  className="w-6 h-6 flex items-center justify-center text-[#6B7280] hover:text-[#111827] disabled:opacity-25 transition-colors text-[16px] leading-none"
+                >
+                  ‹
+                </button>
+                <span className="text-[13px] font-semibold text-[#111827] w-10 text-center tabular-nums">
+                  {selectedYear}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setSelectedYear((y) => y + 1)}
+                  disabled={selectedYear >= currentYear}
+                  className="w-6 h-6 flex items-center justify-center text-[#6B7280] hover:text-[#111827] disabled:opacity-25 transition-colors text-[16px] leading-none"
+                >
+                  ›
+                </button>
+              </div>
+            </div>
             <BarChart bars={bars} onHover={setHoveredBar} />
           </div>
 

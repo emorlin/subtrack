@@ -1,6 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Category } from '../types'
-import { mockCategories } from '../lib/mockData'
 import { supabase } from '../lib/supabase'
 
 const QUERY_KEY = ['categories']
@@ -14,10 +13,9 @@ export function useCategories() {
         .select('*')
         .order('sort_order', { ascending: true })
 
-      if (error) return mockCategories
+      if (error) throw error
       return data as Category[]
     },
-    placeholderData: mockCategories,
   })
 }
 
@@ -28,18 +26,10 @@ export function useAddCategory() {
       const user = (await supabase.auth.getUser()).data.user
       const { data, error } = await supabase
         .from('categories')
-        .insert([{ ...input, user_id: user?.id ?? 'mock', sort_order: 0 }])
+        .insert([{ ...input, user_id: user?.id, sort_order: 0 }])
         .select()
         .single()
-      if (error) {
-        return {
-          id: crypto.randomUUID(),
-          user_id: 'mock',
-          sort_order: 0,
-          created_at: new Date().toISOString(),
-          ...input,
-        } as Category
-      }
+      if (error) throw error
       return data as Category
     },
     onSuccess: (newCat) => {
@@ -61,7 +51,7 @@ export function useUpdateCategory() {
         .eq('id', id)
         .select()
         .single()
-      if (error) return { id, ...updates } as Category
+      if (error) throw error
       return data as Category
     },
     onSuccess: (updated) => {
@@ -77,7 +67,7 @@ export function useDeleteCategory() {
   return useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase.from('categories').delete().eq('id', id)
-      if (error) return id
+      if (error) throw error
       return id
     },
     onSuccess: (id) => {

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useCategories } from '../../hooks/useCategories'
-import type { Subscription, SubscriptionInterval } from '../../types'
+import { useAddSubscription, useUpdateSubscription } from '../../hooks/useSubscriptions'
+import type { Subscription, SubscriptionInterval, SubscriptionFormData } from '../../types'
 
 interface FormState {
   name: string
@@ -61,6 +62,9 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
     subscription ? subscriptionToFormState(subscription) : INITIAL
   )
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
+  const addSubscription = useAddSubscription()
+  const updateSubscription = useUpdateSubscription()
+  const isSaving = addSubscription.isPending || updateSubscription.isPending
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -94,9 +98,36 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
     setStep((s) => s - 1)
   }
 
+  function buildFormData(): SubscriptionFormData {
+    const bindingMonths = Number(form.binding_months)
+    let end_date: string | null = null
+    if (bindingMonths > 0 && form.start_date) {
+      const end = new Date(form.start_date)
+      end.setMonth(end.getMonth() + bindingMonths)
+      end_date = end.toISOString().split('T')[0]
+    }
+    return {
+      name: form.name.trim(),
+      category_id: form.category_id || null,
+      amount: Number(form.amount),
+      currency: form.currency,
+      interval: form.interval,
+      interval_count: form.interval_count,
+      start_date: form.start_date,
+      end_date,
+      legacy_amount_paid: form.has_legacy && form.legacy_amount ? Number(form.legacy_amount) : null,
+      notes: form.notes.trim() || null,
+      reminder_days_before: Number(form.reminder_days_before),
+    }
+  }
+
   function handleSave() {
-    // TODO: anropa useAddSubscription när auth är kopplat
-    onClose()
+    const data = buildFormData()
+    if (isEdit && subscription) {
+      updateSubscription.mutate({ id: subscription.id, ...data }, { onSuccess: onClose })
+    } else {
+      addSubscription.mutate(data, { onSuccess: onClose })
+    }
   }
 
   const autoCalculated = computeAutoPaid(form)
@@ -157,9 +188,10 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
             <button
               type="button"
               onClick={handleSave}
-              className="w-full bg-[#1B4FD8] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out"
+              disabled={isSaving}
+              className="w-full bg-[#1B4FD8] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out disabled:opacity-50"
             >
-              {isEdit ? 'Uppdatera' : 'Spara abonnemang'}
+              {isSaving ? 'Sparar…' : isEdit ? 'Uppdatera' : 'Spara abonnemang'}
             </button>
           )}
         </div>
@@ -215,9 +247,10 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
               <button
                 type="button"
                 onClick={handleSave}
-                className="bg-[#1B4FD8] text-white rounded-[6px] px-4 py-2 text-[13px] font-medium transition-all duration-150 ease-out hover:bg-[#1a46c2]"
+                disabled={isSaving}
+                className="bg-[#1B4FD8] text-white rounded-[6px] px-4 py-2 text-[13px] font-medium transition-all duration-150 ease-out hover:bg-[#1a46c2] disabled:opacity-50"
               >
-                Spara abonnemang
+                {isSaving ? 'Sparar…' : isEdit ? 'Uppdatera' : 'Spara abonnemang'}
               </button>
             )}
           </div>

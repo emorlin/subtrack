@@ -5,6 +5,7 @@ import {
   useUpdateCategory,
   useDeleteCategory,
 } from '../../hooks/useCategories'
+import { useAuth, signOut } from '../../hooks/useAuth'
 import type { Category } from '../../types'
 
 const PRESET_COLORS = [
@@ -23,16 +24,33 @@ const PRESET_COLORS = [
 // ─── Profile ─────────────────────────────────────────────────────────────────
 
 function ProfileCard() {
+  const { user } = useAuth()
+  const name = user?.user_metadata?.full_name ?? user?.email ?? '—'
+  const email = user?.email ?? ''
+  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined
+  const initial = name.charAt(0).toUpperCase()
+
   return (
     <div className="bg-white rounded-[12px] border border-[#E5E7EB] p-4 flex items-center gap-4">
-      <div className="w-11 h-11 rounded-full bg-[#EFF6FF] flex items-center justify-center shrink-0">
-        <span className="text-[17px] font-semibold text-[#1B4FD8]">E</span>
-      </div>
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt={name}
+          className="w-11 h-11 rounded-full object-cover shrink-0"
+        />
+      ) : (
+        <div className="w-11 h-11 rounded-full bg-[#EFF6FF] flex items-center justify-center shrink-0">
+          <span className="text-[17px] font-semibold text-[#1B4FD8]">{initial}</span>
+        </div>
+      )}
       <div className="flex-1 min-w-0">
-        <p className="text-[14px] font-semibold text-[#111827] truncate">Erik Morlin</p>
-        <p className="text-[12px] text-[#6B7280] truncate">emorlin@gmail.com</p>
+        <p className="text-[14px] font-semibold text-[#111827] truncate">{name}</p>
+        <p className="text-[12px] text-[#6B7280] truncate">{email}</p>
       </div>
-      <button className="border border-[#E5E7EB] text-[#6B7280] rounded-[6px] px-3 py-1.5 text-[12px] hover:bg-[#F9FAFB] transition-all duration-150 ease-out shrink-0">
+      <button
+        onClick={signOut}
+        className="border border-[#E5E7EB] text-[#6B7280] rounded-[6px] px-3 py-1.5 text-[12px] hover:bg-[#F9FAFB] transition-all duration-150 ease-out shrink-0"
+      >
         Logga ut
       </button>
     </div>

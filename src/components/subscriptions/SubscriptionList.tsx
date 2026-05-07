@@ -50,48 +50,55 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
 
       {/* Desktop table */}
       <div className="hidden md:block">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-[#E5E7EB]">
-              <Th>Tjänst</Th>
-              <Th>Kategori</Th>
-              <Th align="right">Kostnad</Th>
-              <Th>Intervall</Th>
-              <Th>Förnyelse</Th>
-              <Th>Status</Th>
-            </tr>
-          </thead>
-          <tbody>
+        {active.length === 0 ? (
+          <EmptyState onAdd={onAdd} />
+        ) : (
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-[#E5E7EB]">
+                <Th>Tjänst</Th>
+                <Th>Kategori</Th>
+                <Th align="right">Kostnad</Th>
+                <Th>Intervall</Th>
+                <Th>Förnyelse</Th>
+                <Th>Status</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {active.map((sub) => (
+                <DesktopRow
+                  key={sub.id}
+                  sub={sub}
+                  selected={selectedId === sub.id}
+                  onClick={() => onSelect(sub)}
+                />
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      {/* Mobile list */}
+      <div className="md:hidden">
+        {active.length === 0 ? (
+          <EmptyState onAdd={onAdd} />
+        ) : (
+          <>
+            <div className="flex items-center justify-between px-4 py-2 border-b border-[#E5E7EB]">
+              <span className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase">
+                Tjänster
+              </span>
+            </div>
             {active.map((sub) => (
-              <DesktopRow
+              <MobileRow
                 key={sub.id}
                 sub={sub}
                 selected={selectedId === sub.id}
                 onClick={() => onSelect(sub)}
               />
             ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile list */}
-      <div className="md:hidden">
-        <div className="flex items-center justify-between px-4 py-2 border-b border-[#E5E7EB]">
-          <span className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase">
-            Tjänster
-          </span>
-          <button type="button" className="text-[12px] text-[#1B4FD8]">
-            Sortera
-          </button>
-        </div>
-        {active.map((sub) => (
-          <MobileRow
-            key={sub.id}
-            sub={sub}
-            selected={selectedId === sub.id}
-            onClick={() => onSelect(sub)}
-          />
-        ))}
+          </>
+        )}
       </div>
     </div>
   )
@@ -234,6 +241,22 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
     >
       {label}
     </button>
+  )
+}
+
+function EmptyState({ onAdd }: { onAdd: () => void }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+      <p className="text-[14px] font-medium text-[#111827] mb-1">Inga abonnemang ännu</p>
+      <p className="text-[13px] text-[#6B7280] mb-4">Lägg till ditt första för att komma igång</p>
+      <button
+        type="button"
+        onClick={onAdd}
+        className="bg-[#1B4FD8] text-white rounded-[6px] px-4 py-2 text-[13px] font-medium transition-all duration-150 ease-out hover:bg-[#1a46c2]"
+      >
+        + Lägg till abonnemang
+      </button>
+    </div>
   )
 }
 

@@ -29,8 +29,12 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
   const totalPaid = calculateTotalPaid(subscription)
 
   async function handleDelete() {
-    try { await deleteSub(subscription.id) } catch (_) { /* mock mode */ }
-    onDeleted()
+    try {
+      await deleteSub(subscription.id)
+      onDeleted()
+    } catch (_) {
+      // stay open so user sees the failure
+    }
   }
 
   return (
