@@ -1,0 +1,281 @@
+import { useState } from 'react'
+import type { Subscription } from '../../types'
+import { useSubscriptions } from '../../hooks/useSubscriptions'
+import { useCategories } from '../../hooks/useCategories'
+import { getNextRenewalDate } from '../../lib/calculations'
+import { daysUntil } from '../../lib/dates'
+
+interface SubscriptionListProps {
+  onSelect: (sub: Subscription) => void
+  selectedId: string | null
+  onAdd: () => void
+}
+
+export default function SubscriptionList({ onSelect, selectedId, onAdd }: SubscriptionListProps) {
+  const { data: subscriptions = [] } = useSubscriptions()
+  const { data: categories = [] } = useCategories()
+  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null)
+
+  const filtered = activeCategoryId
+    ? subscriptions.filter((s) => s.category_id === activeCategoryId)
+    : subscriptions
+
+  const active = filtered.filter((s) => s.status !== 'cancelled')
+
+  return (
+    <div className="bg-white rounded-[12px] border border-[#E5E7EB] overflow-hidden">
+      {/* Category filter row */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-[#E5E7EB] overflow-x-auto">
+        <FilterPill
+          label="Alla"
+          active={activeCategoryId === null}
+          onClick={() => setActiveCategoryId(null)}
+        />
+        {categories.map((cat) => (
+          <FilterPill
+            key={cat.id}
+            label={cat.name}
+            active={activeCategoryId === cat.id}
+            onClick={() => setActiveCategoryId(cat.id)}
+          />
+        ))}
+        <button
+          type="button"
+          onClick={onAdd}
+          className="ml-auto shrink-0 bg-[#1B4FD8] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium transition-all duration-150 ease-out hover:bg-[#1a46c2] hidden md:block"
+        >
+          + Lägg till
+        </button>
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-[#E5E7EB]">
+              <Th>Tjänst</Th>
+              <Th>Kategori</Th>
+              <Th align="right">Kostnad</Th>
+              <Th>Intervall</Th>
+              <Th>Förnyelse</Th>
+              <Th>Status</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {active.map((sub) => (
+              <DesktopRow
+                key={sub.id}
+                sub={sub}
+                selected={selectedId === sub.id}
+                onClick={() => onSelect(sub)}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile list */}
+      <div className="md:hidden">
+        <div className="flex items-center justify-between px-4 py-2 border-b border-[#E5E7EB]">
+          <span className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase">
+            Tjänster
+          </span>
+          <button type="button" className="text-[12px] text-[#1B4FD8]">
+            Sortera
+          </button>
+        </div>
+        {active.map((sub) => (
+          <MobileRow
+            key={sub.id}
+            sub={sub}
+            selected={selectedId === sub.id}
+            onClick={() => onSelect(sub)}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ── Desktop row ────────────────────────────────────────────
+
+function DesktopRow({
+  sub,
+  selected,
+  onClick,
+}: {
+  sub: Subscription
+  selected: boolean
+  onClick: () => void
+}) {
+  const renewal = getNextRenewalDate(sub.start_date, sub.interval, sub.interval_count)
+  const days = daysUntil(renewal)
+  const isUrgent = days <= 7
+
+  return (
+    <tr
+      onClick={onClick}
+      className={`border-b border-[#E5E7EB] cursor-pointer transition-all duration-150 ease-out ${
+        selected ? 'bg-[#EFF6FF]' : 'hover:bg-[#F9FAFB]'
+      }`}
+    >
+      {/* Tjänst */}
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-3">
+          <ServiceIcon name={sub.name} />
+          <span className="text-[13px] font-medium text-[#111827]">{sub.name}</span>
+        </div>
+      </td>
+
+      {/* Kategori */}
+      <td className="px-4 py-3 text-[13px] text-[#6B7280]">
+        {sub.category?.name ?? '—'}
+      </td>
+
+      {/* Kostnad */}
+      <td className="px-4 py-3 text-right text-[13px] font-semibold text-[#111827] whitespace-nowrap">
+        {sub.amount} kr
+      </td>
+
+      {/* Intervall */}
+      <td className="px-4 py-3 text-[13px] text-[#6B7280]">
+        {intervalLabel(sub.interval, sub.interval_count)}
+      </td>
+
+      {/* Förnyelse */}
+      <td className={`px-4 py-3 text-[13px] whitespace-nowrap ${isUrgent ? 'text-[#92400E] font-medium' : 'text-[#6B7280]'}`}>
+        {formatRenewalDate(renewal)}
+      </td>
+
+      {/* Status */}
+      <td className="px-4 py-3">
+        {isUrgent ? (
+          <span className="bg-[#FFFBEB] text-[#92400E] text-[10px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap">
+            {days} dagar
+          </span>
+        ) : (
+          <span className="bg-[#F0FDF4] text-[#166534] text-[10px] font-medium px-1.5 py-0.5 rounded">
+            Aktiv
+          </span>
+        )}
+      </td>
+    </tr>
+  )
+}
+
+// ── Mobile row ─────────────────────────────────────────────
+
+function MobileRow({
+  sub,
+  selected,
+  onClick,
+}: {
+  sub: Subscription
+  selected: boolean
+  onClick: () => void
+}) {
+  const renewal = getNextRenewalDate(sub.start_date, sub.interval, sub.interval_count)
+  const days = daysUntil(renewal)
+  const isUrgent = days <= 7
+
+  return (
+    <div
+      onClick={onClick}
+      className={`flex items-center gap-3 px-4 py-3 border-b border-[#E5E7EB] cursor-pointer transition-all duration-150 ease-out ${
+        selected ? 'bg-[#EFF6FF]' : 'active:bg-[#F9FAFB]'
+      }`}
+    >
+      <ServiceIcon name={sub.name} size="lg" />
+
+      <div className="flex-1 min-w-0">
+        <p className="text-[14px] font-medium text-[#111827] truncate">{sub.name}</p>
+        <p className="text-[11px] text-[#6B7280]">{sub.category?.name ?? '—'}</p>
+        {isUrgent ? (
+          <span className="text-[11px] text-[#92400E] font-medium">{days} dagar kvar</span>
+        ) : (
+          <span className="bg-[#F0FDF4] text-[#166534] text-[10px] font-medium px-1.5 py-0.5 rounded inline-block mt-0.5">
+            Aktiv
+          </span>
+        )}
+      </div>
+
+      <div className="text-right shrink-0">
+        <p className="text-[14px] font-semibold text-[#111827]">{sub.amount} kr</p>
+        <p className="text-[11px] text-[#6B7280]">{formatRenewalShort(renewal)}</p>
+      </div>
+    </div>
+  )
+}
+
+// ── Helpers ────────────────────────────────────────────────
+
+function ServiceIcon({ name, size = 'md' }: { name: string; size?: 'md' | 'lg' }) {
+  const initials = getInitials(name)
+  const dim = size === 'lg' ? 'w-10 h-10 text-[13px]' : 'w-8 h-8 text-[11px]'
+  return (
+    <div
+      className={`${dim} rounded-[10px] bg-[#F3F4F6] flex items-center justify-center font-medium text-[#374151] shrink-0`}
+    >
+      {initials}
+    </div>
+  )
+}
+
+function FilterPill({ label, active, onClick }: { label: string; active: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`shrink-0 px-3 py-1 rounded-full text-[12px] font-medium transition-all duration-150 ease-out ${
+        active
+          ? 'bg-[#1B4FD8] text-white'
+          : 'bg-white border border-[#E5E7EB] text-[#374151] hover:border-[#D1D5DB]'
+      }`}
+    >
+      {label}
+    </button>
+  )
+}
+
+function Th({ children, align }: { children: string; align?: 'right' }) {
+  return (
+    <th
+      className={`px-4 py-2.5 text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase text-left ${
+        align === 'right' ? 'text-right' : ''
+      }`}
+    >
+      {children}
+    </th>
+  )
+}
+
+function getInitials(name: string): string {
+  const words = name.trim().split(/\s+/)
+  if (words.length >= 2) {
+    return (words[0][0] + words[1][0]).toUpperCase()
+  }
+  const s = name.trim()
+  return (s[0].toUpperCase() + (s[1] ?? '')).slice(0, 2)
+}
+
+function intervalLabel(interval: string, count: number): string {
+  if (interval === 'month' && count === 1) return 'Månadsvis'
+  if (interval === 'month' && count === 3) return 'Kvartalsvis'
+  if (interval === 'year' && count === 1) return 'Årsvis'
+  return `Var ${count} ${interval === 'month' ? 'mån' : 'år'}`
+}
+
+function formatRenewalDate(date: Date): string {
+  return new Intl.DateTimeFormat('sv-SE', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).format(date)
+}
+
+function formatRenewalShort(date: Date): string {
+  return new Intl.DateTimeFormat('sv-SE', {
+    day: 'numeric',
+    month: 'short',
+  }).format(date)
+}

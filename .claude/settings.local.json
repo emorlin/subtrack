@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Add-Type -AssemblyName System.IO.Compression.FileSystem; $zip = [System.IO.Compression.ZipFile]::OpenRead\\(\"c:\\\\Users\\\\emorl\\\\Projekt\\\\SubTrack\\\\files.zip\"\\); $zip.Entries | Select-Object FullName, Length; $zip.Dispose\\(\\))",
+      "PowerShell(Get-ChildItem -Recurse \"c:\\\\Users\\\\emorl\\\\Projekt\\\\SubTrack\\\\zip_preview\" | ForEach-Object { $_.FullName })",
+      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\emorl\\\\Projekt\\\\subtrack_temp\" | ForEach-Object { $_.Name })",
+      "PowerShell(Get-ChildItem \"c:\\\\Users\\\\emorl\\\\Projekt\\\\subtrack_temp\" -Force | Where-Object { $_.Name -notin @\\('CLAUDE.md','PROMPT.md','files.zip'\\) } | ForEach-Object { Move-Item $_.FullName \"c:\\\\Users\\\\emorl\\\\Projekt\\\\SubTrack\\\\\" -Force }; Remove-Item \"c:\\\\Users\\\\emorl\\\\Projekt\\\\subtrack_temp\" -Recurse -Force)",
+      "PowerShell(Get-ChildItem -Recurse \"c:\\\\Users\\\\emorl\\\\Projekt\\\\SubTrack\\\\screens\" | ForEach-Object { $_.FullName })"
+    ]
+  }
+}
