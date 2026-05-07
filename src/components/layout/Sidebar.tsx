@@ -1,20 +1,21 @@
 import { NavLink } from 'react-router-dom'
+import { IconHome, IconCost, IconBell, IconSettings } from './NavIcons'
 
 const navItems = [
-  { label: 'Översikt', to: '/' },
-  { label: 'Kostnad', to: '/cost' },
-  { label: 'Notiser', to: '/notifications' },
-  { label: 'Inställningar', to: '/settings' },
+  { label: 'Översikt', to: '/', icon: IconHome },
+  { label: 'Kostnad', to: '/cost', icon: IconCost },
+  { label: 'Notiser', to: '/notifications', icon: IconBell },
+  { label: 'Inställningar', to: '/settings', icon: IconSettings },
 ]
 
 export default function Sidebar() {
   return (
     <nav className="pt-2">
-      {navItems.map((item) => (
+      {navItems.map(({ label, to, icon: Icon }) => (
         <NavLink
-          key={item.to}
-          to={item.to}
-          end={item.to === '/'}
+          key={to}
+          to={to}
+          end={to === '/'}
           className={({ isActive }) =>
             isActive
               ? 'flex items-center gap-2.5 px-4 py-2 text-[12px] font-medium text-[#1B4FD8] bg-[#EFF6FF] border-r-2 border-[#1B4FD8] transition-all duration-150 ease-out'
@@ -23,25 +24,12 @@ export default function Sidebar() {
         >
           {({ isActive }) => (
             <>
-              <NavSquare active={isActive} />
-              {item.label}
+              <Icon active={isActive} />
+              {label}
             </>
           )}
         </NavLink>
       ))}
     </nav>
-  )
-}
-
-function NavSquare({ active }: { active: boolean }) {
-  return (
-    <span
-      className="inline-block shrink-0"
-      style={{
-        width: 8,
-        height: 8,
-        backgroundColor: active ? '#1B4FD8' : '#D1D5DB',
-      }}
-    />
   )
 }
