@@ -1,0 +1,18 @@
+{
+  "name": "Subtrack",
+  "short_name": "Subtrack",
+  "description": "Håll koll på dina abonnemang",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F9FAFB",
+  "theme_color": "#1B4FD8",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

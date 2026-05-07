@@ -1,37 +1,28 @@
-import { useEffect } from 'react'
+import { useState } from 'react'
 import { useLayout } from '../components/layout/AppLayout'
 import SubscriptionList from '../components/subscriptions/SubscriptionList'
 import AddSubscriptionModal from '../components/subscriptions/AddSubscriptionModal'
 import SubscriptionDetail from '../components/subscriptions/SubscriptionDetail'
 import { useSubscriptions } from '../hooks/useSubscriptions'
 import { toMonthlyAmount, getEffectiveCurrentAmount } from '../lib/calculations'
-import { useState } from 'react'
 
 type ModalState =
   | { type: 'none' }
   | { type: 'detail'; subscriptionId: string }
-  | { type: 'add' }
   | { type: 'edit'; subscriptionId: string }
 
 export default function Dashboard() {
-  const { setAction, setMobileAddButton } = useLayout()
+  const { openAdd } = useLayout()
   const { data: subscriptions = [] } = useSubscriptions()
   const [modal, setModal] = useState<ModalState>({ type: 'none' })
 
   const close = () => setModal({ type: 'none' })
 
-  const selectedId =
-    modal.type === 'detail' ? modal.subscriptionId : null
+  const selectedId = modal.type === 'detail' ? modal.subscriptionId : null
 
   const detailSub = modal.type === 'detail' || modal.type === 'edit'
     ? subscriptions.find((s) => s.id === modal.subscriptionId) ?? null
     : null
-
-  useEffect(() => {
-    setAction(<AddButton onClick={() => setModal({ type: 'add' })} />)
-    setMobileAddButton(<MobileAddButton onClick={() => setModal({ type: 'add' })} />)
-    return () => { setAction(null); setMobileAddButton(null) }
-  }, [])
 
   const active = subscriptions.filter((s) => s.status === 'active')
   const cancelled = subscriptions.filter((s) => s.status === 'cancelled')
@@ -52,7 +43,7 @@ export default function Dashboard() {
       <SubscriptionList
         selectedId={selectedId}
         onSelect={(sub) => setModal({ type: 'detail', subscriptionId: sub.id })}
-        onAdd={() => setModal({ type: 'add' })}
+        onAdd={openAdd}
       />
 
       {modal.type === 'detail' && detailSub && (
@@ -62,10 +53,6 @@ export default function Dashboard() {
           onEdit={() => setModal({ type: 'edit', subscriptionId: detailSub.id })}
           onDeleted={close}
         />
-      )}
-
-      {modal.type === 'add' && (
-        <AddSubscriptionModal onClose={close} />
       )}
 
       {modal.type === 'edit' && detailSub && (
@@ -83,29 +70,5 @@ function MetricCard({ label, value, accent }: { label: string; value: string; ac
         {value}
       </p>
     </div>
-  )
-}
-
-function AddButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="bg-[#1B4FD8] text-white rounded-[6px] px-4 py-2 text-[13px] font-medium transition-all duration-150 ease-out hover:bg-[#1a46c2]"
-    >
-      + Lägg till
-    </button>
-  )
-}
-
-function MobileAddButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="w-full bg-[#1B4FD8] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out"
-    >
-      + Lägg till abonnemang
-    </button>
   )
 }
