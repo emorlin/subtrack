@@ -27,6 +27,13 @@ const C = {
 // GitHub     day 20 → renews in ~13 days (BLUE)
 // iCloud     day 25 → renews in ~18 days (BLUE)
 // MS365      yearly March 15 → last renewed ~53 days ago (history)
+//
+// Monthly total progression (current year) — creates visible bar chart variation:
+// Jan:  Netflix 189 + Spotify 119 + Adobe 634 + iCloud 12 + GitHub 99 + MS365 ~96 ≈ 1 149 kr
+// Feb:  Netflix 219 (+30)                                                          ≈ 1 179 kr
+// Mar:  Spotify 135 (+16)                                                          ≈ 1 195 kr
+// Apr:  Adobe   699 (+65)                                                          ≈ 1 260 kr
+// May+: unchanged                                                                  ≈ 1 260 kr
 export const DEMO_SUBSCRIPTIONS: Subscription[] = [
   {
     id: 'd2sub0000-0000-0000-0000-000000000001',
@@ -50,6 +57,7 @@ export const DEMO_SUBSCRIPTIONS: Subscription[] = [
       { id: 'd3ph00000-0000-0000-0000-000000000001', subscription_id: 'd2sub0000-0000-0000-0000-000000000001', amount: 99,  interval: 'month', effective_from: '2021-01-09', created_at: '2021-01-09T00:00:00Z' },
       { id: 'd3ph00000-0000-0000-0000-000000000002', subscription_id: 'd2sub0000-0000-0000-0000-000000000001', amount: 139, interval: 'month', effective_from: '2022-04-01', created_at: '2022-04-01T00:00:00Z' },
       { id: 'd3ph00000-0000-0000-0000-000000000003', subscription_id: 'd2sub0000-0000-0000-0000-000000000001', amount: 189, interval: 'month', effective_from: '2023-10-01', created_at: '2023-10-01T00:00:00Z' },
+      { id: 'd3ph00000-0000-0000-0000-000000000006', subscription_id: 'd2sub0000-0000-0000-0000-000000000001', amount: 219, interval: 'month', effective_from: '2026-02-01', created_at: '2026-02-01T00:00:00Z' },
     ],
   },
   {
@@ -73,6 +81,7 @@ export const DEMO_SUBSCRIPTIONS: Subscription[] = [
     price_history: [
       { id: 'd3ph00000-0000-0000-0000-000000000004', subscription_id: 'd2sub0000-0000-0000-0000-000000000002', amount: 99,  interval: 'month', effective_from: '2019-06-20', created_at: '2019-06-20T00:00:00Z' },
       { id: 'd3ph00000-0000-0000-0000-000000000005', subscription_id: 'd2sub0000-0000-0000-0000-000000000002', amount: 119, interval: 'month', effective_from: '2023-07-01', created_at: '2023-07-01T00:00:00Z' },
+      { id: 'd3ph00000-0000-0000-0000-000000000007', subscription_id: 'd2sub0000-0000-0000-0000-000000000002', amount: 135, interval: 'month', effective_from: '2026-03-01', created_at: '2026-03-01T00:00:00Z' },
     ],
   },
   {
@@ -92,8 +101,10 @@ export const DEMO_SUBSCRIPTIONS: Subscription[] = [
     notes: 'Alla appar-plan',
     reminder_days_before: 7,
     created_at: '2022-09-12T00:00:00Z',
-    updated_at: '2022-09-12T00:00:00Z',
-    price_history: [],
+    updated_at: '2026-04-01T00:00:00Z',
+    price_history: [
+      { id: 'd3ph00000-0000-0000-0000-000000000008', subscription_id: 'd2sub0000-0000-0000-0000-000000000003', amount: 699, interval: 'month', effective_from: '2026-04-01', created_at: '2026-04-01T00:00:00Z' },
+    ],
   },
   {
     id: 'd2sub0000-0000-0000-0000-000000000004',
