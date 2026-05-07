@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import type { Subscription } from '../../types'
-import { calculateTotalPaid, getNextRenewalDate } from '../../lib/calculations'
+import { calculateTotalPaid, getNextRenewalDate, getEffectiveCurrentAmount } from '../../lib/calculations'
 import { formatDate, daysUntil } from '../../lib/dates'
 import {
   useDeleteSubscription,
   useCancelSubscription,
   useReactivateSubscription,
+  useAddPriceHistory,
+  useDeletePriceHistory,
 } from '../../hooks/useSubscriptions'
 
 interface Props {
@@ -53,6 +55,7 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
   const days = daysUntil(renewal)
   const isUrgent = !isCancelled && days <= subscription.reminder_days_before
   const totalPaid = calculateTotalPaid(subscription)
+  const effectiveAmount = getEffectiveCurrentAmount(subscription)
 
   async function handleDelete() {
     try {
@@ -200,6 +203,7 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
 
           {isUrgent && <RenewalWarning days={days} amount={subscription.amount} date={renewal} />}
           <DetailRows subscription={subscription} totalPaid={totalPaid} renewal={renewal} />
+          <PriceHistorySection subscription={subscription} />
           {subscription.notes && <Notes text={subscription.notes} />}
           {actionPanel}
         </div>
@@ -269,8 +273,9 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
 
           {/* Body */}
           <div className="p-5 space-y-4">
-            {isUrgent && <RenewalWarning days={days} amount={subscription.amount} date={renewal} />}
-            <DetailRows subscription={subscription} totalPaid={totalPaid} renewal={renewal} />
+            {isUrgent && <RenewalWarning days={days} amount={effectiveAmount} date={renewal} />}
+            <DetailRows subscription={subscription} totalPaid={totalPaid} renewal={renewal} effectiveAmount={effectiveAmount} />
+            <PriceHistorySection subscription={subscription} />
             {subscription.notes && <Notes text={subscription.notes} />}
             {actionPanel}
           </div>
@@ -303,15 +308,16 @@ function RenewalWarning({ days, amount, date }: { days: number; amount: number; 
   )
 }
 
-function DetailRows({ subscription, totalPaid, renewal }: {
+function DetailRows({ subscription, totalPaid, renewal, effectiveAmount }: {
   subscription: Subscription
   totalPaid: number
   renewal: Date
+  effectiveAmount: number
 }) {
   const intervalShort: Record<string, string> = { month: 'mån', quarter: 'kv', year: 'år' }
   const isCancelled = subscription.status === 'cancelled'
   const rows = [
-    { label: 'Kostnad', value: `${subscription.amount} kr / ${intervalShort[subscription.interval] ?? subscription.interval}` },
+    { label: 'Kostnad', value: `${effectiveAmount} kr / ${intervalShort[subscription.interval] ?? subscription.interval}` },
     { label: 'Startdatum', value: formatDate(subscription.start_date) },
     ...(!isCancelled ? [{ label: 'Nästa förnyelse', value: formatDate(renewal) }] : []),
     ...(subscription.end_date ? [{ label: isCancelled ? 'Avslutades' : 'Bindningstid t.o.m.', value: formatDate(subscription.end_date) }] : []),
@@ -334,6 +340,116 @@ function Notes({ text }: { text: string }) {
   return (
     <div className="border-l-2 border-[#1B4FD8] pl-3">
       <p className="text-[13px] text-[#374151] leading-relaxed">{text}</p>
+    </div>
+  )
+}
+
+function PriceHistorySection({ subscription }: { subscription: Subscription }) {
+  const [amount, setAmount] = useState('')
+  const [date, setDate] = useState('')
+  const [formError, setFormError] = useState<string | null>(null)
+
+  const addEntry = useAddPriceHistory()
+  const deleteEntry = useDeletePriceHistory()
+
+  const history = [...(subscription.price_history ?? [])].sort(
+    (a, b) => new Date(a.effective_from).getTime() - new Date(b.effective_from).getTime()
+  )
+
+  // Show the subscription's starting price as an implicit baseline entry
+  // when no price_history entry covers the start date or earlier
+  const showBaseline =
+    history.length === 0 ||
+    new Date(history[0].effective_from) > new Date(subscription.start_date)
+
+  function handleAdd() {
+    setFormError(null)
+    if (!amount || !date) return
+    const duplicate = history.some((h) => h.effective_from === date)
+    if (duplicate || (showBaseline && date === subscription.start_date)) {
+      setFormError('Det finns redan en post för det datumet')
+      return
+    }
+    addEntry.mutate(
+      { subscription_id: subscription.id, amount: Number(amount), interval: subscription.interval, effective_from: date },
+      {
+        onSuccess: () => { setAmount(''); setDate('') },
+        onError: (err) => setFormError(err instanceof Error ? err.message : 'Något gick fel'),
+      }
+    )
+  }
+
+  return (
+    <div className="space-y-2">
+      <p className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase">Prishistorik</p>
+
+      {(showBaseline || history.length > 0) && (
+        <div className="border border-[#E5E7EB] rounded-[8px] overflow-hidden divide-y divide-[#E5E7EB]">
+          {showBaseline && (
+            <div className="flex items-center justify-between px-3 py-2 bg-[#F9FAFB]">
+              <span className="text-[12px] text-[#9CA3AF]">
+                {new Date(subscription.start_date).toLocaleDateString('sv-SE', {
+                  day: 'numeric', month: 'short', year: 'numeric',
+                })}
+                {' '}(start)
+              </span>
+              <span className="text-[13px] font-medium text-[#9CA3AF]">
+                {subscription.amount} kr
+              </span>
+            </div>
+          )}
+          {history.map((entry) => (
+            <div key={entry.id} className="flex items-center justify-between px-3 py-2">
+              <span className="text-[12px] text-[#6B7280]">
+                {new Date(entry.effective_from).toLocaleDateString('sv-SE', {
+                  day: 'numeric', month: 'short', year: 'numeric',
+                })}
+              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-[13px] font-medium text-[#111827]">
+                  {entry.amount} kr
+                </span>
+                <button
+                  type="button"
+                  onClick={() => deleteEntry.mutate(entry.id)}
+                  disabled={deleteEntry.isPending}
+                  className="text-[#D1D5DB] hover:text-[#B91C1C] transition-colors text-[12px] leading-none"
+                  aria-label="Ta bort"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Add form */}
+      <div className="flex gap-2">
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => { setDate(e.target.value); setFormError(null) }}
+          className="flex-1 border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-1.5 text-[12px] text-[#111827] outline-none bg-white transition-all duration-150"
+        />
+        <input
+          type="number"
+          value={amount}
+          onChange={(e) => { setAmount(e.target.value); setFormError(null) }}
+          placeholder="kr"
+          min="0"
+          className="w-20 border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-1.5 text-[12px] text-[#111827] outline-none bg-white transition-all duration-150"
+        />
+        <button
+          type="button"
+          onClick={handleAdd}
+          disabled={!amount || !date || addEntry.isPending}
+          className="bg-[#1B4FD8] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium disabled:opacity-40 transition-all duration-150 ease-out whitespace-nowrap"
+        >
+          {addEntry.isPending ? '…' : '+ Lägg till'}
+        </button>
+      </div>
+      {formError && <p className="text-[11px] text-[#B91C1C]">{formError}</p>}
     </div>
   )
 }

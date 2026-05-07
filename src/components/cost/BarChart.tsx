@@ -14,6 +14,7 @@ export interface MonthBar {
 interface BarChartProps {
   bars: MonthBar[]
   onHover?: (bar: MonthBar | null) => void
+  chartHeight?: number
 }
 
 export function isActiveInMonth(sub: Subscription, year: number, month: number): boolean {
@@ -79,10 +80,9 @@ export function buildMonthBars(subscriptions: Subscription[], year: number): Mon
   })
 }
 
-export default function BarChart({ bars, onHover }: BarChartProps) {
+export default function BarChart({ bars, onHover, chartHeight = 80 }: BarChartProps) {
   const [hoveredMonth, setHoveredMonth] = useState<number | null>(null)
   const max = Math.max(...bars.map((b) => b.amount), 1)
-  const chartHeight = 80
 
   function handleEnter(bar: MonthBar) {
     setHoveredMonth(bar.month)

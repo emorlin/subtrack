@@ -45,25 +45,40 @@ function calculateFromPriceHistory(
     return periods * currentAmount
   }
 
-  const sorted = [...priceHistory].sort(
-    (a, b) => new Date(a.effective_from).getTime() - new Date(b.effective_from).getTime()
-  )
+  // Only consider entries that have already taken effect
+  const sorted = [...priceHistory]
+    .filter((ph) => new Date(ph.effective_from) <= today)
+    .sort((a, b) => new Date(a.effective_from).getTime() - new Date(b.effective_from).getTime())
 
-  let total = 0
-  let cursor = start
-
-  for (let i = 0; i < sorted.length; i++) {
-    const periodEnd = new Date(sorted[i].effective_from)
-    if (periodEnd > today) break
-    if (periodEnd > cursor) {
-      const periods = calculatePeriodsBetween(cursor, periodEnd, interval, intervalCount)
-      total += periods * sorted[i].amount
-      cursor = periodEnd
-    }
+  if (sorted.length === 0) {
+    const periods = calculatePeriodsBetween(start, today, interval, intervalCount)
+    return periods * currentAmount
   }
 
-  const periods = calculatePeriodsBetween(cursor, today, interval, intervalCount)
-  total += periods * currentAmount
+  let total = 0
+
+  // Period before the first price change: use currentAmount (the baseline/original price)
+  const firstChangeDate = new Date(sorted[0].effective_from)
+  if (firstChangeDate > start) {
+    const periods = calculatePeriodsBetween(start, firstChangeDate, interval, intervalCount)
+    total += periods * currentAmount
+  }
+
+  // Each price history period: from effective_from until the next entry (or today)
+  for (let i = 0; i < sorted.length; i++) {
+    const periodStart = new Date(sorted[i].effective_from) < start
+      ? start
+      : new Date(sorted[i].effective_from)
+    const periodEnd = i + 1 < sorted.length
+      ? new Date(sorted[i + 1].effective_from)
+      : today
+    const clampedEnd = periodEnd > today ? today : periodEnd
+
+    if (periodStart >= clampedEnd) continue
+
+    const periods = calculatePeriodsBetween(periodStart, clampedEnd, interval, intervalCount)
+    total += periods * sorted[i].amount
+  }
 
   return total
 }
@@ -100,6 +115,18 @@ export function calculateTotalPaid(subscription: Subscription): number {
     interval,
     interval_count
   )
+}
+
+export function getEffectiveCurrentAmount(subscription: Subscription): number {
+  if (!subscription.price_history || subscription.price_history.length === 0) {
+    return subscription.amount
+  }
+  const today = new Date()
+  const sorted = [...subscription.price_history].sort(
+    (a, b) => new Date(b.effective_from).getTime() - new Date(a.effective_from).getTime()
+  )
+  const latest = sorted.find((ph) => new Date(ph.effective_from) <= today)
+  return latest ? latest.amount : subscription.amount
 }
 
 export function toYearlyAmount(

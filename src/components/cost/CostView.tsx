@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import BarChart, { buildMonthBars, isActiveInMonth } from './BarChart'
 import type { MonthBar } from './BarChart'
 import CategoryBreakdown from './CategoryBreakdown'
@@ -16,6 +16,14 @@ export default function CostView() {
   const { data: subscriptions = [] } = useSubscriptions()
   const { data: categories = [] } = useCategories()
   const [hoveredBar, setHoveredBar] = useState<MonthBar | null>(null)
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia('(min-width: 768px)').matches)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)')
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
 
   const now = new Date()
   const currentMonth = now.getMonth()     // 0-indexed
@@ -121,7 +129,7 @@ export default function CostView() {
                 </button>
               </div>
             </div>
-            <BarChart bars={bars} onHover={setHoveredBar} />
+            <BarChart bars={bars} onHover={setHoveredBar} chartHeight={isDesktop ? 240 : 80} />
           </div>
 
           {/* Divider (desktop) */}

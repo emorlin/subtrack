@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Subscription } from '../../types'
 import { useSubscriptions } from '../../hooks/useSubscriptions'
 import { useCategories } from '../../hooks/useCategories'
-import { getNextRenewalDate } from '../../lib/calculations'
+import { getNextRenewalDate, getEffectiveCurrentAmount } from '../../lib/calculations'
 import { daysUntil } from '../../lib/dates'
 
 interface SubscriptionListProps {
@@ -199,7 +199,7 @@ function DesktopRow({
 
       {/* Kostnad */}
       <td className="px-4 py-3 text-right text-[13px] font-semibold text-[#111827] whitespace-nowrap overflow-hidden">
-        {sub.amount} kr
+        {getEffectiveCurrentAmount(sub)} kr
       </td>
 
       {/* Intervall */}
@@ -273,7 +273,7 @@ function MobileRow({
       </div>
 
       <div className="text-right shrink-0">
-        <p className="text-[14px] font-semibold text-[#111827]">{sub.amount} kr</p>
+        <p className="text-[14px] font-semibold text-[#111827]">{getEffectiveCurrentAmount(sub)} kr</p>
         <p className="text-[11px] text-[#6B7280]">{formatRenewalShort(renewal)}</p>
       </div>
     </div>

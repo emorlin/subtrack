@@ -5,14 +5,13 @@ import AddSubscriptionModal from '../components/subscriptions/AddSubscriptionMod
 import SubscriptionDetail from '../components/subscriptions/SubscriptionDetail'
 import { useSubscriptions } from '../hooks/useSubscriptions'
 import { toMonthlyAmount } from '../lib/calculations'
-import type { Subscription } from '../types'
 import { useState } from 'react'
 
 type ModalState =
   | { type: 'none' }
-  | { type: 'detail'; subscription: Subscription }
+  | { type: 'detail'; subscriptionId: string }
   | { type: 'add' }
-  | { type: 'edit'; subscription: Subscription }
+  | { type: 'edit'; subscriptionId: string }
 
 export default function Dashboard() {
   const { setAction, setMobileAddButton } = useLayout()
@@ -22,7 +21,11 @@ export default function Dashboard() {
   const close = () => setModal({ type: 'none' })
 
   const selectedId =
-    modal.type === 'detail' ? modal.subscription.id : null
+    modal.type === 'detail' ? modal.subscriptionId : null
+
+  const detailSub = modal.type === 'detail' || modal.type === 'edit'
+    ? subscriptions.find((s) => s.id === modal.subscriptionId) ?? null
+    : null
 
   useEffect(() => {
     setAction(<AddButton onClick={() => setModal({ type: 'add' })} />)
@@ -48,15 +51,15 @@ export default function Dashboard() {
 
       <SubscriptionList
         selectedId={selectedId}
-        onSelect={(sub) => setModal({ type: 'detail', subscription: sub })}
+        onSelect={(sub) => setModal({ type: 'detail', subscriptionId: sub.id })}
         onAdd={() => setModal({ type: 'add' })}
       />
 
-      {modal.type === 'detail' && (
+      {modal.type === 'detail' && detailSub && (
         <SubscriptionDetail
-          subscription={modal.subscription}
+          subscription={detailSub}
           onClose={close}
-          onEdit={() => setModal({ type: 'edit', subscription: modal.subscription })}
+          onEdit={() => setModal({ type: 'edit', subscriptionId: detailSub.id })}
           onDeleted={close}
         />
       )}
@@ -65,8 +68,8 @@ export default function Dashboard() {
         <AddSubscriptionModal onClose={close} />
       )}
 
-      {modal.type === 'edit' && (
-        <AddSubscriptionModal subscription={modal.subscription} onClose={close} />
+      {modal.type === 'edit' && detailSub && (
+        <AddSubscriptionModal subscription={detailSub} onClose={close} />
       )}
     </div>
   )
