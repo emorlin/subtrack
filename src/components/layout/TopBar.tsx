@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { Wallet } from 'lucide-react'
 
@@ -47,14 +47,17 @@ function Avatar({ user, size }: { user: ReturnType<typeof useAuth>['user']; size
   const avatarUrl = user?.user_metadata?.avatar_url as string | undefined
   const name = user?.user_metadata?.full_name ?? user?.email ?? '?'
   const initial = name.charAt(0).toUpperCase()
+  const [imgFailed, setImgFailed] = useState(false)
 
-  if (avatarUrl) {
+  if (avatarUrl && !imgFailed) {
     return (
       <img
         src={avatarUrl}
         alt={name}
         width={size}
         height={size}
+        referrerPolicy="no-referrer"
+        onError={() => setImgFailed(true)}
         className="rounded-full object-cover shrink-0"
         style={{ width: size, height: size }}
       />
