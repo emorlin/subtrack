@@ -36,7 +36,7 @@ export function isActiveInMonth(sub: Subscription, year: number, month: number):
   return true
 }
 
-function getAmountForMonth(sub: Subscription, year: number, month: number): number {
+export function getAmountForMonth(sub: Subscription, year: number, month: number): number {
   const monthEnd = new Date(year, month, 0) // last day of month
 
   if (!sub.price_history || sub.price_history.length === 0) {

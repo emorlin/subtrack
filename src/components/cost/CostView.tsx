@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
-import BarChart, { buildMonthBars, isActiveInMonth } from './BarChart'
+import BarChart, { buildMonthBars, isActiveInMonth, getAmountForMonth } from './BarChart'
 import type { MonthBar } from './BarChart'
 import CategoryBreakdown from './CategoryBreakdown'
 import { useSubscriptions } from '../../hooks/useSubscriptions'
 import { useCategories } from '../../hooks/useCategories'
-import { toMonthlyAmount } from '../../lib/calculations'
+import { toMonthlyAmount, getEffectiveCurrentAmount } from '../../lib/calculations'
 
 const MONTH_LABELS = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec']
 
@@ -58,8 +58,8 @@ export default function CostView() {
   const mostExpensive = activeNow.reduce<typeof activeNow[0] | null>(
     (top, s) =>
       !top ||
-      toMonthlyAmount(s.amount, s.interval, s.interval_count) >
-        toMonthlyAmount(top.amount, top.interval, top.interval_count)
+      toMonthlyAmount(getEffectiveCurrentAmount(s), s.interval, s.interval_count) >
+        toMonthlyAmount(getEffectiveCurrentAmount(top), top.interval, top.interval_count)
         ? s
         : top,
     null
@@ -81,7 +81,7 @@ export default function CostView() {
       color_hex: cat.color_hex,
       amount: subsInDisplayMonth
         .filter((s) => s.category_id === cat.id)
-        .reduce((sum, s) => sum + toMonthlyAmount(s.amount, s.interval, s.interval_count), 0),
+        .reduce((sum, s) => sum + toMonthlyAmount(getAmountForMonth(s, selectedYear, displayBar.month), s.interval, s.interval_count), 0),
     }))
     .filter((r) => r.amount > 0)
     .sort((a, b) => b.amount - a.amount)

@@ -1,6 +1,7 @@
 import { useNotifications } from '../../hooks/useNotifications'
 import type { UpcomingRenewal, PastRenewal } from '../../hooks/useNotifications'
 import type { SubscriptionInterval } from '../../types'
+import { getEffectiveCurrentAmount } from '../../lib/calculations'
 
 const MONTH_LABELS = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec']
 
@@ -45,7 +46,7 @@ function UpcomingItem({ item }: { item: UpcomingRenewal }) {
         {formatDaysUntil(daysUntil)}
       </span>
       <span className="text-[12px] font-medium text-[#374151] tabular-nums shrink-0 w-24 text-right">
-        {s.amount.toLocaleString('sv-SE')} kr{formatInterval(s.interval, s.interval_count)}
+        {getEffectiveCurrentAmount(s).toLocaleString('sv-SE')} kr{formatInterval(s.interval, s.interval_count)}
       </span>
     </div>
   )
@@ -61,7 +62,7 @@ function HistoryItem({ item }: { item: PastRenewal }) {
         {formatPastDate(prevDate)}
       </span>
       <span className="text-[12px] text-[#9CA3AF] tabular-nums shrink-0 w-24 text-right">
-        {s.amount.toLocaleString('sv-SE')} kr{formatInterval(s.interval, s.interval_count)}
+        {getEffectiveCurrentAmount(s).toLocaleString('sv-SE')} kr{formatInterval(s.interval, s.interval_count)}
       </span>
     </div>
   )

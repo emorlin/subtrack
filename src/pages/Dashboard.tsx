@@ -4,7 +4,7 @@ import SubscriptionList from '../components/subscriptions/SubscriptionList'
 import AddSubscriptionModal from '../components/subscriptions/AddSubscriptionModal'
 import SubscriptionDetail from '../components/subscriptions/SubscriptionDetail'
 import { useSubscriptions } from '../hooks/useSubscriptions'
-import { toMonthlyAmount } from '../lib/calculations'
+import { toMonthlyAmount, getEffectiveCurrentAmount } from '../lib/calculations'
 import { useState } from 'react'
 
 type ModalState =
@@ -36,7 +36,7 @@ export default function Dashboard() {
   const active = subscriptions.filter((s) => s.status === 'active')
   const cancelled = subscriptions.filter((s) => s.status === 'cancelled')
   const monthlyTotal = active.reduce(
-    (sum, s) => sum + toMonthlyAmount(s.amount, s.interval, s.interval_count),
+    (sum, s) => sum + toMonthlyAmount(getEffectiveCurrentAmount(s), s.interval, s.interval_count),
     0
   )
 
