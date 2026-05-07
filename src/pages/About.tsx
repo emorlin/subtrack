@@ -297,7 +297,6 @@ export default function About() {
         <div className="mt-4 space-y-3">
           <div className="bg-[#F9FAFB] rounded-[10px] border border-[#E5E7EB] p-4 space-y-2">
             <DeployRow label="Hosting" value="Vercel — statisk SPA-deploy med edge-nätverk" />
-            <DeployRow label="URL" value="emorlin-subtrack.vercel.app" />
             <DeployRow label="Deploy-trigger" value="Push till main-branch (Git-integration)" />
             <DeployRow label="Routing" value="vercel.json rewriter: alla sökvägar → index.html" />
             <DeployRow label="Miljövariabler" value="VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY i Vercel dashboard" />
