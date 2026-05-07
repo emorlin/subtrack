@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Claude Code
+.claude/
+
+# Project files not needed in repo
+files.zip
+screens/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
