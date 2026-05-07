@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react'
 import type { Subscription } from '../../types'
 import { calculateTotalPaid, getNextRenewalDate } from '../../lib/calculations'
 import { formatDate, daysUntil } from '../../lib/dates'
-import { useDeleteSubscription } from '../../hooks/useSubscriptions'
+import {
+  useDeleteSubscription,
+  useCancelSubscription,
+  useReactivateSubscription,
+} from '../../hooks/useSubscriptions'
 
 interface Props {
   subscription: Subscription
@@ -11,31 +15,126 @@ interface Props {
   onDeleted: () => void
 }
 
+type ActionState = 'none' | 'cancel' | 'delete'
+
+const STATUS_BADGE: Record<string, { label: string; className: string }> = {
+  active:    { label: 'Aktiv',     className: 'bg-[#F0FDF4] text-[#166534]' },
+  paused:    { label: 'Pausad',    className: 'bg-[#FFFBEB] text-[#92400E]' },
+  cancelled: { label: 'Avslutad', className: 'bg-[#F3F4F6] text-[#6B7280]' },
+}
+
+function todayString() {
+  return new Date().toISOString().split('T')[0]
+}
+
 export default function SubscriptionDetail({ subscription, onClose, onEdit, onDeleted }: Props) {
-  const [deleteConfirm, setDeleteConfirm] = useState(false)
+  const [actionState, setActionState] = useState<ActionState>('none')
+  const [cancelDate, setCancelDate] = useState(todayString)
+
+  const { mutateAsync: deleteSub, isPending: isDeleting } = useDeleteSubscription()
+  const { mutateAsync: cancelSub, isPending: isCancelling } = useCancelSubscription()
+  const { mutateAsync: reactivateSub, isPending: isReactivating } = useReactivateSubscription()
+
+  const isCancelled = subscription.status === 'cancelled'
+  const badge = STATUS_BADGE[subscription.status] ?? STATUS_BADGE.active
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') {
+        if (actionState !== 'none') setActionState('none')
+        else onClose()
+      }
     }
     document.addEventListener('keydown', handleKey)
     return () => document.removeEventListener('keydown', handleKey)
-  }, [onClose])
-  const { mutateAsync: deleteSub, isPending } = useDeleteSubscription()
+  }, [onClose, actionState])
 
   const renewal = getNextRenewalDate(subscription.start_date, subscription.interval, subscription.interval_count)
   const days = daysUntil(renewal)
-  const isUrgent = days <= subscription.reminder_days_before
+  const isUrgent = !isCancelled && days <= subscription.reminder_days_before
   const totalPaid = calculateTotalPaid(subscription)
 
   async function handleDelete() {
     try {
       await deleteSub(subscription.id)
       onDeleted()
-    } catch (_) {
-      // stay open so user sees the failure
-    }
+    } catch (_) {}
   }
+
+  async function handleCancel() {
+    try {
+      await cancelSub({ id: subscription.id, end_date: cancelDate })
+      onClose()
+    } catch (_) {}
+  }
+
+  async function handleReactivate() {
+    try {
+      await reactivateSub(subscription.id)
+      onClose()
+    } catch (_) {}
+  }
+
+  const actionPanel = (
+    <>
+      {actionState === 'cancel' && (
+        <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-[8px] p-4 space-y-3">
+          <p className="text-[13px] font-medium text-[#92400E]">Avsluta {subscription.name}?</p>
+          <p className="text-[12px] text-[#6B7280]">Abonnemanget sparas kvar i historiken.</p>
+          <div className="space-y-1">
+            <label className="block text-[12px] font-medium text-[#374151]">Sista betalningsdag</label>
+            <input
+              type="date"
+              value={cancelDate}
+              onChange={(e) => setCancelDate(e.target.value)}
+              className="w-full border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-2 text-[13px] outline-none bg-white"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleCancel}
+              disabled={isCancelling}
+              className="flex-1 bg-[#92400E] text-white rounded-[6px] py-2 text-[13px] font-medium disabled:opacity-50 transition-all duration-150"
+            >
+              {isCancelling ? 'Avslutar…' : 'Avsluta'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActionState('none')}
+              className="flex-1 bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] py-2 text-[13px] font-medium"
+            >
+              Avbryt
+            </button>
+          </div>
+        </div>
+      )}
+
+      {actionState === 'delete' && (
+        <div className="bg-[#FEF2F2] rounded-[8px] p-4 space-y-3">
+          <p className="text-[13px] text-[#B91C1C] font-medium">Radera {subscription.name} permanent?</p>
+          <p className="text-[12px] text-[#6B7280]">All data och prishistorik tas bort för alltid.</p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="flex-1 bg-[#B91C1C] text-white rounded-[6px] py-2 text-[13px] font-medium disabled:opacity-50 transition-all duration-150"
+            >
+              {isDeleting ? 'Raderar…' : 'Ja, radera'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setActionState('none')}
+              className="flex-1 bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] py-2 text-[13px] font-medium"
+            >
+              Avbryt
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  )
 
   return (
     <>
@@ -45,13 +144,22 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
           <button type="button" onClick={onClose} className="text-[13px] text-[#1B4FD8]">
             ← Tillbaka
           </button>
-          {!deleteConfirm && (
+          {!isCancelled && actionState === 'none' && (
             <button
               type="button"
-              onClick={() => setDeleteConfirm(true)}
+              onClick={() => setActionState('cancel')}
+              className="text-[13px] text-[#92400E]"
+            >
+              Avsluta
+            </button>
+          )}
+          {isCancelled && actionState === 'none' && (
+            <button
+              type="button"
+              onClick={() => setActionState('delete')}
               className="text-[13px] text-[#B91C1C]"
             >
-              Ta bort
+              Radera
             </button>
           )}
         </div>
@@ -62,33 +170,38 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
             <div>
               <div className="flex items-center gap-2">
                 <p className="text-[18px] font-semibold text-[#111827]">{subscription.name}</p>
-                <span className="bg-[#F0FDF4] text-[#166534] text-[10px] font-medium px-1.5 py-0.5 rounded">
-                  Aktiv
+                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${badge.className}`}>
+                  {badge.label}
                 </span>
               </div>
               <p className="text-[13px] text-[#6B7280]">{subscription.category?.name ?? '—'}</p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={onEdit}
-            className="w-full bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] py-2 text-[13px] font-medium hover:bg-[#F9FAFB] transition-all duration-150 ease-out"
-          >
-            Redigera
-          </button>
+          {!isCancelled && (
+            <button
+              type="button"
+              onClick={onEdit}
+              className="w-full bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] py-2 text-[13px] font-medium hover:bg-[#F9FAFB] transition-all duration-150 ease-out"
+            >
+              Redigera
+            </button>
+          )}
+          {isCancelled && (
+            <button
+              type="button"
+              onClick={handleReactivate}
+              disabled={isReactivating}
+              className="w-full bg-[#EFF6FF] text-[#1B4FD8] border border-[#BFDBFE] rounded-[6px] py-2 text-[13px] font-medium disabled:opacity-50 transition-all duration-150 ease-out"
+            >
+              {isReactivating ? 'Återaktiverar…' : 'Återaktivera'}
+            </button>
+          )}
 
           {isUrgent && <RenewalWarning days={days} amount={subscription.amount} date={renewal} />}
           <DetailRows subscription={subscription} totalPaid={totalPaid} renewal={renewal} />
           {subscription.notes && <Notes text={subscription.notes} />}
-          {deleteConfirm && (
-            <DeleteConfirm
-              name={subscription.name}
-              loading={isPending}
-              onConfirm={handleDelete}
-              onCancel={() => setDeleteConfirm(false)}
-            />
-          )}
+          {actionPanel}
         </div>
       </div>
 
@@ -103,25 +216,54 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
             <div className="flex items-center gap-3">
               <ServiceIcon name={subscription.name} size="xl" />
               <div>
-                <p className="text-[16px] font-semibold text-[#111827]">{subscription.name}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-[16px] font-semibold text-[#111827]">{subscription.name}</p>
+                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${badge.className}`}>
+                    {badge.label}
+                  </span>
+                </div>
                 <p className="text-[12px] text-[#6B7280]">{subscription.category?.name ?? '—'}</p>
               </div>
             </div>
+
             <div className="flex gap-2 shrink-0">
-              <button
-                type="button"
-                onClick={onEdit}
-                className="bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] px-3 py-1.5 text-[12px] font-medium hover:bg-[#F9FAFB] transition-all duration-150 ease-out"
-              >
-                Redigera
-              </button>
-              <button
-                type="button"
-                onClick={() => setDeleteConfirm(true)}
-                className="bg-[#FEF2F2] text-[#B91C1C] rounded-[6px] px-3 py-1.5 text-[12px] font-medium hover:opacity-80 transition-all duration-150 ease-out"
-              >
-                Ta bort
-              </button>
+              {!isCancelled && (
+                <>
+                  <button
+                    type="button"
+                    onClick={onEdit}
+                    className="bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] px-3 py-1.5 text-[12px] font-medium hover:bg-[#F9FAFB] transition-all duration-150 ease-out"
+                  >
+                    Redigera
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActionState(actionState === 'cancel' ? 'none' : 'cancel')}
+                    className="bg-[#FFFBEB] text-[#92400E] rounded-[6px] px-3 py-1.5 text-[12px] font-medium hover:opacity-80 transition-all duration-150 ease-out"
+                  >
+                    Avsluta
+                  </button>
+                </>
+              )}
+              {isCancelled && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleReactivate}
+                    disabled={isReactivating}
+                    className="bg-[#EFF6FF] text-[#1B4FD8] border border-[#BFDBFE] rounded-[6px] px-3 py-1.5 text-[12px] font-medium disabled:opacity-50 transition-all duration-150 ease-out"
+                  >
+                    {isReactivating ? 'Återaktiverar…' : 'Återaktivera'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActionState(actionState === 'delete' ? 'none' : 'delete')}
+                    className="bg-[#FEF2F2] text-[#B91C1C] rounded-[6px] px-3 py-1.5 text-[12px] font-medium hover:opacity-80 transition-all duration-150 ease-out"
+                  >
+                    Radera
+                  </button>
+                </>
+              )}
             </div>
           </div>
 
@@ -130,14 +272,7 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
             {isUrgent && <RenewalWarning days={days} amount={subscription.amount} date={renewal} />}
             <DetailRows subscription={subscription} totalPaid={totalPaid} renewal={renewal} />
             {subscription.notes && <Notes text={subscription.notes} />}
-            {deleteConfirm && (
-              <DeleteConfirm
-                name={subscription.name}
-                loading={isPending}
-                onConfirm={handleDelete}
-                onCancel={() => setDeleteConfirm(false)}
-              />
-            )}
+            {actionPanel}
           </div>
         </div>
       </div>
@@ -145,7 +280,7 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
   )
 }
 
-// ── Shared sub-components ────────────────────────────────────
+// ── Sub-components ────────────────────────────────────────────
 
 function ServiceIcon({ name, size }: { name: string; size: 'lg' | 'xl' }) {
   const initials = getInitials(name)
@@ -174,11 +309,12 @@ function DetailRows({ subscription, totalPaid, renewal }: {
   renewal: Date
 }) {
   const intervalShort: Record<string, string> = { month: 'mån', quarter: 'kv', year: 'år' }
+  const isCancelled = subscription.status === 'cancelled'
   const rows = [
     { label: 'Kostnad', value: `${subscription.amount} kr / ${intervalShort[subscription.interval] ?? subscription.interval}` },
     { label: 'Startdatum', value: formatDate(subscription.start_date) },
-    { label: 'Nästa förnyelse', value: formatDate(renewal) },
-    { label: 'Bindningstid', value: subscription.end_date ? formatDate(subscription.end_date) : 'Ingen' },
+    ...(!isCancelled ? [{ label: 'Nästa förnyelse', value: formatDate(renewal) }] : []),
+    ...(subscription.end_date ? [{ label: isCancelled ? 'Avslutades' : 'Bindningstid t.o.m.', value: formatDate(subscription.end_date) }] : []),
     { label: 'Totalt betalt', value: `${Math.round(totalPaid).toLocaleString('sv-SE')} kr` },
     { label: 'Påminnelse', value: `${subscription.reminder_days_before} dagar` },
   ]
@@ -198,37 +334,6 @@ function Notes({ text }: { text: string }) {
   return (
     <div className="border-l-2 border-[#1B4FD8] pl-3">
       <p className="text-[13px] text-[#374151] leading-relaxed">{text}</p>
-    </div>
-  )
-}
-
-function DeleteConfirm({ name, loading, onConfirm, onCancel }: {
-  name: string
-  loading: boolean
-  onConfirm: () => void
-  onCancel: () => void
-}) {
-  return (
-    <div className="bg-[#FEF2F2] rounded-[8px] p-4 space-y-3">
-      <p className="text-[13px] text-[#B91C1C] font-medium">Ta bort {name}?</p>
-      <p className="text-[12px] text-[#6B7280]">Abonnemanget och all prishistorik raderas permanent.</p>
-      <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={onConfirm}
-          disabled={loading}
-          className="flex-1 bg-[#B91C1C] text-white rounded-[6px] py-2 text-[13px] font-medium disabled:opacity-50 transition-all duration-150"
-        >
-          {loading ? 'Raderar…' : 'Ja, ta bort'}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex-1 bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] py-2 text-[13px] font-medium transition-all duration-150"
-        >
-          Avbryt
-        </button>
-      </div>
     </div>
   )
 }

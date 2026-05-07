@@ -15,12 +15,14 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
   const { data: subscriptions = [] } = useSubscriptions()
   const { data: categories = [] } = useCategories()
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null)
+  const [showCancelled, setShowCancelled] = useState(false)
 
   const filtered = activeCategoryId
     ? subscriptions.filter((s) => s.category_id === activeCategoryId)
     : subscriptions
 
   const active = filtered.filter((s) => s.status !== 'cancelled')
+  const cancelled = filtered.filter((s) => s.status === 'cancelled')
 
   return (
     <div className="bg-white rounded-[12px] border border-[#E5E7EB] overflow-hidden">
@@ -53,7 +55,8 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
         {active.length === 0 ? (
           <EmptyState onAdd={onAdd} />
         ) : (
-          <table className="w-full">
+          <table className="w-full table-fixed">
+            <ColGroup />
             <thead>
               <tr className="border-b border-[#E5E7EB]">
                 <Th>Tjänst</Th>
@@ -76,6 +79,35 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
             </tbody>
           </table>
         )}
+
+        {/* Cancelled section — desktop */}
+        {cancelled.length > 0 && (
+          <>
+            <button
+              type="button"
+              onClick={() => setShowCancelled((v) => !v)}
+              className="w-full flex items-center justify-between px-4 py-3 border-t border-[#E5E7EB] text-[12px] text-[#6B7280] hover:bg-[#F9FAFB] transition-colors"
+            >
+              <span>Avslutade ({cancelled.length})</span>
+              <span>{showCancelled ? '▲' : '▼'}</span>
+            </button>
+            {showCancelled && (
+              <table className="w-full table-fixed opacity-50">
+                <ColGroup />
+                <tbody>
+                  {cancelled.map((sub) => (
+                    <DesktopRow
+                      key={sub.id}
+                      sub={sub}
+                      selected={selectedId === sub.id}
+                      onClick={() => onSelect(sub)}
+                    />
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </>
+        )}
       </div>
 
       {/* Mobile list */}
@@ -97,6 +129,32 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
                 onClick={() => onSelect(sub)}
               />
             ))}
+          </>
+        )}
+
+        {/* Cancelled section — mobile */}
+        {cancelled.length > 0 && (
+          <>
+            <button
+              type="button"
+              onClick={() => setShowCancelled((v) => !v)}
+              className="w-full flex items-center justify-between px-4 py-3 border-t border-[#E5E7EB] text-[12px] text-[#6B7280]"
+            >
+              <span>Avslutade ({cancelled.length})</span>
+              <span>{showCancelled ? '▲' : '▼'}</span>
+            </button>
+            {showCancelled && (
+              <div className="opacity-50">
+                {cancelled.map((sub) => (
+                  <MobileRow
+                    key={sub.id}
+                    sub={sub}
+                    selected={selectedId === sub.id}
+                    onClick={() => onSelect(sub)}
+                  />
+                ))}
+              </div>
+            )}
           </>
         )}
       </div>
@@ -127,36 +185,40 @@ function DesktopRow({
       }`}
     >
       {/* Tjänst */}
-      <td className="px-4 py-3">
-        <div className="flex items-center gap-3">
+      <td className="px-4 py-3 overflow-hidden">
+        <div className="flex items-center gap-3 min-w-0">
           <ServiceIcon name={sub.name} />
-          <span className="text-[13px] font-medium text-[#111827]">{sub.name}</span>
+          <span className="text-[13px] font-medium text-[#111827] truncate">{sub.name}</span>
         </div>
       </td>
 
       {/* Kategori */}
-      <td className="px-4 py-3 text-[13px] text-[#6B7280]">
+      <td className="px-4 py-3 text-[13px] text-[#6B7280] truncate overflow-hidden">
         {sub.category?.name ?? '—'}
       </td>
 
       {/* Kostnad */}
-      <td className="px-4 py-3 text-right text-[13px] font-semibold text-[#111827] whitespace-nowrap">
+      <td className="px-4 py-3 text-right text-[13px] font-semibold text-[#111827] whitespace-nowrap overflow-hidden">
         {sub.amount} kr
       </td>
 
       {/* Intervall */}
-      <td className="px-4 py-3 text-[13px] text-[#6B7280]">
+      <td className="px-4 py-3 text-[13px] text-[#6B7280] overflow-hidden">
         {intervalLabel(sub.interval, sub.interval_count)}
       </td>
 
       {/* Förnyelse */}
-      <td className={`px-4 py-3 text-[13px] whitespace-nowrap ${isUrgent ? 'text-[#92400E] font-medium' : 'text-[#6B7280]'}`}>
+      <td className={`px-4 py-3 text-[13px] overflow-hidden ${isUrgent ? 'text-[#92400E] font-medium' : 'text-[#6B7280]'}`}>
         {formatRenewalDate(renewal)}
       </td>
 
       {/* Status */}
-      <td className="px-4 py-3">
-        {isUrgent ? (
+      <td className="px-4 py-3 overflow-hidden">
+        {sub.status === 'cancelled' ? (
+          <span className="bg-[#F3F4F6] text-[#6B7280] text-[10px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap">
+            Avslutad
+          </span>
+        ) : isUrgent ? (
           <span className="bg-[#FFFBEB] text-[#92400E] text-[10px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap">
             {days} dagar
           </span>
@@ -197,7 +259,11 @@ function MobileRow({
       <div className="flex-1 min-w-0">
         <p className="text-[14px] font-medium text-[#111827] truncate">{sub.name}</p>
         <p className="text-[11px] text-[#6B7280]">{sub.category?.name ?? '—'}</p>
-        {isUrgent ? (
+        {sub.status === 'cancelled' ? (
+          <span className="bg-[#F3F4F6] text-[#6B7280] text-[10px] font-medium px-1.5 py-0.5 rounded inline-block mt-0.5">
+            Avslutad
+          </span>
+        ) : isUrgent ? (
           <span className="text-[11px] text-[#92400E] font-medium">{days} dagar kvar</span>
         ) : (
           <span className="bg-[#F0FDF4] text-[#166534] text-[10px] font-medium px-1.5 py-0.5 rounded inline-block mt-0.5">
@@ -241,6 +307,19 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
     >
       {label}
     </button>
+  )
+}
+
+function ColGroup() {
+  return (
+    <colgroup>
+      <col style={{ width: '38%' }} />  {/* Tjänst */}
+      <col style={{ width: '18%' }} />  {/* Kategori */}
+      <col style={{ width: '11%' }} />  {/* Kostnad */}
+      <col style={{ width: '12%' }} />  {/* Intervall */}
+      <col style={{ width: '14%' }} />  {/* Förnyelse */}
+      <col style={{ width: '7%' }}  />  {/* Status */}
+    </colgroup>
   )
 }
 

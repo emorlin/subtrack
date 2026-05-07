@@ -62,3 +62,37 @@ export function useDeleteSubscription() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
   })
 }
+
+export function useCancelSubscription() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, end_date }: { id: string; end_date: string }) => {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .update({ status: 'cancelled', end_date })
+        .eq('id', id)
+        .select('*, category:categories(*)')
+        .single()
+      if (error) throw error
+      return data as Subscription
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+  })
+}
+
+export function useReactivateSubscription() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .update({ status: 'active', end_date: null })
+        .eq('id', id)
+        .select('*, category:categories(*)')
+        .single()
+      if (error) throw error
+      return data as Subscription
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: QUERY_KEY }),
+  })
+}

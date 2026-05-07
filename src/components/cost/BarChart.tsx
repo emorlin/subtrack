@@ -35,6 +35,21 @@ export function isActiveInMonth(sub: Subscription, year: number, month: number):
   return true
 }
 
+function getAmountForMonth(sub: Subscription, year: number, month: number): number {
+  const monthEnd = new Date(year, month, 0) // last day of month
+
+  if (!sub.price_history || sub.price_history.length === 0) {
+    return sub.amount
+  }
+
+  // Find the most recent price_history entry that took effect on or before monthEnd
+  const sorted = [...sub.price_history].sort(
+    (a, b) => new Date(b.effective_from).getTime() - new Date(a.effective_from).getTime()
+  )
+  const applicable = sorted.find((ph) => new Date(ph.effective_from) <= monthEnd)
+  return applicable ? applicable.amount : sub.amount
+}
+
 export function buildMonthBars(subscriptions: Subscription[], year: number): MonthBar[] {
   const now = new Date()
   const currentYear = now.getFullYear()
@@ -45,7 +60,11 @@ export function buildMonthBars(subscriptions: Subscription[], year: number): Mon
 
     const amount = subscriptions
       .filter((s) => isActiveInMonth(s, year, month))
-      .reduce((sum, s) => sum + toMonthlyAmount(s.amount, s.interval, s.interval_count), 0)
+      .reduce((sum, s) => sum + toMonthlyAmount(
+        getAmountForMonth(s, year, month),
+        s.interval,
+        s.interval_count
+      ), 0)
 
     let state: MonthBar['state']
     if (year < currentYear || (year === currentYear && month < currentMonth)) {

@@ -77,4 +77,5 @@ export interface SubscriptionFormData {
   legacy_amount_paid: number | null
   notes: string | null
   reminder_days_before: number
+  status?: SubscriptionStatus
 }

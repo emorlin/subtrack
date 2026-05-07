@@ -13,9 +13,9 @@ interface FormState {
   start_date: string
   binding_months: string
   reminder_days_before: string
-  has_legacy: boolean
-  legacy_amount: string
   notes: string
+  is_cancelled: boolean
+  cancelled_date: string
 }
 
 const INITIAL: FormState = {
@@ -28,9 +28,9 @@ const INITIAL: FormState = {
   start_date: '',
   binding_months: '0',
   reminder_days_before: '3',
-  has_legacy: false,
-  legacy_amount: '',
   notes: '',
+  is_cancelled: false,
+  cancelled_date: '',
 }
 
 interface Props {
@@ -49,9 +49,9 @@ function subscriptionToFormState(sub: Subscription): FormState {
     start_date: sub.start_date,
     binding_months: '0',
     reminder_days_before: String(sub.reminder_days_before),
-    has_legacy: sub.legacy_amount_paid !== null,
-    legacy_amount: sub.legacy_amount_paid !== null ? String(sub.legacy_amount_paid) : '',
     notes: sub.notes ?? '',
+    is_cancelled: sub.status === 'cancelled',
+    cancelled_date: sub.end_date ?? '',
   }
 }
 
@@ -101,7 +101,9 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
   function buildFormData(): SubscriptionFormData {
     const bindingMonths = Number(form.binding_months)
     let end_date: string | null = null
-    if (bindingMonths > 0 && form.start_date) {
+    if (form.is_cancelled && form.cancelled_date) {
+      end_date = form.cancelled_date
+    } else if (bindingMonths > 0 && form.start_date) {
       const end = new Date(form.start_date)
       end.setMonth(end.getMonth() + bindingMonths)
       end_date = end.toISOString().split('T')[0]
@@ -115,9 +117,10 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
       interval_count: form.interval_count,
       start_date: form.start_date,
       end_date,
-      legacy_amount_paid: form.has_legacy && form.legacy_amount ? Number(form.legacy_amount) : null,
+      legacy_amount_paid: null,
       notes: form.notes.trim() || null,
       reminder_days_before: Number(form.reminder_days_before),
+      ...(form.is_cancelled ? { status: 'cancelled' } : {}),
     }
   }
 
@@ -130,16 +133,10 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
     }
   }
 
-  const autoCalculated = computeAutoPaid(form)
-  const totalPaid = form.has_legacy && form.legacy_amount
-    ? Number(form.legacy_amount)
-    : autoCalculated.total
-
   const stepContent = (
     <>
       {step === 1 && <BasicInfoStep form={form} update={update} errors={errors} />}
-      {step === 2 && <HistoryStep form={form} update={update} autoCalculated={autoCalculated} totalPaid={totalPaid} />}
-      {step === 3 && <ConfirmStep form={form} update={update} totalPaid={totalPaid} />}
+      {step === 2 && <ConfirmStep form={form} update={update} />}
     </>
   )
 
@@ -161,7 +158,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
           <span className="text-[14px] font-semibold text-[#111827]">
             {isEdit ? 'Redigera abonnemang' : 'Nytt abonnemang'}
           </span>
-          <span className="text-[13px] text-[#9CA3AF]">{step}/3</span>
+          <span className="text-[13px] text-[#9CA3AF]">{step}/2</span>
         </div>
 
         {/* Step indicator */}
@@ -176,7 +173,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
 
         {/* Footer */}
         <div className="px-4 py-4 border-t border-[#E5E7EB] shrink-0">
-          {step < 3 ? (
+          {step < 2 ? (
             <button
               type="button"
               onClick={handleNext}
@@ -208,7 +205,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
             <h2 className="text-[18px] font-semibold text-[#111827] tracking-[-0.3px]">
               {isEdit ? 'Redigera abonnemang' : 'Nytt abonnemang'}
             </h2>
-            <span className="text-[13px] text-[#9CA3AF]">Steg {step} av 3</span>
+            <span className="text-[13px] text-[#9CA3AF]">Steg {step} av 2</span>
           </div>
 
           {/* Content */}
@@ -235,7 +232,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
                 ← Tillbaka
               </button>
             )}
-            {step < 3 ? (
+            {step < 2 ? (
               <button
                 type="button"
                 onClick={handleNext}
@@ -265,8 +262,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
 function StepIndicator({ step }: { step: number }) {
   const steps = [
     { num: 1, label: 'Info' },
-    { num: 2, label: 'Historik' },
-    { num: 3, label: 'Bekräfta' },
+    { num: 2, label: 'Bekräfta' },
   ]
 
   return (
@@ -409,127 +405,62 @@ function BasicInfoStep({
         </Field>
       </div>
 
-      {/* Påminnelse */}
-      <Field label="Påminnelse">
-        <select
-          value={form.reminder_days_before}
-          onChange={(e) => update('reminder_days_before', e.target.value)}
-          className={inputClass(false)}
-        >
-          <option value="1">1 dag innan förnyelse</option>
-          <option value="3">3 dagar innan förnyelse</option>
-          <option value="7">7 dagar innan förnyelse</option>
-          <option value="14">14 dagar innan förnyelse</option>
-        </select>
-      </Field>
-    </>
-  )
-}
-
-// ── Step 2: Historik ─────────────────────────────────────────
-
-function HistoryStep({
-  form,
-  update,
-  autoCalculated,
-  totalPaid,
-}: {
-  form: FormState
-  update: <K extends keyof FormState>(k: K, v: FormState[K]) => void
-  autoCalculated: { total: number; periods: number; startLabel: string }
-  totalPaid: number
-}) {
-  return (
-    <>
-      <div className="space-y-4">
-        <div>
-          <p className="text-[14px] font-medium text-[#111827]">
-            Har du betalat för {form.name || 'tjänsten'} innan du lägger till den här?
-          </p>
-          <p className="text-[12px] text-[#6B7280] mt-1">
-            Ange manuellt belopp om du vill ha korrekt historik, annars räknar vi från startdatum.
-          </p>
-        </div>
-
-        {/* Choice buttons */}
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => update('has_legacy', true)}
-            className={`flex-1 rounded-[6px] py-2 text-[13px] font-medium transition-all duration-150 ease-out ${
-              form.has_legacy
-                ? 'bg-[#1B4FD8] text-white'
-                : 'bg-white border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB]'
-            }`}
+      {/* Påminnelse — döljs om abonnemanget är avslutat */}
+      {!form.is_cancelled && (
+        <Field label="Påminnelse">
+          <select
+            value={form.reminder_days_before}
+            onChange={(e) => update('reminder_days_before', e.target.value)}
+            className={inputClass(false)}
           >
-            Ja, ange belopp
-          </button>
-          <button
-            type="button"
-            onClick={() => { update('has_legacy', false); update('legacy_amount', '') }}
-            className={`flex-1 rounded-[6px] py-2 text-[13px] font-medium transition-all duration-150 ease-out ${
-              !form.has_legacy
-                ? 'bg-[#1B4FD8] text-white'
-                : 'bg-white border border-[#E5E7EB] text-[#374151] hover:bg-[#F9FAFB]'
-            }`}
-          >
-            Nej, hoppa över
-          </button>
-        </div>
+            <option value="1">1 dag innan förnyelse</option>
+            <option value="3">3 dagar innan förnyelse</option>
+            <option value="7">7 dagar innan förnyelse</option>
+            <option value="14">14 dagar innan förnyelse</option>
+          </select>
+        </Field>
+      )}
 
-        {/* Manual amount input */}
-        {form.has_legacy && (
-          <Field label="Manuellt totalt betalt (kr)">
-            <input
-              type="number"
-              value={form.legacy_amount}
-              onChange={(e) => update('legacy_amount', e.target.value)}
-              placeholder="t.ex. 5811"
-              min="0"
-              className={inputClass(false)}
-            />
-          </Field>
+      {/* Historiskt abonnemang */}
+      <div className="border-t border-[#E5E7EB] pt-4">
+        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={form.is_cancelled}
+            onChange={(e) => {
+              update('is_cancelled', e.target.checked)
+              if (!e.target.checked) update('cancelled_date', '')
+            }}
+            className="w-4 h-4 rounded accent-[#1B4FD8]"
+          />
+          <span className="text-[13px] text-[#6B7280]">Abonnemanget är avslutat</span>
+        </label>
+
+        {form.is_cancelled && (
+          <div className="mt-3">
+            <Field label="Avslutades (sista betalning)">
+              <input
+                type="date"
+                value={form.cancelled_date}
+                onChange={(e) => update('cancelled_date', e.target.value)}
+                className={inputClass(false)}
+              />
+            </Field>
+          </div>
         )}
-
-        {/* Preview */}
-        <div className="bg-[#F9FAFB] rounded-[8px] p-4 space-y-2">
-          <div className="flex justify-between text-[13px] text-[#6B7280]">
-            <span>Autoberäknat ({autoCalculated.startLabel} → idag)</span>
-            <span>{Math.round(autoCalculated.total).toLocaleString('sv-SE')} kr</span>
-          </div>
-          <div className="flex justify-between text-[13px] text-[#6B7280]">
-            <span>Manuellt belopp</span>
-            <span>
-              {form.has_legacy && form.legacy_amount
-                ? `${Number(form.legacy_amount).toLocaleString('sv-SE')} kr`
-                : '—'}
-            </span>
-          </div>
-          <div className="border-t border-[#E5E7EB] pt-2 flex justify-between text-[14px] font-semibold text-[#111827]">
-            <span>Totalt betalt</span>
-            <span>{Math.round(totalPaid).toLocaleString('sv-SE')} kr</span>
-          </div>
-          {!form.has_legacy && autoCalculated.periods > 0 && (
-            <p className="text-[11px] text-[#9CA3AF]">
-              Beräknat: {form.amount} kr × {autoCalculated.periods} månader
-            </p>
-          )}
-        </div>
       </div>
     </>
   )
 }
 
-// ── Step 3: Bekräfta ─────────────────────────────────────────
+// ── Step 2: Bekräfta ─────────────────────────────────────────
 
 function ConfirmStep({
   form,
   update,
-  totalPaid,
 }: {
   form: FormState
   update: <K extends keyof FormState>(k: K, v: FormState[K]) => void
-  totalPaid: number
 }) {
   const { data: categories = [] } = useCategories()
   const category = categories.find((c) => c.id === form.category_id)
@@ -557,7 +488,6 @@ function ConfirmStep({
         <SummaryRow label="Kostnad" value={`${form.amount} kr / ${intervalMap[intervalKey] ?? form.interval}`} />
         <SummaryRow label="Startdatum" value={form.start_date} />
         <SummaryRow label="Bindningstid" value={bindingMap[form.binding_months] ?? '—'} />
-        <SummaryRow label="Totalt betalt" value={`${Math.round(totalPaid).toLocaleString('sv-SE')} kr`} />
         <SummaryRow label="Påminnelse" value={`${form.reminder_days_before} dagar innan`} />
       </div>
 
@@ -613,30 +543,4 @@ function inputClass(hasError: boolean) {
   return `w-full border ${
     hasError ? 'border-[#B91C1C]' : 'border-[#D1D5DB]'
   } focus:border-[#1B4FD8] rounded-[6px] px-3 py-2 text-[13px] text-[#111827] outline-none bg-white transition-all duration-150 ease-out`
-}
-
-// ── Calculation helper ───────────────────────────────────────
-
-function computeAutoPaid(form: FormState): { total: number; periods: number; startLabel: string } {
-  if (!form.start_date || !form.amount || isNaN(Number(form.amount))) {
-    return { total: 0, periods: 0, startLabel: '—' }
-  }
-
-  const start = new Date(form.start_date)
-  const today = new Date()
-  const amount = Number(form.amount)
-
-  const msPerDay = 1000 * 60 * 60 * 24
-  const days = (today.getTime() - start.getTime()) / msPerDay
-  const daysPerPeriod = form.interval === 'year' ? 365.25 : form.interval === 'quarter' ? 91.3125 : 30.4375
-  const periods = Math.max(0, Math.floor(days / (daysPerPeriod * form.interval_count)))
-
-  // For the label, show month + year of start
-  const startLabel = start.toLocaleDateString('sv-SE', { month: 'short', year: 'numeric' })
-
-  return {
-    total: periods * amount,
-    periods,
-    startLabel,
-  }
 }
