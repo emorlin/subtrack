@@ -1,4 +1,4 @@
-import { LayoutDashboard, TrendingUp, Bell, Settings } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, Bell, Settings, Info } from 'lucide-react'
 
 type IconProps = { active: boolean }
 
@@ -16,4 +16,8 @@ export function IconBell({ active }: IconProps) {
 
 export function IconSettings({ active }: IconProps) {
   return <Settings size={20} color={active ? '#1B4FD8' : '#6B7280'} strokeWidth={2} />
+}
+
+export function IconAbout({ active }: IconProps) {
+  return <Info size={20} color={active ? '#1B4FD8' : '#6B7280'} strokeWidth={2} />
 }

@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import Cost from './pages/Cost'
 import Notifications from './pages/Notifications'
 import Settings from './pages/Settings'
+import About from './pages/About'
 import Login from './pages/Login'
 import AuthCallback from './pages/AuthCallback'
 
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="/cost" element={<Cost />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/about" element={<About />} />
           </Route>
         </Routes>
       </BrowserRouter>

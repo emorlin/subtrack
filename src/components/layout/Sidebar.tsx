@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { IconHome, IconCost, IconBell, IconSettings } from './NavIcons'
+import { IconHome, IconCost, IconBell, IconSettings, IconAbout } from './NavIcons'
 
 const navItems = [
   { label: 'Översikt', to: '/', icon: IconHome },
   { label: 'Kostnad', to: '/cost', icon: IconCost },
   { label: 'Notiser', to: '/notifications', icon: IconBell },
   { label: 'Inställningar', to: '/settings', icon: IconSettings },
+  { label: 'Om appen', to: '/about', icon: IconAbout },
 ]
 
 export default function Sidebar() {
