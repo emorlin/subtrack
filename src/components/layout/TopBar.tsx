@@ -47,11 +47,8 @@ export default function TopBar({ action }: TopBarProps) {
             </>
           ) : (
             <>
-              {/* Notification dot (mobile only) */}
-              <div className="md:hidden w-2 h-2 rounded-full bg-[#1B4FD8]" />
-
-              {/* Desktop: avatar + name */}
-              <div className="hidden md:flex items-center gap-2">
+              {/* Avatar + name */}
+              <div className="flex items-center gap-2">
                 <Avatar user={user} size={28} />
                 <span className="text-[13px] text-[#6B7280]">
                   {user?.user_metadata?.full_name ?? user?.email ?? ''}
