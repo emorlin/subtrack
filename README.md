@@ -575,4 +575,4 @@ Alla: `transition-all duration-150 ease-out` · Modal/panel: `duration-200`
 
 ---
 
-*Byggd med React, TypeScript, Supabase & Vercel · 2025*
+*Byggd med React, TypeScript, Supabase & Vercel · 2026*

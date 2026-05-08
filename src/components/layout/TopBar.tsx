@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
 import { useDemoContext } from '../../contexts/DemoContext'
 import { Wallet } from 'lucide-react'
@@ -18,12 +19,12 @@ export default function TopBar({ action }: TopBarProps) {
     >
       <div className="h-14 flex items-center px-4">
         {/* Logo */}
-        <div className="flex items-center gap-2.5">
+        <Link to="/" className="flex items-center gap-2.5">
           <SubtrackIcon />
           <span className="text-[15px] font-semibold text-[#111827] tracking-[-0.3px]">
             Subtrack
           </span>
-        </div>
+        </Link>
 
         {/* Right side */}
         <div className="ml-auto flex items-center gap-3">

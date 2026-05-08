@@ -12,7 +12,7 @@ export default function About() {
           </div>
           <div>
             <h1 className="text-[22px] font-semibold text-[#111827] tracking-[-0.4px]">Om Subtrack</h1>
-            <p className="text-[13px] text-[#6B7280]">Version 1.0 · Byggd 2025</p>
+            <p className="text-[13px] text-[#6B7280]">Version 1.0 · Byggd 2026</p>
           </div>
         </div>
         <p className="text-[14px] text-[#374151] leading-relaxed">
@@ -407,7 +407,7 @@ export default function About() {
 
       {/* Footer */}
       <div className="border-t border-[#E5E7EB] pt-6 text-center">
-        <p className="text-[12px] text-[#9CA3AF]">Subtrack · Byggd med React, TypeScript, Supabase & Vercel · 2025</p>
+        <p className="text-[12px] text-[#9CA3AF]">Subtrack · Byggd med React, TypeScript, Supabase & Vercel · 2026</p>
       </div>
 
     </div>

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { DEMO_SUBSCRIPTIONS, DEMO_CATEGORIES } from '../lib/demoData'
 
@@ -17,6 +18,7 @@ const DemoContext = createContext<DemoContextValue>({
 export function DemoProvider({ children }: { children: ReactNode }) {
   const [isDemoMode, setIsDemoMode] = useState(false)
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const enterDemo = useCallback(() => {
     queryClient.setQueryData(['subscriptions'], DEMO_SUBSCRIPTIONS)
@@ -27,7 +29,8 @@ export function DemoProvider({ children }: { children: ReactNode }) {
   const exitDemo = useCallback(() => {
     setIsDemoMode(false)
     queryClient.clear()
-  }, [queryClient])
+    navigate('/login')
+  }, [queryClient, navigate])
 
   return (
     <DemoContext.Provider value={{ isDemoMode, enterDemo, exitDemo }}>

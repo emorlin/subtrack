@@ -150,7 +150,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
       <div className="px-6 py-4 shrink-0">
         <StepIndicator step={step} />
       </div>
-      <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-4">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-4 space-y-4">
         {stepContent}
       </div>
       <div className="px-4 py-4 border-t border-[#E5E7EB] shrink-0">

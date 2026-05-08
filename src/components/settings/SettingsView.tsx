@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Pencil, Trash2 } from 'lucide-react'
 import {
   useCategories,
@@ -28,6 +29,12 @@ const PRESET_COLORS = [
 function ProfileCard() {
   const { user } = useAuth()
   const { isDemoMode, exitDemo } = useDemoContext()
+  const navigate = useNavigate()
+
+  async function handleSignOut() {
+    await signOut()
+    navigate('/login')
+  }
 
   const name = isDemoMode ? 'Alex Svensson' : (user?.user_metadata?.full_name ?? user?.email ?? '—')
   const email = isDemoMode ? 'demo@subtrack.app' : (user?.email ?? '')
@@ -62,7 +69,7 @@ function ProfileCard() {
         </button>
       ) : (
         <button
-          onClick={signOut}
+          onClick={handleSignOut}
           className="border border-[#E5E7EB] text-[#6B7280] rounded-[6px] px-3 py-1.5 text-[12px] hover:bg-[#F9FAFB] transition-all duration-150 ease-out shrink-0"
         >
           Logga ut
