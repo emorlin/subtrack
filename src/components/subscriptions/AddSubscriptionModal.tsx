@@ -150,7 +150,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
       <div className="px-6 py-4 shrink-0">
         <StepIndicator step={step} />
       </div>
-      <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-4">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-4 space-y-4">
         {stepContent}
       </div>
       <div className="px-4 py-4 border-t border-[#E5E7EB] shrink-0">
@@ -473,7 +473,7 @@ function Field({
 }
 
 function inputClass(hasError: boolean) {
-  return `w-full border ${
+  return `w-full max-w-full border ${
     hasError ? 'border-[#B91C1C]' : 'border-[#D1D5DB]'
   } focus:border-[#1B4FD8] rounded-[6px] px-3 py-2 text-[16px] md:text-[13px] text-[#111827] outline-none bg-white transition-all duration-150 ease-out`
 }
