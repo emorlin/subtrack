@@ -90,7 +90,7 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
               type="date"
               value={cancelDate}
               onChange={(e) => setCancelDate(e.target.value)}
-              className="w-full border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-2 text-[13px] outline-none bg-white"
+              className="w-full border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-2 text-[16px] md:text-[13px] outline-none bg-white"
             />
           </div>
           <div className="flex gap-2">
@@ -430,7 +430,7 @@ function PriceHistorySection({ subscription }: { subscription: Subscription }) {
           type="date"
           value={date}
           onChange={(e) => { setDate(e.target.value); setFormError(null) }}
-          className="flex-1 border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-1.5 text-[12px] text-[#111827] outline-none bg-white transition-all duration-150"
+          className="flex-1 border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-1.5 text-[16px] md:text-[12px] text-[#111827] outline-none bg-white transition-all duration-150"
         />
         <input
           type="number"
@@ -438,7 +438,7 @@ function PriceHistorySection({ subscription }: { subscription: Subscription }) {
           onChange={(e) => { setAmount(e.target.value); setFormError(null) }}
           placeholder="kr"
           min="0"
-          className="w-20 border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-1.5 text-[12px] text-[#111827] outline-none bg-white transition-all duration-150"
+          className="w-20 border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-1.5 text-[16px] md:text-[12px] text-[#111827] outline-none bg-white transition-all duration-150"
         />
         <button
           type="button"

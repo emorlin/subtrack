@@ -542,5 +542,5 @@ function Field({
 function inputClass(hasError: boolean) {
   return `w-full border ${
     hasError ? 'border-[#B91C1C]' : 'border-[#D1D5DB]'
-  } focus:border-[#1B4FD8] rounded-[6px] px-3 py-2 text-[13px] text-[#111827] outline-none bg-white transition-all duration-150 ease-out`
+  } focus:border-[#1B4FD8] rounded-[6px] px-3 py-2 text-[16px] md:text-[13px] text-[#111827] outline-none bg-white transition-all duration-150 ease-out`
 }

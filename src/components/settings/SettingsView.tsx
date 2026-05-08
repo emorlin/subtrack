@@ -110,7 +110,7 @@ function CategoryForm({
           onChange={(e) => setName(e.target.value)}
           placeholder="Kategorinamn"
           autoFocus
-          className="flex-1 min-w-0 border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-1.5 text-[13px] outline-none bg-white"
+          className="flex-1 min-w-0 border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-1.5 text-[16px] md:text-[13px] outline-none bg-white"
           onKeyDown={(e) => {
             if (e.key === 'Enter') submit()
             if (e.key === 'Escape') onCancel()

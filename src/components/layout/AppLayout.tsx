@@ -38,7 +38,7 @@ export default function AppLayout() {
 
   return (
     <LayoutContext.Provider value={{ openAdd }}>
-      <div className="min-h-screen bg-[#F9FAFB] flex flex-col">
+      <div className="h-dvh bg-[#F9FAFB] flex flex-col">
         <TopBar action={
           <button
             type="button"
