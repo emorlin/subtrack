@@ -29,6 +29,10 @@ export default function TopBar({ action }: TopBarProps) {
         <div className="ml-auto flex items-center gap-3">
           {isDemoMode ? (
             <>
+              <div className="hidden md:flex items-center gap-2">
+                <DemoAvatar size={28} />
+                <span className="text-[13px] text-[#6B7280]">Alex Svensson</span>
+              </div>
               <span className="hidden md:inline text-[11px] font-medium text-[#92400E] bg-[#FFFBEB] border border-[#FDE68A] px-2 py-0.5 rounded-[4px]">
                 Demo
               </span>
@@ -90,6 +94,19 @@ function Avatar({ user, size }: { user: ReturnType<typeof useAuth>['user']; size
     >
       <span style={{ fontSize: size * 0.45 }} className="font-semibold text-[#1B4FD8] leading-none">
         {initial}
+      </span>
+    </div>
+  )
+}
+
+function DemoAvatar({ size }: { size: number }) {
+  return (
+    <div
+      className="rounded-full bg-[#E0E7FF] flex items-center justify-center shrink-0"
+      style={{ width: size, height: size }}
+    >
+      <span style={{ fontSize: size * 0.45 }} className="font-semibold text-[#4338CA] leading-none">
+        A
       </span>
     </div>
   )

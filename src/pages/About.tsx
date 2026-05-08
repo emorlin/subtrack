@@ -46,7 +46,7 @@ export default function About() {
           />
           <FeatureCard
             title="Responsiv design"
-            description="Fungerar lika bra på mobil som desktop. Samma data, två anpassade gränssnitt — bottom nav + FAB på mobil, sidebar + panel på desktop."
+            description="Fungerar lika bra på mobil som desktop. Bottom nav alltid sticky (h-dvh) på mobil, sidebar på desktop. Modaler har samma inre layout på båda — centrerad titel och X-knapp, fast bredd på desktop, fullskärm på mobil."
           />
           <FeatureCard
             title="PWA / Hemskärm"
@@ -58,7 +58,7 @@ export default function About() {
           />
           <FeatureCard
             title="Demo-läge"
-            description="Prova appen utan att skapa ett konto. Hårdkodad exempeldata med 8 abonnemang, prishistorik och kommande förnyelser. Alla skrivoperationer fungerar men sparas bara i minnet."
+            description="Prova appen utan att skapa ett konto. Hårdkodad exempeldata med 8 abonnemang och en demoanvändare (Alex Svensson) med avatar och namn i topbaren. Alla skrivoperationer fungerar men sparas bara i minnet."
           />
         </div>
       </section>
@@ -271,9 +271,10 @@ export default function About() {
             <ul className="space-y-1 text-[13px] text-[#6B7280]">
               <li>Bottom navigation med 5 flikar</li>
               <li>Full-width "Lägg till"-knapp ovanför nav</li>
-              <li>Detaljvy som fullskärm (slide-in)</li>
+              <li>Detaljvy och modaler som fullskärm</li>
               <li>Kortvisning med svep-interaktion</li>
               <li>Safe area-insets för iOS notch och home indicator</li>
+              <li>Inputfält har font-size 16px (förhindrar iOS Safari-zoom)</li>
             </ul>
           </div>
           <div className="bg-[#F9FAFB] rounded-[10px] border border-[#E5E7EB] p-4">
@@ -281,7 +282,7 @@ export default function About() {
             <ul className="space-y-1 text-[13px] text-[#6B7280]">
               <li>Sidebar (188px) med ikonnavigation</li>
               <li>"Lägg till"-knapp alltid synlig i topbaren</li>
-              <li>Master/detail: lista + höger sidopanel</li>
+              <li>Master/detail: lista + höger sidopanel · modaler som fast bredd (480–560px)</li>
               <li>Stapeldiagram med 3× höjd jämfört med mobil</li>
               <li>Hover-states och keyboard-tillgänglighet</li>
             </ul>
@@ -342,9 +343,9 @@ export default function About() {
           <div className="bg-[#F9FAFB] rounded-[10px] border border-[#E5E7EB] p-4">
             <p className="text-[12px] font-semibold text-[#111827] mb-2">Exempeldata som ingår</p>
             <ul className="space-y-1 text-[12px] text-[#6B7280]">
-              <li>Netflix — prishistorik i tre steg (99 → 139 → 189 kr)</li>
-              <li>Spotify — prishistorik i två steg (99 → 119 kr)</li>
-              <li>Adobe Creative Cloud — 634 kr/mån</li>
+              <li>Netflix — prishistorik i fyra steg (99 → 139 → 189 → 219 kr)</li>
+              <li>Spotify — prishistorik i tre steg (99 → 119 → 135 kr)</li>
+              <li>Adobe Creative Cloud — 699 kr/mån</li>
               <li>iCloud+ 50 GB — 12 kr/mån</li>
               <li>GitHub Pro — 99 kr/mån</li>
               <li>Microsoft 365 — 1 149 kr/år (familjeplan)</li>
@@ -374,6 +375,7 @@ export default function About() {
               'Auth-vakten i AppLayout låter demo-användare passera utan inloggad session',
               'En amber-banner i topbaren indikerar tydligt att man är i demo-läge',
               'exitDemo() rensar hela cachen och den reaktiva auth-vakten skickar tillbaka till login',
+              'Demo­användaren "Alex Svensson" visas med avatar och namn i topbaren och i inställningars profilkort',
             ].map((item, i) => (
               <li key={i} className="flex gap-2">
                 <span className="text-[#1B4FD8] font-semibold shrink-0">·</span>

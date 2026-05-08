@@ -50,7 +50,7 @@ Appen är byggd som en **Progressive Web App** och kan installeras direkt från 
 | **Kategorier** | Egna kategorier med valfri färg, standardkategorier skapas automatiskt |
 | **Google-inloggning** | OAuth via Supabase Auth — inga lösenord att hantera |
 | **PWA / Hemskärm** | Installerbar som app på iOS och Android |
-| **Responsiv** | Bottom nav + FAB på mobil, sidebar + sidopanel på desktop |
+| **Responsiv** | Sticky bottom nav + FAB på mobil, sidebar + sidopanel på desktop. Modaler: fullskärm (mobil) / fast bredd (desktop) |
 | **Demo-läge** | Utforska appen utan konto — hårdkodad data, inga Supabase-anrop |
 
 ---
@@ -369,9 +369,10 @@ Breakpoint: `md` (768 px). Under = mobil, över = desktop.
 |---|---|---|
 | Navigation | Bottom nav med 5 flikar | Sidebar (188px) |
 | Lägg till | Full-width knapp ovanför nav | Knapp i topbaren |
-| Detaljvy | Fullskärm (slide-in) | Höger sidopanel |
+| Detaljvy/modal | Fullskärm, X-knapp | Fast bredd (480–560px), X-knapp |
 | Stapeldiagram | Låg höjd (80px) | Hög höjd (240px) |
 | Safe area | `env(safe-area-inset-top/bottom)` | N/A |
+| Input-zoom | 16px font-size (ingen iOS-zoom) | 13px |
 
 **Installera som app på iOS:**
 1. Öppna appen i Safari
@@ -388,9 +389,9 @@ Inloggningssidan erbjuder en "Utforska demo"-knapp för den som vill prova appen
 
 | Abonnemang | Kategori | Kostnad | Status |
 |---|---|---|---|
-| Netflix | Streaming | 189 kr/mån | Aktiv — prishistorik i 3 steg |
-| Spotify | Musik | 119 kr/mån | Aktiv — prishistorik i 2 steg |
-| Adobe Creative Cloud | Mjukvara | 634 kr/mån | Aktiv |
+| Netflix | Streaming | 219 kr/mån | Aktiv — prishistorik i 4 steg |
+| Spotify | Musik | 135 kr/mån | Aktiv — prishistorik i 3 steg |
+| Adobe Creative Cloud | Mjukvara | 699 kr/mån | Aktiv |
 | iCloud+ 50 GB | Lagring | 12 kr/mån | Aktiv |
 | GitHub Pro | Mjukvara | 99 kr/mån | Aktiv |
 | Microsoft 365 | Produktivitet | 1 149 kr/år | Aktiv |
@@ -417,6 +418,8 @@ src/contexts/DemoContext.tsx — isDemoMode, enterDemo(), exitDemo()
 5. En amber-banner indikerar demo-läget; "Logga in"-knappen i topbaren anropar `exitDemo()` som rensar cachen och skickar tillbaka till `/login`
 
 Data lever enbart i minnet — inget sparas i `localStorage` eller cookies. Stäng fliken och allt är borta.
+
+Demoanvändaren **Alex Svensson** visas med indigo-avatar och namn i topbaren och i inställningarnas profilkort (e-post: demo@subtrack.app). "Logga in"-knappen i profilen anropar `exitDemo()`.
 
 ---
 

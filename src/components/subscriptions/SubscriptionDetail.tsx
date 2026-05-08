@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { X } from 'lucide-react'
 import type { Subscription } from '../../types'
 import { calculateTotalPaid, getNextRenewalDate, getEffectiveCurrentAmount } from '../../lib/calculations'
 import { formatDate, daysUntil } from '../../lib/dates'
@@ -139,146 +140,80 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
     </>
   )
 
-  return (
+  const inner = (
     <>
-      {/* ── Mobile: full-screen ── */}
-      <div className="md:hidden fixed inset-0 bg-white z-40 flex flex-col">
-        <div className="h-14 px-4 border-b border-[#E5E7EB] flex items-center justify-between shrink-0">
-          <button type="button" onClick={onClose} className="text-[13px] text-[#1B4FD8]">
-            ← Tillbaka
-          </button>
-          {!isCancelled && actionState === 'none' && (
-            <button
-              type="button"
-              onClick={() => setActionState('cancel')}
-              className="text-[13px] text-[#92400E]"
-            >
-              Avsluta
-            </button>
-          )}
-          {isCancelled && actionState === 'none' && (
-            <button
-              type="button"
-              onClick={() => setActionState('delete')}
-              className="text-[13px] text-[#B91C1C]"
-            >
-              Radera
-            </button>
-          )}
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          <div className="flex items-center gap-3">
-            <ServiceIcon name={subscription.name} size="xl" />
-            <div>
-              <div className="flex items-center gap-2">
-                <p className="text-[18px] font-semibold text-[#111827]">{subscription.name}</p>
-                <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${badge.className}`}>
-                  {badge.label}
-                </span>
-              </div>
-              <p className="text-[13px] text-[#6B7280]">{subscription.category?.name ?? '—'}</p>
+      <div className="h-14 px-4 border-b border-[#E5E7EB] flex items-center justify-end shrink-0">
+        <button type="button" onClick={onClose} className="text-[#9CA3AF] hover:text-[#374151] transition-colors" aria-label="Stäng">
+          <X size={20} />
+        </button>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex items-center gap-3">
+          <ServiceIcon name={subscription.name} size="xl" />
+          <div>
+            <div className="flex items-center gap-2">
+              <p className="text-[18px] font-semibold text-[#111827]">{subscription.name}</p>
+              <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${badge.className}`}>
+                {badge.label}
+              </span>
             </div>
+            <p className="text-[13px] text-[#6B7280]">{subscription.category?.name ?? '—'}</p>
           </div>
-
-          {!isCancelled && (
+        </div>
+        {!isCancelled && (
+          <div className="flex gap-2">
             <button
               type="button"
               onClick={onEdit}
-              className="w-full bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] py-2 text-[13px] font-medium hover:bg-[#F9FAFB] transition-all duration-150 ease-out"
+              className="flex-1 bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] py-2 text-[13px] font-medium hover:bg-[#F9FAFB] transition-all duration-150 ease-out"
             >
               Redigera
             </button>
-          )}
-          {isCancelled && (
+            <button
+              type="button"
+              onClick={() => setActionState(actionState === 'cancel' ? 'none' : 'cancel')}
+              className="flex-1 bg-[#FFFBEB] text-[#92400E] rounded-[6px] py-2 text-[13px] font-medium hover:opacity-80 transition-all duration-150 ease-out"
+            >
+              Avsluta
+            </button>
+          </div>
+        )}
+        {isCancelled && (
+          <div className="flex gap-2">
             <button
               type="button"
               onClick={handleReactivate}
               disabled={isReactivating}
-              className="w-full bg-[#EFF6FF] text-[#1B4FD8] border border-[#BFDBFE] rounded-[6px] py-2 text-[13px] font-medium disabled:opacity-50 transition-all duration-150 ease-out"
+              className="flex-1 bg-[#EFF6FF] text-[#1B4FD8] border border-[#BFDBFE] rounded-[6px] py-2 text-[13px] font-medium disabled:opacity-50 transition-all duration-150 ease-out"
             >
               {isReactivating ? 'Återaktiverar…' : 'Återaktivera'}
             </button>
-          )}
-
-          {isUrgent && <RenewalWarning days={days} amount={subscription.amount} date={renewal} />}
-          <DetailRows subscription={subscription} totalPaid={totalPaid} renewal={renewal} effectiveAmount={effectiveAmount} />
-          <PriceHistorySection subscription={subscription} />
-          {subscription.notes && <Notes text={subscription.notes} />}
-          {actionPanel}
-        </div>
+            <button
+              type="button"
+              onClick={() => setActionState(actionState === 'delete' ? 'none' : 'delete')}
+              className="flex-1 bg-[#FEF2F2] text-[#B91C1C] rounded-[6px] py-2 text-[13px] font-medium hover:opacity-80 transition-all duration-150 ease-out"
+            >
+              Radera
+            </button>
+          </div>
+        )}
+        {isUrgent && <RenewalWarning days={days} amount={subscription.amount} date={renewal} />}
+        <DetailRows subscription={subscription} totalPaid={totalPaid} renewal={renewal} effectiveAmount={effectiveAmount} />
+        <PriceHistorySection subscription={subscription} />
+        {subscription.notes && <Notes text={subscription.notes} />}
+        {actionPanel}
       </div>
+    </>
+  )
 
-      {/* ── Desktop: centered modal overlay ── */}
-      <div
-        className="hidden md:flex fixed inset-0 bg-black/50 z-40 items-center justify-center"
-        onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
-      >
-        <div className="bg-white rounded-[16px] w-[480px] max-h-[85vh] overflow-y-auto shadow-xl flex flex-col">
-          {/* Header */}
-          <div className="flex items-start justify-between p-5 border-b border-[#E5E7EB]">
-            <div className="flex items-center gap-3">
-              <ServiceIcon name={subscription.name} size="xl" />
-              <div>
-                <div className="flex items-center gap-2">
-                  <p className="text-[16px] font-semibold text-[#111827]">{subscription.name}</p>
-                  <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${badge.className}`}>
-                    {badge.label}
-                  </span>
-                </div>
-                <p className="text-[12px] text-[#6B7280]">{subscription.category?.name ?? '—'}</p>
-              </div>
-            </div>
-
-            <div className="flex gap-2 shrink-0">
-              {!isCancelled && (
-                <>
-                  <button
-                    type="button"
-                    onClick={onEdit}
-                    className="bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] px-3 py-1.5 text-[12px] font-medium hover:bg-[#F9FAFB] transition-all duration-150 ease-out"
-                  >
-                    Redigera
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActionState(actionState === 'cancel' ? 'none' : 'cancel')}
-                    className="bg-[#FFFBEB] text-[#92400E] rounded-[6px] px-3 py-1.5 text-[12px] font-medium hover:opacity-80 transition-all duration-150 ease-out"
-                  >
-                    Avsluta
-                  </button>
-                </>
-              )}
-              {isCancelled && (
-                <>
-                  <button
-                    type="button"
-                    onClick={handleReactivate}
-                    disabled={isReactivating}
-                    className="bg-[#EFF6FF] text-[#1B4FD8] border border-[#BFDBFE] rounded-[6px] px-3 py-1.5 text-[12px] font-medium disabled:opacity-50 transition-all duration-150 ease-out"
-                  >
-                    {isReactivating ? 'Återaktiverar…' : 'Återaktivera'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActionState(actionState === 'delete' ? 'none' : 'delete')}
-                    className="bg-[#FEF2F2] text-[#B91C1C] rounded-[6px] px-3 py-1.5 text-[12px] font-medium hover:opacity-80 transition-all duration-150 ease-out"
-                  >
-                    Radera
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* Body */}
-          <div className="p-5 space-y-4">
-            {isUrgent && <RenewalWarning days={days} amount={effectiveAmount} date={renewal} />}
-            <DetailRows subscription={subscription} totalPaid={totalPaid} renewal={renewal} effectiveAmount={effectiveAmount} />
-            <PriceHistorySection subscription={subscription} />
-            {subscription.notes && <Notes text={subscription.notes} />}
-            {actionPanel}
-          </div>
+  return (
+    <>
+      <div className="md:hidden fixed inset-0 bg-white z-40 flex flex-col">
+        {inner}
+      </div>
+      <div className="hidden md:flex fixed inset-0 bg-black/50 z-40 items-center justify-center" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
+        <div className="bg-white rounded-[16px] w-[480px] max-h-[85vh] flex flex-col shadow-xl">
+          {inner}
         </div>
       </div>
     </>

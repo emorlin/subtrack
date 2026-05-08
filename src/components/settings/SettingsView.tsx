@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Pencil, Trash2 } from 'lucide-react'
 import {
   useCategories,
   useAddCategory,
@@ -6,6 +7,7 @@ import {
   useDeleteCategory,
 } from '../../hooks/useCategories'
 import { useAuth, signOut } from '../../hooks/useAuth'
+import { useDemoContext } from '../../contexts/DemoContext'
 import type { Category } from '../../types'
 
 const PRESET_COLORS = [
@@ -25,10 +27,14 @@ const PRESET_COLORS = [
 
 function ProfileCard() {
   const { user } = useAuth()
-  const name = user?.user_metadata?.full_name ?? user?.email ?? '—'
-  const email = user?.email ?? ''
-  const avatarUrl = user?.user_metadata?.avatar_url as string | undefined
+  const { isDemoMode, exitDemo } = useDemoContext()
+
+  const name = isDemoMode ? 'Alex Svensson' : (user?.user_metadata?.full_name ?? user?.email ?? '—')
+  const email = isDemoMode ? 'demo@subtrack.app' : (user?.email ?? '')
+  const avatarUrl = isDemoMode ? null : (user?.user_metadata?.avatar_url as string | undefined)
   const initial = name.charAt(0).toUpperCase()
+  const avatarBg = isDemoMode ? 'bg-[#E0E7FF]' : 'bg-[#EFF6FF]'
+  const avatarText = isDemoMode ? 'text-[#4338CA]' : 'text-[#1B4FD8]'
 
   return (
     <div className="bg-white rounded-[12px] border border-[#E5E7EB] p-4 flex items-center gap-4">
@@ -39,20 +45,29 @@ function ProfileCard() {
           className="w-11 h-11 rounded-full object-cover shrink-0"
         />
       ) : (
-        <div className="w-11 h-11 rounded-full bg-[#EFF6FF] flex items-center justify-center shrink-0">
-          <span className="text-[17px] font-semibold text-[#1B4FD8]">{initial}</span>
+        <div className={`w-11 h-11 rounded-full ${avatarBg} flex items-center justify-center shrink-0`}>
+          <span className={`text-[17px] font-semibold ${avatarText}`}>{initial}</span>
         </div>
       )}
       <div className="flex-1 min-w-0">
         <p className="text-[14px] font-semibold text-[#111827] truncate">{name}</p>
         <p className="text-[12px] text-[#6B7280] truncate">{email}</p>
       </div>
-      <button
-        onClick={signOut}
-        className="border border-[#E5E7EB] text-[#6B7280] rounded-[6px] px-3 py-1.5 text-[12px] hover:bg-[#F9FAFB] transition-all duration-150 ease-out shrink-0"
-      >
-        Logga ut
-      </button>
+      {isDemoMode ? (
+        <button
+          onClick={exitDemo}
+          className="bg-[#1B4FD8] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium hover:bg-[#1a46c2] transition-all duration-150 ease-out shrink-0"
+        >
+          Logga in
+        </button>
+      ) : (
+        <button
+          onClick={signOut}
+          className="border border-[#E5E7EB] text-[#6B7280] rounded-[6px] px-3 py-1.5 text-[12px] hover:bg-[#F9FAFB] transition-all duration-150 ease-out shrink-0"
+        >
+          Logga ut
+        </button>
+      )}
     </div>
   )
 }
@@ -180,14 +195,14 @@ function CategoryRow({
             className="text-[#9CA3AF] hover:text-[#374151] transition-colors"
             aria-label="Redigera"
           >
-            <PencilIcon />
+            <Pencil size={14} />
           </button>
           <button
             onClick={() => setConfirming(true)}
             className="text-[#9CA3AF] hover:text-[#B91C1C] transition-colors"
             aria-label="Ta bort"
           >
-            <TrashIcon />
+            <Trash2 size={14} />
           </button>
         </div>
       )}
@@ -275,32 +290,3 @@ export default function SettingsView() {
   )
 }
 
-// ─── Icons ────────────────────────────────────────────────────────────────────
-
-function PencilIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path
-        d="M9.5 2.5l2 2M2 10l.5 1.5L4 11l7-7-2-2-7 7z"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}
-
-function TrashIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path
-        d="M2 4h10M5 4V2.5h4V4M5.5 6.5v4M8.5 6.5v4M3 4l.75 7.5h6.5L11 4"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  )
-}

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { X } from 'lucide-react'
 import { useCategories } from '../../hooks/useCategories'
 import { useAddSubscription, useUpdateSubscription } from '../../hooks/useSubscriptions'
 import type { Subscription, SubscriptionInterval, SubscriptionFormData } from '../../types'
@@ -140,117 +141,53 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
     </>
   )
 
+  const inner = (
+    <>
+      <div className="relative flex items-center justify-center px-4 h-14 border-b border-[#E5E7EB] shrink-0">
+        <span className="text-[14px] font-semibold text-[#111827]">
+          {isEdit ? 'Redigera abonnemang' : 'Nytt abonnemang'}
+        </span>
+        <button type="button" onClick={onClose} className="absolute right-4 text-[#9CA3AF] hover:text-[#374151] transition-colors" aria-label="Stäng">
+          <X size={20} />
+        </button>
+      </div>
+      <div className="px-6 py-4 shrink-0">
+        <StepIndicator step={step} />
+      </div>
+      <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-4">
+        {stepContent}
+      </div>
+      <div className="px-4 py-4 border-t border-[#E5E7EB] shrink-0">
+        {step < 2 ? (
+          <button
+            type="button"
+            onClick={handleNext}
+            className="w-full bg-[#1B4FD8] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out"
+          >
+            Nästa →
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={isSaving}
+            className="w-full bg-[#1B4FD8] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out disabled:opacity-50"
+          >
+            {isSaving ? 'Sparar…' : isEdit ? 'Uppdatera' : 'Spara abonnemang'}
+          </button>
+        )}
+      </div>
+    </>
+  )
+
   return (
     <>
-      {/* ── Mobile (full screen) ────────────────────────────── */}
       <div className="md:hidden fixed inset-0 bg-white z-50 flex flex-col">
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 h-14 border-b border-[#E5E7EB] shrink-0">
-          {step === 1 ? (
-            <button type="button" onClick={onClose} className="text-[13px] text-[#1B4FD8]">
-              Avbryt
-            </button>
-          ) : (
-            <button type="button" onClick={handleBack} className="text-[13px] text-[#1B4FD8]">
-              ← Tillbaka
-            </button>
-          )}
-          <span className="text-[14px] font-semibold text-[#111827]">
-            {isEdit ? 'Redigera abonnemang' : 'Nytt abonnemang'}
-          </span>
-          <span className="text-[13px] text-[#9CA3AF]">{step}/2</span>
-        </div>
-
-        {/* Step indicator */}
-        <div className="px-6 py-4 shrink-0">
-          <StepIndicator step={step} />
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-4">
-          {stepContent}
-        </div>
-
-        {/* Footer */}
-        <div className="px-4 py-4 border-t border-[#E5E7EB] shrink-0">
-          {step < 2 ? (
-            <button
-              type="button"
-              onClick={handleNext}
-              className="w-full bg-[#1B4FD8] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out"
-            >
-              Nästa →
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={handleSave}
-              disabled={isSaving}
-              className="w-full bg-[#1B4FD8] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out disabled:opacity-50"
-            >
-              {isSaving ? 'Sparar…' : isEdit ? 'Uppdatera' : 'Spara abonnemang'}
-            </button>
-          )}
-        </div>
+        {inner}
       </div>
-
-      {/* ── Desktop (modal overlay) ─────────────────────────── */}
-      <div
-        className="hidden md:flex fixed inset-0 bg-black/50 z-50 items-center justify-center"
-        onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
-      >
-        <div className="bg-white rounded-[16px] w-[560px] max-h-[90vh] overflow-y-auto shadow-xl">
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 pt-6 pb-4">
-            <h2 className="text-[18px] font-semibold text-[#111827] tracking-[-0.3px]">
-              {isEdit ? 'Redigera abonnemang' : 'Nytt abonnemang'}
-            </h2>
-            <span className="text-[13px] text-[#9CA3AF]">Steg {step} av 2</span>
-          </div>
-
-          {/* Content */}
-          <div className="px-6 pb-4 space-y-4">
-            {stepContent}
-          </div>
-
-          {/* Footer */}
-          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#E5E7EB]">
-            {step === 1 ? (
-              <button
-                type="button"
-                onClick={onClose}
-                className="bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] px-4 py-2 text-[13px] font-medium transition-all duration-150 ease-out hover:bg-[#F9FAFB]"
-              >
-                Avbryt
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleBack}
-                className="bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] px-4 py-2 text-[13px] font-medium transition-all duration-150 ease-out hover:bg-[#F9FAFB]"
-              >
-                ← Tillbaka
-              </button>
-            )}
-            {step < 2 ? (
-              <button
-                type="button"
-                onClick={handleNext}
-                className="bg-[#1B4FD8] text-white rounded-[6px] px-4 py-2 text-[13px] font-medium transition-all duration-150 ease-out hover:bg-[#1a46c2]"
-              >
-                Nästa →
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={isSaving}
-                className="bg-[#1B4FD8] text-white rounded-[6px] px-4 py-2 text-[13px] font-medium transition-all duration-150 ease-out hover:bg-[#1a46c2] disabled:opacity-50"
-              >
-                {isSaving ? 'Sparar…' : isEdit ? 'Uppdatera' : 'Spara abonnemang'}
-              </button>
-            )}
-          </div>
+      <div className="hidden md:flex fixed inset-0 bg-black/50 z-50 items-center justify-center" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
+        <div className="bg-white rounded-[16px] w-[560px] max-h-[90vh] flex flex-col shadow-xl">
+          {inner}
         </div>
       </div>
     </>

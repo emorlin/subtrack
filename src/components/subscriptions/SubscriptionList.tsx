@@ -188,7 +188,7 @@ function DesktopRow({
       <td className="px-4 py-3 overflow-hidden">
         <div className="flex items-center gap-3 min-w-0">
           <ServiceIcon name={sub.name} />
-          <span className="text-[13px] font-medium text-[#111827] truncate">{sub.name}</span>
+          <span className="text-[13px] font-medium text-[#111827] truncate underline decoration-[#374151] underline-offset-4">{sub.name}</span>
         </div>
       </td>
 
@@ -257,7 +257,7 @@ function MobileRow({
       <ServiceIcon name={sub.name} size="lg" />
 
       <div className="flex-1 min-w-0">
-        <p className="text-[14px] font-medium text-[#111827] truncate">{sub.name}</p>
+        <p className="text-[14px] font-medium text-[#111827] truncate underline decoration-[#374151] underline-offset-4">{sub.name}</p>
         <p className="text-[11px] text-[#6B7280]">{sub.category?.name ?? '—'}</p>
         {sub.status === 'cancelled' ? (
           <span className="bg-[#F3F4F6] text-[#6B7280] text-[10px] font-medium px-1.5 py-0.5 rounded inline-block mt-0.5">
