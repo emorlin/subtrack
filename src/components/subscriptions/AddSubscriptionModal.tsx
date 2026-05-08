@@ -95,10 +95,6 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
     setStep((s) => s + 1)
   }
 
-  function handleBack() {
-    setStep((s) => s - 1)
-  }
-
   function buildFormData(): SubscriptionFormData {
     const bindingMonths = Number(form.binding_months)
     let end_date: string | null = null
