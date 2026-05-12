@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Subscription } from '../../types'
 import { useSubscriptions } from '../../hooks/useSubscriptions'
 import { useCategories } from '../../hooks/useCategories'
-import { getNextRenewalDate, getLastRenewalDate, getEffectiveCurrentAmount } from '../../lib/calculations'
+import { getNextRenewalDate, getLastRenewalDate, getEffectiveCurrentAmount, toMonthlyAmount } from '../../lib/calculations'
 import { daysUntil } from '../../lib/dates'
 
 interface SubscriptionListProps {
@@ -61,7 +61,7 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
               <tr className="border-b border-[var(--c-border)]">
                 <Th>Tjänst</Th>
                 <Th>Kategori</Th>
-                <Th align="right">Kostnad</Th>
+                <Th align="right">Kr/mån</Th>
                 <Th>Intervall</Th>
                 <Th>Förnyelse</Th>
                 <Th>Status</Th>
@@ -183,6 +183,9 @@ function DesktopRow({
     : getNextRenewalDate(sub.start_date, sub.interval, sub.interval_count)
   const days = isCancelled ? null : daysUntil(date)
   const isUrgent = !isCancelled && days !== null && days <= 7
+  const amount = getEffectiveCurrentAmount(sub)
+  const monthly = Math.round(toMonthlyAmount(amount, sub.interval, sub.interval_count))
+  const isMonthly = sub.interval === 'month' && sub.interval_count === 1
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() }
@@ -211,8 +214,15 @@ function DesktopRow({
       </td>
 
       {/* Kostnad */}
-      <td className="px-4 py-3 text-right text-[13px] font-semibold text-[var(--c-text-primary)] whitespace-nowrap overflow-hidden">
-        {getEffectiveCurrentAmount(sub)} kr
+      <td className="px-4 py-3 text-right overflow-hidden">
+        <p className="text-[13px] font-semibold text-[var(--c-text-primary)] whitespace-nowrap">
+          {monthly.toLocaleString('sv-SE')} kr
+        </p>
+        {!isMonthly && (
+          <p className="text-[11px] text-[var(--c-text-subtle)] whitespace-nowrap">
+            {amount.toLocaleString('sv-SE')} kr/{intervalShort(sub.interval, sub.interval_count)}
+          </p>
+        )}
       </td>
 
       {/* Intervall */}
@@ -262,6 +272,9 @@ function MobileRow({
     : getNextRenewalDate(sub.start_date, sub.interval, sub.interval_count)
   const days = isCancelled ? null : daysUntil(date)
   const isUrgent = !isCancelled && days !== null && days <= 7
+  const amount = getEffectiveCurrentAmount(sub)
+  const monthly = Math.round(toMonthlyAmount(amount, sub.interval, sub.interval_count))
+  const isMonthly = sub.interval === 'month' && sub.interval_count === 1
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() }
@@ -296,8 +309,14 @@ function MobileRow({
       </div>
 
       <div className="text-right shrink-0">
-        <p className="text-[14px] font-semibold text-[var(--c-text-primary)]">{getEffectiveCurrentAmount(sub)} kr</p>
-        <p className="text-[11px] text-[var(--c-text-muted)]">{formatRenewalShort(date)}</p>
+        <p className="text-[14px] font-semibold text-[var(--c-text-primary)]">
+          {monthly.toLocaleString('sv-SE')} kr
+        </p>
+        {isMonthly ? (
+          <p className="text-[11px] text-[var(--c-text-muted)]">{formatRenewalShort(date)}</p>
+        ) : (
+          <p className="text-[11px] text-[var(--c-text-subtle)]">{amount.toLocaleString('sv-SE')} kr/{intervalShort(sub.interval, sub.interval_count)}</p>
+        )}
       </div>
     </div>
   )
@@ -390,6 +409,12 @@ function intervalLabel(interval: string, count: number): string {
   if (interval === 'month' && count === 3) return 'Kvartalsvis'
   if (interval === 'year' && count === 1) return 'Årsvis'
   return `Var ${count} ${interval === 'month' ? 'mån' : 'år'}`
+}
+
+function intervalShort(interval: string, count: number): string {
+  if (interval === 'month') return count === 1 ? 'mån' : `${count} mån`
+  if (interval === 'quarter') return 'kvartal'
+  return count === 1 ? 'år' : `${count} år`
 }
 
 function formatRenewalDate(date: Date): string {
