@@ -23,6 +23,7 @@
 - [Säkerhet & RLS](#säkerhet--rls)
 - [Responsiv design & PWA](#responsiv-design--pwa)
 - [Demo-läge](#demo-läge)
+- [Tillgänglighet](#tillgänglighet)
 - [Komma igång](#komma-igång)
 - [Miljövariabler](#miljövariabler)
 - [Supabase — setup](#supabase--setup)
@@ -429,6 +430,38 @@ Demoanvändaren **Alex Svensson** visas med indigo-avatar och namn i topbaren oc
 
 ---
 
+## Tillgänglighet
+
+Subtrack är byggt med **WCAG 2.1 AA** som riktlinje och DOS-lagen (Lagen om tillgänglighet till digital offentlig service) som referens. Samtliga åtgärder är implementerade och testbara med tangentbord, skärmläsare och DevTools.
+
+| Område | Implementerat |
+|---|---|
+| **Skip-länk** | Dold länk ("Hoppa till innehåll") dyker upp vid `Tab`-fokus och hoppar förbi sidnavigationen |
+| **Sidtitlar** | `document.title` uppdateras per sida via `usePageTitle`-hook — t.ex. "Kostnad – Subtrack" |
+| **Rubrikhierarki** | En `<h1>` per sida (synlig eller `sr-only`), `<h2>` för alla sektionsrubriker |
+| **Tangentbord** | Alla rader, knappar och stapeldiagram-staplar är nåbara med `Tab`, aktiverbara med `Enter`/`Mellanslag` |
+| **Fokushantering i modaler** | `useFocusTrap`-hook fångar fokus inuti öppna modaler och återgår till utlösande element vid stängning |
+| **Modalsemantik** | `role="dialog"`, `aria-modal="true"`, `aria-labelledby` på alla tre modaler |
+| **Felmeddelanden** | `role="alert"` på valideringsfel i formulär — skärmläsare läser upp dem automatiskt |
+| **Laddningsstatus** | `role="status"` på laddningstexter för polite uppläsning |
+| **ARIA-states** | `aria-expanded` på kollapsibla avsnitt, `aria-pressed` på filterknappar, `aria-hidden` på dekorativa ikoner |
+| **Stapeldiagram** | Staplarna är `<button>`-element med `aria-label` per stapel; behållaren har `role="img"` med beskrivande etikett |
+| **Tabellstruktur** | `scope="col"` på alla `<th>` i abonnemangstabellen och admintabellen |
+| **Fokusring** | `:focus-visible` genomgående — synlig blå kontur vid tangentbord, ingen vid musklick |
+| **Färgkontrast** | Alla textstorlekar uppfyller 4,5:1 mot bakgrunden i både ljust och mörkt läge |
+
+### Tekniska detaljer
+
+- **`src/hooks/useFocusTrap.ts`** — återanvändbar hook för alla modaler; hanterar synlighetsdetektering via `offsetWidth`/`offsetHeight`/`getClientRects()`
+- **`src/hooks/usePageTitle.ts`** — sätter `document.title` och återställer till "Subtrack" vid avmontering
+- Ikoner från `lucide-react` renderas med `aria-hidden="true"` när de används bredvid text
+
+### Känd begränsning
+
+Inloggningsflödet använder Googles OAuth-dialog vars tillgänglighetsimplementering kontrolleras av Google.
+
+---
+
 ## Komma igång
 
 ### Förutsättningar
@@ -559,7 +592,7 @@ Temat sätts med `data-theme="dark"` på `<html>`-elementet. En inline `<script>
 | `--c-bg-subtle` | `#F3F4F6` | `#334155` | Dividers, subtil bakgrund |
 | `--c-text-primary` | `#111827` | `#F1F5F9` | Rubriker, primärtext |
 | `--c-text-muted` | `#6B7280` | `#94A3B8` | Etiketter, metadata |
-| `--c-text-subtle` | `#9CA3AF` | `#64748B` | Platshållare, hjälptext |
+| `--c-text-subtle` | `#6B7280` | `#94A3B8` | Platshållare, hjälptext |
 | `--c-border` | `#E5E7EB` | `#334155` | Borders |
 | `--c-success-*` | grön | mörkgrön | Aktiv status |
 | `--c-warning-*` | amber | mörk amber | Varning |

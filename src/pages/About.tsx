@@ -1,4 +1,4 @@
-import { Database, Shield, Server, Smartphone, Globe, Code2, Layers, Calculator, Bell, RefreshCw, Lock, MonitorPlay } from 'lucide-react'
+import { Database, Shield, Server, Smartphone, Globe, Code2, Layers, Calculator, Bell, RefreshCw, Lock, MonitorPlay, Eye } from 'lucide-react'
 import { usePageTitle } from '../hooks/usePageTitle'
 
 export default function About() {
@@ -69,6 +69,10 @@ export default function About() {
           <FeatureCard
             title="Admin-vy"
             description="Dold sida på /admin med en översikt av alla registrerade användare: antal konton, abonnemang, aktiva och avslutade. Syns bara för appägaren via en UUID-baserad React-guard kombinerad med dedikerade RLS-policies i Postgres."
+          />
+          <FeatureCard
+            title="Tillgänglighet"
+            description="Byggt enligt WCAG 2.1 AA — tangentbordsnavigering, fokushantering i modaler, ARIA-attribut för skärmläsare, korrekt rubrikhierarki och färgkontrast ≥ 4,5:1 i både ljust och mörkt läge."
           />
         </div>
       </section>
@@ -394,6 +398,35 @@ export default function About() {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      {/* Tillgänglighet */}
+      <section>
+        <SectionHeader icon={<Eye size={16} strokeWidth={2} />} title="Tillgänglighet" />
+        <p className="text-[13px] text-[var(--c-text-secondary)] leading-relaxed mt-3 mb-4">
+          Subtrack är byggt med WCAG 2.1 AA som riktlinje. Målet är att appen ska fungera för alla — oavsett om man navigerar med mus, tangentbord, skärmläsare eller switch-kontroll.
+        </p>
+        <div className="bg-[var(--c-bg-app)] rounded-[10px] border border-[var(--c-border)] p-4 space-y-3">
+          {[
+            ['Tangentbordsnavigering', 'Alla interaktiva element — rader, knappar, staplar i diagrammet — är nåbara med Tab och aktiverbara med Enter eller Mellanslag.'],
+            ['Skip-länk', 'En dold länk ("Hoppa till innehåll") dyker upp vid tangentbordsfokus och hoppar förbi navigationen direkt till sidinnehållet.'],
+            ['Fokushantering i modaler', 'Fokus fångas inuti öppna modaler och återgår till utlösande element när de stängs — förhindrar att fokus hamnar på osynligt innehåll.'],
+            ['Skärmläsarstöd', 'Modaler har role="dialog", aria-modal och aria-labelledby. Felmeddelanden har role="alert" för automatisk uppläsning. Laddningsstatus har role="status".'],
+            ['Rubrikhierarki', 'Varje sida har exakt en h1 och sektionsrubriker är h2 — oavsett visuell storlek.'],
+            ['Färgkontrast', 'Alla textstorlekar uppfyller kravet på 4,5:1 kontrastförhållande mot bakgrunden, i både ljust och mörkt läge.'],
+            ['ARIA-states', 'Kollapsibla avsnitt har aria-expanded. Filterknappars aktivt läge kommuniceras via aria-pressed. Dekorativa ikoner har aria-hidden="true".'],
+            ['Stapeldiagram', 'Varje stapel är ett button-element med aria-label som anger månad och belopp. Diagrambehållaren har role="img" med en beskrivande etikett.'],
+            ['Tabellstruktur', 'Alla tabellrubriker har scope="col" så skärmläsare kan koppla dataceller till rätt kolumn.'],
+            ['Fokusring', 'Synlig fokusring via :focus-visible vid tangentbordsnavigering — men inte vid musklick, för att hålla UI-n rent.'],
+          ].map(([title, detail]) => (
+            <div key={title} className="flex gap-2">
+              <span className="text-[var(--c-accent)] font-semibold shrink-0 mt-0.5">·</span>
+              <p className="text-[12px] text-[var(--c-text-muted)] leading-relaxed">
+                <span className="font-semibold text-[var(--c-text-primary)]">{title}</span> — {detail}
+              </p>
+            </div>
+          ))}
         </div>
       </section>
 
