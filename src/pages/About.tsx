@@ -34,7 +34,7 @@ export default function About() {
           />
           <FeatureCard
             title="Kostnadstrend"
-            description="Stapeldiagram per månad och år med nedbrytning per kategori. Se hur dina abonnemangskostnader utvecklats historiskt."
+            description="Stapeldiagram per månad och år med nedbrytning per kategori. Klicka en stapel för att öppna en detaljmodal med alla aktiva tjänster och deras individuella kostnader just den månaden — navigera månadsvis med pilknappar direkt i modalen (stäng med Esc)."
           />
           <FeatureCard
             title="Påminnelser"

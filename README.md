@@ -45,7 +45,7 @@ Appen är byggd som en **Progressive Web App** och kan installeras direkt från 
 |---|---|
 | **Abonnemangsöversikt** | Lista med aktuell månads- och årskostnad, status och kategori |
 | **Prishistorik** | Spåra prisändringar bakåt i tiden — se exakt vad du betalat sedan starten |
-| **Kostnadstrend** | Stapeldiagram per månad och år med nedbrytning per kategori |
+| **Kostnadstrend** | Stapeldiagram per månad och år med nedbrytning per kategori. Klicka en stapel för att se en detaljlista med alla aktiva tjänster och individuella kostnader den månaden — navigera månadsvis med piltangenter i modalen |
 | **Påminnelser** | Notiser inför förnyelsedatum, konfigurerbart per abonnemang |
 | **Kategorier** | Egna kategorier med valfri färg, standardkategorier skapas automatiskt |
 | **Google-inloggning** | OAuth via Supabase Auth — inga lösenord att hantera |
