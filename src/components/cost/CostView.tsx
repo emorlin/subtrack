@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useId } from 'react'
+import { useState, useEffect, useRef, useId, useMemo } from 'react'
 import { X } from 'lucide-react'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
 import BarChart, { buildMonthBars, isActiveInMonth, getAmountForMonth } from './BarChart'
@@ -8,6 +8,7 @@ import { useSubscriptions } from '../../hooks/useSubscriptions'
 import { useCategories } from '../../hooks/useCategories'
 import { toMonthlyAmount, getEffectiveCurrentAmount } from '../../lib/calculations'
 import type { Subscription, Category } from '../../types'
+import { getTopInsights, type Insight } from '../../lib/insights'
 
 const MONTH_LABELS = ['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec']
 
@@ -68,6 +69,8 @@ export default function CostView() {
         : top,
     null
   )
+
+  const insights = useMemo(() => getTopInsights(subscriptions, categories), [subscriptions, categories])
 
   // Right column: use hovered bar, fall back to current month bar
   const displayBar = hoveredBar ?? bars.find((b) => b.state === 'current') ?? bars[nonFutureBars.length - 1] ?? bars[0]
@@ -166,6 +169,20 @@ export default function CostView() {
           </div>
         </div>
       </div>
+
+      {/* Insights */}
+      {insights.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase">
+            Insikter
+          </p>
+          <div className="flex flex-col md:flex-row gap-3">
+            {insights.map((insight) => (
+              <InsightCard key={insight.id} insight={insight} />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -280,6 +297,30 @@ function MonthDetailModal({
         className="flex flex-col flex-1 md:flex-none bg-[var(--c-bg-card)] md:w-[480px] md:max-h-[85vh] md:rounded-[16px] md:shadow-xl focus:outline-none"
       >
         {inner}
+      </div>
+    </div>
+  )
+}
+
+function InsightCard({ insight }: { insight: Insight }) {
+  const dot =
+    insight.type === 'warning'
+      ? 'bg-[var(--c-warning-text)]'
+      : insight.type === 'positive'
+      ? 'bg-[var(--c-success-text)]'
+      : 'bg-[var(--c-accent)]'
+
+  return (
+    <div className="flex-1 bg-[var(--c-bg-card)] rounded-[12px] border border-[var(--c-border)] p-4">
+      <div className="flex items-start gap-2.5">
+        <span className={`mt-[3px] w-2 h-2 rounded-full shrink-0 ${dot}`} aria-hidden="true" />
+        <div className="min-w-0">
+          <p className="text-[12px] text-[var(--c-text-muted)] leading-snug">{insight.label}</p>
+          <p className="text-[19px] font-semibold text-[var(--c-text-primary)] tracking-[-0.3px] mt-1 leading-tight">
+            {insight.value}
+          </p>
+          <p className="text-[11px] text-[var(--c-text-subtle)] mt-0.5">{insight.detail}</p>
+        </div>
       </div>
     </div>
   )

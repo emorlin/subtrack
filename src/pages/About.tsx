@@ -43,6 +43,10 @@ export default function About() {
             description="Stapeldiagram per månad och år med nedbrytning per kategori. Klicka en stapel för att öppna en detaljmodal med alla aktiva tjänster och deras individuella kostnader just den månaden — navigera månadsvis med pilknappar direkt i modalen (stäng med Esc)."
           />
           <FeatureCard
+            title="Insikter"
+            description="Upp till tre automatiskt valda insikter ovanför stapeldiagrammet: prisökningar senaste 12 mån, pausade abonnemang, mest prisökade tjänst, dominerande kategori, kassaflöde nästa 30 dagar, kostnad per dag, totalt betalt sedan start och äldsta abonnemang. Beräknas direkt ur cachad data — inga extra databasanrop."
+          />
+          <FeatureCard
             title="Påminnelser"
             description="Automatiska notiser inför förnyelsedatum — konfigurerbart antal dagar i förväg per abonnemang. Historik visar skickade och lästa notiser."
           />

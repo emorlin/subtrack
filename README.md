@@ -48,6 +48,7 @@ Appen är byggd som en **Progressive Web App** och kan installeras direkt från 
 | **Tjänsteikoner** | Automatisk logotyp för ~130 kända tjänster (Netflix, Spotify, Adobe m.fl.) via favicon.im. Faller tillbaka på initialerbricka om tjänsten inte finns i mappningen. Täcker svenska tidningar (DN, SvD, GP, Expressen m.fl.), AI-tjänster (ChatGPT, Claude, Midjourney) och dev-verktyg |
 | **Prishistorik** | Spåra prisändringar bakåt i tiden — se exakt vad du betalat sedan starten |
 | **Kostnadstrend** | Stapeldiagram per månad och år med nedbrytning per kategori. Klicka en stapel för att se en detaljlista med alla aktiva tjänster och individuella kostnader den månaden — navigera månadsvis med piltangenter i modalen |
+| **Insikter** | Upp till tre automatiskt valda insikter visas ovanför stapeldiagrammet. Beräknas ur befintlig data utan extra databasanrop: prisökningar senaste 12 mån, pausade abonnemang, mest prisökade tjänst, dominerande kategori, kassaflöde nästa 30 dagar, kostnad per dag, totalt betalt sedan start och äldsta abonnemang |
 | **Påminnelser** | Notiser inför förnyelsedatum, konfigurerbart per abonnemang |
 | **Kategorier** | Egna kategorier med valfri färg, standardkategorier skapas automatiskt |
 | **Google-inloggning** | OAuth via Supabase Auth — inga lösenord att hantera |
