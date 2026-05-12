@@ -53,6 +53,7 @@ Appen är byggd som en **Progressive Web App** och kan installeras direkt från 
 | **Responsiv** | Sticky bottom nav + FAB på mobil, sidebar + sidopanel på desktop. Modaler: fullskärm (mobil) / fast bredd (desktop) |
 | **Demo-läge** | Utforska appen utan konto — hårdkodad data, inga Supabase-anrop |
 | **Mörkt läge** | Fullt mörkt tema via CSS-variabler. Växla i Inställningar → Utseende — valet sparas i `localStorage`, systempreferens används som standard |
+| **Admin-vy** | Dold sida på `/admin` med användaröversikt: antal registrerade konton, totalt antal abonnemang, aktiva/avslutade. Syns bara för appägaren via UUID-baserad guard och dedikerade RLS-policies |
 
 ---
 
@@ -139,7 +140,8 @@ subtrack/
 │   │   ├── useCategories.ts
 │   │   ├── useNotifications.ts
 │   │   ├── useAuth.ts
-│   │   └── useTheme.ts                # Temabyte light/dark, localStorage-persistens
+│   │   ├── useTheme.ts                # Temabyte light/dark, localStorage-persistens
+│   │   └── useAdmin.ts                # ADMIN_ID, useIsAdmin, useAdminUsers
 │   ├── lib/
 │   │   ├── supabase.ts                # Initialiserad Supabase-klient
 │   │   ├── calculations.ts            # Beräkningsfunktioner (se nedan)
@@ -150,6 +152,7 @@ subtrack/
 │   │   ├── Notifications.tsx
 │   │   ├── Settings.tsx
 │   │   ├── About.tsx                  # Om appen
+│   │   ├── Admin.tsx                  # Dold admin-vy, åtkomst via UUID-guard
 │   │   ├── Login.tsx
 │   │   └── AuthCallback.tsx
 │   ├── types/
@@ -360,6 +363,7 @@ Beräknar totalt betalt belopp sedan startdatum med hänsyn till prishistoriken.
 - **Kaskaderad åtkomst** — `price_history` saknar direkt `user_id` men skyddas via `EXISTS`-subquery mot `subscriptions`.
 - **Anon-nyckel** — klienten använder anon-nyckeln som aldrig kan kringgå RLS. Service role-nyckeln används aldrig i klientkoden.
 - **OAuth via Supabase Auth** — inga lösenord lagras. Google hanterar autentiseringen och skickar en JWT som Supabase validerar. Sessions uppdateras automatiskt.
+- **Admin-policies** — separata RLS-policies på `profiles` och `subscriptions` ger appägaren läsrättigheter till alla användares data. Skyddet är tvålager: UUID-jämförelse i React-guarden (`user.id === ADMIN_ID`) och Postgres-policies som matchar samma UUID.
 
 ---
 

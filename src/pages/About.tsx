@@ -64,6 +64,10 @@ export default function About() {
             title="Mörkt läge"
             description="Fullt mörkt tema med CSS-variabler. Växla i inställningar — valet sparas i localStorage och systempreferens används som standard."
           />
+          <FeatureCard
+            title="Admin-vy"
+            description="Dold sida på /admin med en översikt av alla registrerade användare: antal konton, abonnemang, aktiva och avslutade. Syns bara för appägaren via en UUID-baserad React-guard kombinerad med dedikerade RLS-policies i Postgres."
+          />
         </div>
       </section>
 
@@ -214,6 +218,11 @@ export default function About() {
               icon={<Lock size={13} strokeWidth={2} color="var(--c-accent)" />}
               title="OAuth via Supabase Auth"
               detail="Inga lösenord lagras. Google hanterar autentiseringen och skickar en JWT till Supabase som validerar den. Sessions hanteras av Supabase med automatisk refresh."
+            />
+            <SecurityItem
+              icon={<Lock size={13} strokeWidth={2} color="var(--c-accent)" />}
+              title="Admin-guard i tvålager"
+              detail="Admin-vyn skyddas både av en React-guard (user.id === ADMIN_ID) och av dedikerade RLS-policies i Postgres som matchar samma UUID. Ingen annan användare kan se eller hämta övriga användares profiler — varken via appen eller direkt mot Supabase."
             />
           </div>
         </div>
