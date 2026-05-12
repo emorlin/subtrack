@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useId } from 'react'
 import { X } from 'lucide-react'
+import { useFocusTrap } from '../../hooks/useFocusTrap'
 import type { Subscription } from '../../types'
 import { calculateTotalPaid, getNextRenewalDate, getEffectiveCurrentAmount } from '../../lib/calculations'
 import { formatDate, daysUntil } from '../../lib/dates'
@@ -33,6 +34,9 @@ function todayString() {
 export default function SubscriptionDetail({ subscription, onClose, onEdit, onDeleted }: Props) {
   const [actionState, setActionState] = useState<ActionState>('none')
   const [cancelDate, setCancelDate] = useState(todayString)
+  const titleId = useId()
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef)
 
   const { mutateAsync: deleteSub, isPending: isDeleting } = useDeleteSubscription()
   const { mutateAsync: cancelSub, isPending: isCancelling } = useCancelSubscription()
@@ -152,7 +156,7 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
           <ServiceIcon name={subscription.name} size="xl" />
           <div>
             <div className="flex items-center gap-2">
-              <p className="text-[18px] font-semibold text-[var(--c-text-primary)]">{subscription.name}</p>
+              <p id={titleId} className="text-[18px] font-semibold text-[var(--c-text-primary)]">{subscription.name}</p>
               <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${badge.className}`}>
                 {badge.label}
               </span>
@@ -207,16 +211,21 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
   )
 
   return (
-    <>
-      <div className="md:hidden fixed inset-0 bg-[var(--c-bg-card)] z-40 flex flex-col">
+    <div
+      className="fixed inset-0 z-40 flex flex-col md:bg-[var(--c-overlay)] md:items-center md:justify-center"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className="flex flex-col flex-1 md:flex-none bg-[var(--c-bg-card)] md:w-[480px] md:max-h-[85vh] md:rounded-[16px] md:shadow-xl focus:outline-none"
+      >
         {inner}
       </div>
-      <div className="hidden md:flex fixed inset-0 bg-[var(--c-overlay)] z-40 items-center justify-center" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
-        <div className="bg-[var(--c-bg-card)] rounded-[16px] w-[480px] max-h-[85vh] flex flex-col shadow-xl">
-          {inner}
-        </div>
-      </div>
-    </>
+    </div>
   )
 }
 

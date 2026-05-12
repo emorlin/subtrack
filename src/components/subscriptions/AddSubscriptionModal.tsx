@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useId } from 'react'
 import { X } from 'lucide-react'
+import { useFocusTrap } from '../../hooks/useFocusTrap'
 import { useCategories } from '../../hooks/useCategories'
 import { useAddSubscription, useUpdateSubscription } from '../../hooks/useSubscriptions'
 import type { Subscription, SubscriptionInterval, SubscriptionFormData } from '../../types'
@@ -63,6 +64,9 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
   const addSubscription = useAddSubscription()
   const updateSubscription = useUpdateSubscription()
   const isSaving = addSubscription.isPending || updateSubscription.isPending
+  const titleId = useId()
+  const dialogRef = useRef<HTMLDivElement>(null)
+  useFocusTrap(dialogRef)
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -126,56 +130,56 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
     </>
   )
 
-  const inner = (
-    <>
-      <div className="relative flex items-center justify-center px-4 h-14 border-b border-[var(--c-border)] shrink-0">
-        <span className="text-[14px] font-semibold text-[var(--c-text-primary)]">
-          {isEdit ? 'Redigera abonnemang' : 'Nytt abonnemang'}
-        </span>
-        <button type="button" onClick={onClose} className="absolute right-4 text-[var(--c-text-subtle)] hover:text-[var(--c-text-secondary)] transition-colors" aria-label="Stäng">
-          <X size={20} />
-        </button>
-      </div>
-      <div className="px-6 py-4 shrink-0">
-        <StepIndicator step={step} />
-      </div>
-      <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-4 space-y-4">
-        {stepContent}
-      </div>
-      <div className="px-4 py-4 border-t border-[var(--c-border)] shrink-0">
-        {step < 2 ? (
-          <button
-            type="button"
-            onClick={handleNext}
-            className="w-full bg-[var(--c-accent)] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out"
-          >
-            Nästa →
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={isSaving}
-            className="w-full bg-[var(--c-accent)] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out disabled:opacity-50"
-          >
-            {isSaving ? 'Sparar…' : isEdit ? 'Uppdatera' : 'Spara abonnemang'}
-          </button>
-        )}
-      </div>
-    </>
-  )
-
   return (
-    <>
-      <div className="md:hidden fixed inset-0 bg-[var(--c-bg-card)] z-50 flex flex-col">
-        {inner}
-      </div>
-      <div className="hidden md:flex fixed inset-0 bg-[var(--c-overlay)] z-50 items-center justify-center" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
-        <div className="bg-[var(--c-bg-card)] rounded-[16px] w-[560px] max-h-[90vh] flex flex-col shadow-xl">
-          {inner}
+    <div
+      className="fixed inset-0 z-50 flex flex-col md:bg-[var(--c-overlay)] md:items-center md:justify-center"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        tabIndex={-1}
+        className="flex flex-col flex-1 md:flex-none bg-[var(--c-bg-card)] md:w-[560px] md:max-h-[90vh] md:rounded-[16px] md:shadow-xl focus:outline-none"
+      >
+        <div className="relative flex items-center justify-center px-4 h-14 border-b border-[var(--c-border)] shrink-0">
+          <span id={titleId} className="text-[14px] font-semibold text-[var(--c-text-primary)]">
+            {isEdit ? 'Redigera abonnemang' : 'Nytt abonnemang'}
+          </span>
+          <button type="button" onClick={onClose} className="absolute right-4 text-[var(--c-text-subtle)] hover:text-[var(--c-text-secondary)] transition-colors" aria-label="Stäng">
+            <X size={20} />
+          </button>
+        </div>
+        <div className="px-6 py-4 shrink-0">
+          <StepIndicator step={step} />
+        </div>
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-4 space-y-4">
+          {step === 1 && <BasicInfoStep form={form} update={update} errors={errors} />}
+          {step === 2 && <ConfirmStep form={form} update={update} />}
+        </div>
+        <div className="px-4 py-4 border-t border-[var(--c-border)] shrink-0">
+          {step < 2 ? (
+            <button
+              type="button"
+              onClick={handleNext}
+              className="w-full bg-[var(--c-accent)] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out"
+            >
+              Nästa →
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={isSaving}
+              className="w-full bg-[var(--c-accent)] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out disabled:opacity-50"
+            >
+              {isSaving ? 'Sparar…' : isEdit ? 'Uppdatera' : 'Spara abonnemang'}
+            </button>
+          )}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
