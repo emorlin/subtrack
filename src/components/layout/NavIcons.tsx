@@ -1,4 +1,4 @@
-import { LayoutDashboard, TrendingUp, Bell, Settings, Info } from 'lucide-react'
+import { LayoutDashboard, TrendingUp, Bell, Settings, Info, ShieldCheck } from 'lucide-react'
 
 type IconProps = { active: boolean }
 
@@ -20,4 +20,8 @@ export function IconSettings({ active }: IconProps) {
 
 export function IconAbout({ active }: IconProps) {
   return <Info size={20} color={active ? 'var(--c-accent)' : 'var(--c-text-muted)'} strokeWidth={2} />
+}
+
+export function IconAdmin({ active }: IconProps) {
+  return <ShieldCheck size={20} color={active ? 'var(--c-accent)' : 'var(--c-text-muted)'} strokeWidth={2} />
 }
