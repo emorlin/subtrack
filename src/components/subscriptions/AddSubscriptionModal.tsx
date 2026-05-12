@@ -123,13 +123,6 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
     }
   }
 
-  const stepContent = (
-    <>
-      {step === 1 && <BasicInfoStep form={form} update={update} errors={errors} />}
-      {step === 2 && <ConfirmStep form={form} update={update} />}
-    </>
-  )
-
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col md:bg-[var(--c-overlay)] md:items-center md:justify-center"
