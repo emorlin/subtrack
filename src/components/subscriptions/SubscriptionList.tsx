@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { getDomainForService } from '../../lib/serviceIcons'
 import type { Subscription } from '../../types'
 import { useSubscriptions } from '../../hooks/useSubscriptions'
 import { useCategories } from '../../hooks/useCategories'
@@ -325,13 +326,28 @@ function MobileRow({
 // ── Helpers ────────────────────────────────────────────────
 
 function ServiceIcon({ name, size = 'md' }: { name: string; size?: 'md' | 'lg' }) {
-  const initials = getInitials(name)
-  const dim = size === 'lg' ? 'w-10 h-10 text-[13px]' : 'w-8 h-8 text-[11px]'
+  const [failed, setFailed] = useState(false)
+  const domain = getDomainForService(name)
+  const dim = size === 'lg' ? 'w-10 h-10' : 'w-8 h-8'
+  const textDim = size === 'lg' ? 'text-[13px]' : 'text-[11px]'
+
+  if (domain && !failed) {
+    return (
+      <img
+        src={`https://favicon.im/${domain}?larger=true`}
+        alt=""
+        aria-hidden="true"
+        onError={() => setFailed(true)}
+        className={`${dim} rounded-[10px] object-contain bg-white shrink-0`}
+      />
+    )
+  }
+
   return (
     <div
-      className={`${dim} rounded-[10px] bg-[var(--c-bg-subtle)] flex items-center justify-center font-medium text-[var(--c-text-secondary)] shrink-0`}
+      className={`${dim} rounded-[10px] bg-[var(--c-bg-subtle)] flex items-center justify-center font-medium ${textDim} text-[var(--c-text-secondary)] shrink-0`}
     >
-      {initials}
+      {getInitials(name)}
     </div>
   )
 }

@@ -28,7 +28,11 @@ export default function About() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
           <FeatureCard
             title="Abonnemangsöversikt"
-            description="Se alla dina abonnemang i en lista med aktuell månads- och årskostnad. Filtrera och sortera per kategori, status eller kostnad."
+            description="Se alla dina abonnemang normaliserade till kr/mån för enkel jämförelse — oavsett om de faktureras månadsvis, kvartalsvis eller årsvis. Faktiskt belopp visas som ledtext för icke-månadsabonnemang."
+          />
+          <FeatureCard
+            title="Tjänsteikoner"
+            description="Automatisk logotyp för ~130 kända tjänster via favicon.im — Netflix, Spotify, Adobe, ChatGPT, Claude, svenska tidningar med mera. Faller tillbaka på initialerbricka för okända tjänster."
           />
           <FeatureCard
             title="Prishistorik"

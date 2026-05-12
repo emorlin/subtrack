@@ -44,14 +44,15 @@ Appen är byggd som en **Progressive Web App** och kan installeras direkt från 
 
 | Funktion | Beskrivning |
 |---|---|
-| **Abonnemangsöversikt** | Lista med aktuell månads- och årskostnad, status och kategori |
+| **Abonnemangsöversikt** | Lista med alla tjänster normaliserade till kr/mån för enkel jämförelse — oavsett om abonnemanget faktureras månadsvis, kvartalsvis eller årsvis. Faktiskt fakturerat belopp visas som ledtext för icke-månadsabonnemang |
+| **Tjänsteikoner** | Automatisk logotyp för ~130 kända tjänster (Netflix, Spotify, Adobe m.fl.) via favicon.im. Faller tillbaka på initialerbricka om tjänsten inte finns i mappningen. Täcker svenska tidningar (DN, SvD, GP, Expressen m.fl.), AI-tjänster (ChatGPT, Claude, Midjourney) och dev-verktyg |
 | **Prishistorik** | Spåra prisändringar bakåt i tiden — se exakt vad du betalat sedan starten |
 | **Kostnadstrend** | Stapeldiagram per månad och år med nedbrytning per kategori. Klicka en stapel för att se en detaljlista med alla aktiva tjänster och individuella kostnader den månaden — navigera månadsvis med piltangenter i modalen |
 | **Påminnelser** | Notiser inför förnyelsedatum, konfigurerbart per abonnemang |
 | **Kategorier** | Egna kategorier med valfri färg, standardkategorier skapas automatiskt |
 | **Google-inloggning** | OAuth via Supabase Auth — inga lösenord att hantera |
 | **PWA / Hemskärm** | Installerbar som app på iOS och Android |
-| **Responsiv** | Sticky bottom nav + FAB på mobil, sidebar + sidopanel på desktop. Modaler: fullskärm (mobil) / fast bredd (desktop) |
+| **Responsiv** | Sticky bottom nav + FAB på mobil, sidebar + sidopanel på desktop. Modaler: fullskärm (mobil) / fast bredd (desktop). Abonnemangstabellen scrollar horisontellt på tablet när den inte får plats |
 | **Demo-läge** | Utforska appen utan konto — hårdkodad data, inga Supabase-anrop |
 | **Mörkt läge** | Fullt mörkt tema via CSS-variabler. Växla i Inställningar → Utseende — valet sparas i `localStorage`, systempreferens används som standard |
 | **Admin-vy** | Dold sida på `/admin` med användaröversikt: antal registrerade konton, totalt antal abonnemang, aktiva/avslutade. Syns bara för appägaren via UUID-baserad guard och dedikerade RLS-policies |
@@ -365,6 +366,7 @@ Beräknar totalt betalt belopp sedan startdatum med hänsyn till prishistoriken.
 - **Anon-nyckel** — klienten använder anon-nyckeln som aldrig kan kringgå RLS. Service role-nyckeln används aldrig i klientkoden.
 - **OAuth via Supabase Auth** — inga lösenord lagras. Google hanterar autentiseringen och skickar en JWT som Supabase validerar. Sessions uppdateras automatiskt.
 - **Admin-policies** — separata RLS-policies på `profiles` och `subscriptions` ger appägaren läsrättigheter till alla användares data. Skyddet är tvålager: UUID-jämförelse i React-guarden (`user.id === ADMIN_ID`) och Postgres-policies som matchar samma UUID.
+- **Defense-in-depth på queries** — alla Supabase-queries filtrerar explicit på `user_id = auth.uid()` i klientkoden, utöver RLS-skyddet. Förhindrar datainläckage även om en RLS-policy skulle vara felkonfigurerad (t.ex. en admin-policy som ger bredare läsrättigheter).
 
 ---
 
