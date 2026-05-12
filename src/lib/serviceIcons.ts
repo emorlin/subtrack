@@ -239,3 +239,75 @@ export function getDomainForService(name: string): string | null {
   const match = SORTED_KEYS.find((key) => lower.includes(key))
   return match ? SERVICE_DOMAINS[match] : null
 }
+
+// ── Type-ahead suggestions ──────────────────────────────────
+
+const DISPLAY_NAMES: Record<string, string> = {
+  'apple tv':          'Apple TV+',
+  'apple music':       'Apple Music',
+  'apple arcade':      'Apple Arcade',
+  'apple one':         'Apple One',
+  'apple fitness':     'Apple Fitness+',
+  'google one':        'Google One',
+  'google workspace':  'Google Workspace',
+  'google cloud':      'Google Cloud',
+  'hbo max':           'HBO Max',
+  'youtube premium':   'YouTube Premium',
+  'youtube':           'YouTube',
+  'icloud':            'iCloud',
+  'onedrive':          'OneDrive',
+  'microsoft 365':     'Microsoft 365',
+  'office 365':        'Office 365',
+  'm365':              'Microsoft 365',
+  'o365':              'Office 365',
+  'creative cloud':    'Adobe Creative Cloud',
+  'github copilot':    'GitHub Copilot',
+  'github':            'GitHub',
+  'gitlab':            'GitLab',
+  'chatgpt':           'ChatGPT',
+  'openai':            'OpenAI',
+  'gpt':               'GPT',
+  'aws':               'AWS',
+  'nordvpn':           'NordVPN',
+  'expressvpn':        'ExpressVPN',
+  '1password':         '1Password',
+  'ea play':           'EA Play',
+  'game pass':         'Xbox Game Pass',
+  'gog':               'GOG',
+  'geforce':           'NVIDIA GeForce Now',
+  'playstation':       'PlayStation',
+  'skyshowtime':       'SkyShowtime',
+  'soundcloud':        'SoundCloud',
+  'curiosity stream':  'CuriosityStream',
+  'cleanmymac':        'CleanMyMac',
+  'myfitnesspal':      'MyFitnessPal',
+  'frontend masters':  'Frontend Masters',
+  'ynab':              'YNAB',
+  'dn':                'DN',
+  'di':                'DI',
+  'svd':               'SvD',
+  'gp':                'GP',
+  'sr':                'SR',
+  'svt':               'SVT',
+  'tv4':               'TV4',
+  'hd':                'HD',
+  'vk':                'VK',
+  'nwt':               'NWT',
+  'dagens nyheter':    'Dagens Nyheter',
+  'svenska dagbladet': 'Svenska Dagbladet',
+  'dagens industri':   'Dagens Industri',
+  'göteborgs-posten':  'Göteborgs-Posten',
+  'göteborgs posten':  'Göteborgs-Posten',
+  'göteborgsposten':   'Göteborgs-Posten',
+  'östgöta':           'Östgöta Correspondenten',
+  'corren':            'Corren',
+}
+
+function toDisplayName(key: string): string {
+  if (DISPLAY_NAMES[key]) return DISPLAY_NAMES[key]
+  return key.split(' ').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+}
+
+export const SERVICE_SUGGESTIONS: string[] = Array.from(
+  new Set(Object.keys(SERVICE_DOMAINS).map(toDisplayName))
+).sort((a, b) => a.localeCompare(b, 'sv'))

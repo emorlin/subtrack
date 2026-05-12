@@ -35,6 +35,10 @@ export default function About() {
             description="Automatisk logotyp för ~130 kända tjänster via favicon.im — Netflix, Spotify, Adobe, ChatGPT, Claude, svenska tidningar med mera. Faller tillbaka på initialerbricka för okända tjänster."
           />
           <FeatureCard
+            title="Type-ahead"
+            description="Autocomplete på tjänstnamnet i formuläret. Börja skriva så filtreras ~130 kända tjänster fram med ikonförhandsvisning — välj med mus eller tangentbord. Byggt med Headless UI för fullständig tillgänglighet."
+          />
+          <FeatureCard
             title="Prishistorik"
             description="Spåra prisändringar över tid. Lägg till historiska priser för att se exakt vad du betalat sedan starten, inte bara nuvarande pris."
           />

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useId } from 'react'
 import { X } from 'lucide-react'
+import ServiceNameCombobox from '../ui/ServiceNameCombobox'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
 import { useCategories } from '../../hooks/useCategories'
 import { useAddSubscription, useUpdateSubscription } from '../../hooks/useSubscriptions'
@@ -235,12 +236,10 @@ function BasicInfoStep({
   return (
     <>
       <Field label="Tjänstens namn" required error={errors.name}>
-        <input
-          type="text"
+        <ServiceNameCombobox
           value={form.name}
-          onChange={(e) => update('name', e.target.value)}
-          placeholder="t.ex. Netflix"
-          className={inputClass(!!errors.name)}
+          onChange={(v) => update('name', v)}
+          hasError={!!errors.name}
         />
       </Field>
 
