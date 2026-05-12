@@ -51,11 +51,11 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
       </div>
 
       {/* Desktop table */}
-      <div className="hidden md:block">
+      <div className="hidden md:block overflow-x-auto">
         {active.length === 0 ? (
           <EmptyState onAdd={onAdd} />
         ) : (
-          <table className="w-full table-fixed">
+          <table className="w-full table-fixed min-w-[600px]">
             <ColGroup />
             <thead>
               <tr className="border-b border-[var(--c-border)]">
@@ -94,7 +94,7 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
               <span aria-hidden="true">{showCancelled ? '▲' : '▼'}</span>
             </button>
             {showCancelled && (
-              <table id="cancelled-list-desktop" className="w-full table-fixed opacity-50">
+              <table id="cancelled-list-desktop" className="w-full table-fixed min-w-[600px] opacity-50">
                 <ColGroup />
                 <tbody>
                   {cancelled.map((sub) => (
