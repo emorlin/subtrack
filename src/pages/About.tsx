@@ -63,6 +63,10 @@ export default function About() {
             description="Autentisering via Google OAuth — inga separata lösenord att hantera. Profil­bild och namn hämtas automatiskt från Google-kontot."
           />
           <FeatureCard
+            title="Exportera CSV"
+            description="Ladda ner alla abonnemang som en CSV-fil med ett klick — knappen finns i filtreringsraden på översiktssidan. Filen öppnas direkt i Excel med rätt teckenkodning (UTF-8 BOM, semikolonavgränsning) och innehåller tjänst, kategori, belopp, intervall, kr/mån, status, startdatum, nästa förnyelse och anteckningar."
+          />
+          <FeatureCard
             title="Demo-läge"
             description="Prova appen utan att skapa ett konto. Hårdkodad exempeldata med 8 abonnemang och en demoanvändare (Alex Svensson) med avatar och namn i topbaren. Alla skrivoperationer fungerar men sparas bara i minnet."
           />

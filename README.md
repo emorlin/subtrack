@@ -53,6 +53,7 @@ Appen är byggd som en **Progressive Web App** och kan installeras direkt från 
 | **Google-inloggning** | OAuth via Supabase Auth — inga lösenord att hantera |
 | **PWA / Hemskärm** | Installerbar som app på iOS och Android |
 | **Responsiv** | Sticky bottom nav + FAB på mobil, sidebar + sidopanel på desktop. Modaler: fullskärm (mobil) / fast bredd (desktop). Abonnemangstabellen scrollar horisontellt på tablet när den inte får plats |
+| **Exportera CSV** | Ladda ner alla abonnemang som en CSV-fil med ett klick — öppnas direkt i Excel med rätt teckenkodning (UTF-8 BOM, semikolonavgränsning). Innehåller tjänst, kategori, belopp, intervall, kr/mån, status, startdatum, nästa förnyelse och anteckningar |
 | **Demo-läge** | Utforska appen utan konto — hårdkodad data, inga Supabase-anrop |
 | **Mörkt läge** | Fullt mörkt tema via CSS-variabler. Växla i Inställningar → Utseende — valet sparas i `localStorage`, systempreferens används som standard |
 | **Admin-vy** | Dold sida på `/admin` med användaröversikt: antal registrerade konton, totalt antal abonnemang, aktiva/avslutade. Syns bara för appägaren via UUID-baserad guard och dedikerade RLS-policies |

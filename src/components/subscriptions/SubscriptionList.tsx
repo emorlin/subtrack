@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react'
+import { ArrowUp, ArrowDown, ArrowUpDown, Download } from 'lucide-react'
+import { exportSubscriptionsToCSV } from '../../lib/export'
 import { getDomainForService } from '../../lib/serviceIcons'
 import type { Subscription } from '../../types'
 import { useSubscriptions } from '../../hooks/useSubscriptions'
@@ -65,13 +66,23 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
             onClick={() => setActiveCategoryId(cat.id)}
           />
         ))}
-        <button
-          type="button"
-          onClick={onAdd}
-          className="ml-auto shrink-0 bg-[var(--c-accent)] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium transition-all duration-150 ease-out hover:bg-[var(--c-accent-hover)] hidden md:block"
-        >
-          + Lägg till
-        </button>
+        <div className="ml-auto shrink-0 flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => exportSubscriptionsToCSV(subscriptions)}
+            className="hidden md:flex items-center gap-1.5 bg-white border border-[var(--c-border)] text-[var(--c-text-secondary)] rounded-[6px] px-3 py-1.5 text-[12px] font-medium transition-all duration-150 ease-out hover:border-[var(--c-border-strong)] hover:text-[var(--c-text-primary)]"
+          >
+            <Download size={13} />
+            Exportera CSV
+          </button>
+          <button
+            type="button"
+            onClick={onAdd}
+            className="bg-[var(--c-accent)] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium transition-all duration-150 ease-out hover:bg-[var(--c-accent-hover)] hidden md:block"
+          >
+            + Lägg till
+          </button>
+        </div>
       </div>
 
       {/* Desktop table */}
