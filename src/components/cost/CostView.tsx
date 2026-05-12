@@ -101,6 +101,7 @@ export default function CostView() {
           onClose={() => setSelectedBar(null)}
         />
       )}
+      <h1 className="sr-only">Kostnad</h1>
       {/* Metric cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <MetricCard label={ytdLabel} value={`${Math.round(ytd).toLocaleString('sv-SE')} kr`} accent />

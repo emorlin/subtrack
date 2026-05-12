@@ -1,6 +1,8 @@
 import { Database, Shield, Server, Smartphone, Globe, Code2, Layers, Calculator, Bell, RefreshCw, Lock, MonitorPlay } from 'lucide-react'
+import { usePageTitle } from '../hooks/usePageTitle'
 
 export default function About() {
+  usePageTitle('Om appen')
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 pb-16 space-y-12">
 

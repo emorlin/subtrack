@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useLayout } from '../components/layout/AppLayout'
+import { usePageTitle } from '../hooks/usePageTitle'
 import SubscriptionList from '../components/subscriptions/SubscriptionList'
 import AddSubscriptionModal from '../components/subscriptions/AddSubscriptionModal'
 import SubscriptionDetail from '../components/subscriptions/SubscriptionDetail'
@@ -12,6 +13,7 @@ type ModalState =
   | { type: 'edit'; subscriptionId: string }
 
 export default function Dashboard() {
+  usePageTitle('Översikt')
   const { openAdd } = useLayout()
   const { data: subscriptions = [] } = useSubscriptions()
   const [modal, setModal] = useState<ModalState>({ type: 'none' })
@@ -33,6 +35,7 @@ export default function Dashboard() {
 
   return (
     <div className="p-4 md:p-6 space-y-4">
+      <h1 className="sr-only">Översikt</h1>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <MetricCard label="Per månad" value={`${Math.round(monthlyTotal)} kr`} accent />
         <MetricCard label="Per år" value={`${Math.round(monthlyTotal * 12).toLocaleString('sv-SE')} kr`} />

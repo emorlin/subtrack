@@ -11,7 +11,7 @@ const navItems = [
 
 export default function BottomNav() {
   return (
-    <nav className="bg-[var(--c-bg-card)] border-t border-[var(--c-border)] flex" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <nav aria-label="Huvudnavigation" className="bg-[var(--c-bg-card)] border-t border-[var(--c-border)] flex" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       {navItems.map(({ label, to, icon: Icon }) => (
         <NavLink
           key={to}

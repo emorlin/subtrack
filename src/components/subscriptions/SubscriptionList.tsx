@@ -86,13 +86,15 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
             <button
               type="button"
               onClick={() => setShowCancelled((v) => !v)}
+              aria-expanded={showCancelled}
+              aria-controls="cancelled-list-desktop"
               className="w-full flex items-center justify-between px-4 py-3 border-t border-[var(--c-border)] text-[12px] text-[var(--c-text-muted)] hover:bg-[var(--c-bg-app)] transition-colors"
             >
               <span>Avslutade ({cancelled.length})</span>
-              <span>{showCancelled ? '▲' : '▼'}</span>
+              <span aria-hidden="true">{showCancelled ? '▲' : '▼'}</span>
             </button>
             {showCancelled && (
-              <table className="w-full table-fixed opacity-50">
+              <table id="cancelled-list-desktop" className="w-full table-fixed opacity-50">
                 <ColGroup />
                 <tbody>
                   {cancelled.map((sub) => (
@@ -138,13 +140,15 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
             <button
               type="button"
               onClick={() => setShowCancelled((v) => !v)}
+              aria-expanded={showCancelled}
+              aria-controls="cancelled-list-mobile"
               className="w-full flex items-center justify-between px-4 py-3 border-t border-[var(--c-border)] text-[12px] text-[var(--c-text-muted)]"
             >
               <span>Avslutade ({cancelled.length})</span>
-              <span>{showCancelled ? '▲' : '▼'}</span>
+              <span aria-hidden="true">{showCancelled ? '▲' : '▼'}</span>
             </button>
             {showCancelled && (
-              <div className="opacity-50">
+              <div id="cancelled-list-mobile" className="opacity-50">
                 {cancelled.map((sub) => (
                   <MobileRow
                     key={sub.id}
@@ -180,10 +184,16 @@ function DesktopRow({
   const days = isCancelled ? null : daysUntil(date)
   const isUrgent = !isCancelled && days !== null && days <= 7
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() }
+  }
+
   return (
     <tr
       onClick={onClick}
-      className={`border-b border-[var(--c-border)] cursor-pointer transition-all duration-150 ease-out ${
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      className={`border-b border-[var(--c-border)] cursor-pointer transition-all duration-150 ease-out focus-visible:outline-2 focus-visible:outline-[var(--c-accent)] focus-visible:outline-offset-[-2px] ${
         selected ? 'bg-[var(--c-accent-subtle)]' : 'hover:bg-[var(--c-bg-app)]'
       }`}
     >
@@ -253,10 +263,17 @@ function MobileRow({
   const days = isCancelled ? null : daysUntil(date)
   const isUrgent = !isCancelled && days !== null && days <= 7
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() }
+  }
+
   return (
     <div
       onClick={onClick}
-      className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--c-border)] cursor-pointer transition-all duration-150 ease-out ${
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--c-border)] cursor-pointer transition-all duration-150 ease-out focus-visible:outline-2 focus-visible:outline-[var(--c-accent)] focus-visible:outline-offset-[-2px] ${
         selected ? 'bg-[var(--c-accent-subtle)]' : 'active:bg-[var(--c-bg-app)]'
       }`}
     >
@@ -305,6 +322,7 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={`shrink-0 px-3 py-1 rounded-full text-[12px] font-medium transition-all duration-150 ease-out ${
         active
           ? 'bg-[var(--c-accent)] text-white'
@@ -348,6 +366,7 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
 function Th({ children, align }: { children: string; align?: 'right' }) {
   return (
     <th
+      scope="col"
       className={`px-4 py-2.5 text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase text-left ${
         align === 'right' ? 'text-right' : ''
       }`}

@@ -25,7 +25,7 @@ export default function AppLayout() {
   if (loading && !isDemoMode) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--c-bg-app)]">
-        <span className="text-[13px] text-[var(--c-text-subtle)]">Laddar…</span>
+        <span role="status" className="text-[13px] text-[var(--c-text-subtle)]">Laddar…</span>
       </div>
     )
   }
@@ -39,6 +39,12 @@ export default function AppLayout() {
   return (
     <LayoutContext.Provider value={{ openAdd }}>
       <div className="h-dvh bg-[var(--c-bg-app)] flex flex-col">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-[var(--c-accent)] focus:text-white focus:rounded-[6px] focus:text-[13px] focus:font-medium"
+        >
+          Hoppa till innehåll
+        </a>
         <TopBar action={
           <button
             type="button"
@@ -61,7 +67,7 @@ export default function AppLayout() {
           <aside className="hidden md:block w-[188px] shrink-0 border-r border-[var(--c-border)] bg-[var(--c-bg-card)]">
             <Sidebar />
           </aside>
-          <main className="flex-1 overflow-y-auto">
+          <main id="main-content" className="flex-1 overflow-y-auto">
             <Outlet />
           </main>
         </div>

@@ -81,59 +81,68 @@ export function buildMonthBars(subscriptions: Subscription[], year: number): Mon
 }
 
 export default function BarChart({ bars, onHover, onClick, chartHeight = 80 }: BarChartProps) {
-  const [hoveredMonth, setHoveredMonth] = useState<number | null>(null)
+  const [activeMonth, setActiveMonth] = useState<number | null>(null)
   const max = Math.max(...bars.map((b) => b.amount), 1)
 
-  function handleEnter(bar: MonthBar) {
-    setHoveredMonth(bar.month)
+  function handleActivate(bar: MonthBar) {
+    setActiveMonth(bar.month)
     onHover?.(bar)
   }
 
-  function handleLeave() {
-    setHoveredMonth(null)
+  function handleDeactivate() {
+    setActiveMonth(null)
     onHover?.(null)
   }
 
   return (
-    <div className="flex items-end gap-1">
+    <div role="img" aria-label="Stapeldiagram: månadsvis kostnad" className="flex items-end gap-1">
       {bars.map((bar) => {
-        const isHovered = hoveredMonth === bar.month
+        const isActive = activeMonth === bar.month
         const barH = Math.max(Math.round((bar.amount / max) * chartHeight), bar.amount > 0 ? 4 : 2)
         const color =
           bar.state === 'current' ? 'bg-[var(--c-accent)]'
           : bar.state === 'past'  ? 'bg-[var(--c-accent-muted)]'
           :                         'bg-[var(--c-border)]'
+        const cap = bar.label.charAt(0).toUpperCase() + bar.label.slice(1)
+        const stateLabel = bar.state === 'future' ? ' (prognos)' : ''
+        const ariaLabel = `${cap}: ${Math.round(bar.amount).toLocaleString('sv-SE')} kr${stateLabel}`
 
         return (
-          <div
+          <button
             key={bar.month}
-            className="flex-1 flex flex-col items-center gap-1 relative cursor-pointer"
-            onMouseEnter={() => handleEnter(bar)}
-            onMouseLeave={handleLeave}
+            type="button"
+            aria-label={ariaLabel}
+            onMouseEnter={() => handleActivate(bar)}
+            onMouseLeave={handleDeactivate}
+            onFocus={() => handleActivate(bar)}
+            onBlur={handleDeactivate}
             onClick={() => onClick?.(bar)}
+            className="flex-1 flex flex-col items-center gap-1 relative bg-transparent border-0 p-0 cursor-pointer focus-visible:outline-2 focus-visible:outline-[var(--c-accent)] focus-visible:outline-offset-2 focus-visible:rounded-[2px]"
           >
-            {/* Tooltip */}
-            {isHovered && (
-              <div className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-[var(--c-text-primary)] text-[var(--c-bg-card)] text-[10px] font-medium px-1.5 py-0.5 rounded-[4px] whitespace-nowrap z-10 pointer-events-none">
+            {/* Tooltip — visas vid hover och tangentbordsfokus */}
+            {isActive && (
+              <div aria-hidden="true" className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-[var(--c-text-primary)] text-[var(--c-bg-card)] text-[10px] font-medium px-1.5 py-0.5 rounded-[4px] whitespace-nowrap z-10 pointer-events-none">
                 {Math.round(bar.amount).toLocaleString('sv-SE')} kr
               </div>
             )}
 
             {/* Bar */}
             <div
-              className={`w-full rounded-[2px] transition-all duration-150 ${color} ${isHovered ? 'opacity-70' : ''}`}
+              aria-hidden="true"
+              className={`w-full rounded-[2px] transition-all duration-150 ${color} ${isActive ? 'opacity-70' : ''}`}
               style={{ height: barH }}
             />
 
             {/* Month label */}
             <span
+              aria-hidden="true"
               className={`text-[9px] font-medium ${
                 bar.state === 'current' ? 'text-[var(--c-accent)]' : 'text-[var(--c-text-subtle)]'
               }`}
             >
               {bar.label}
             </span>
-          </div>
+          </button>
         )
       })}
     </div>

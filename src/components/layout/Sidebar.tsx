@@ -19,7 +19,7 @@ export default function Sidebar() {
   const isAdmin = useIsAdmin()
 
   return (
-    <nav className="pt-2 flex flex-col h-full">
+    <nav aria-label="Huvudnavigation" className="pt-2 flex flex-col h-full">
       <div className="flex-1">
         {navItems.map(({ label, to, icon: Icon }) => (
           <NavLink key={to} to={to} end={to === '/'} className={({ isActive }) => linkClass(isActive)}>

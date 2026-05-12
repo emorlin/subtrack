@@ -1,10 +1,12 @@
 import { Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useAdminUsers, ADMIN_ID } from '../hooks/useAdmin'
+import { usePageTitle } from '../hooks/usePageTitle'
 import type { AdminUser } from '../hooks/useAdmin'
 
 export default function Admin() {
   const { user, loading } = useAuth()
+  usePageTitle('Admin')
 
   if (loading) return null
   if (user?.id !== ADMIN_ID) return <Navigate to="/" replace />
@@ -48,7 +50,7 @@ function AdminContent() {
         </div>
 
         {isLoading ? (
-          <p className="px-4 py-6 text-[13px] text-[var(--c-text-muted)]">Laddar…</p>
+          <p role="status" className="px-4 py-6 text-[13px] text-[var(--c-text-muted)]">Laddar…</p>
         ) : users.length === 0 ? (
           <p className="px-4 py-6 text-[13px] text-[var(--c-text-muted)]">
             Inga användare hittades — kontrollera att RLS-policies är tillagda i Supabase.
@@ -172,7 +174,7 @@ function MetricCard({ label, value, accent }: { label: string; value: string; ac
 
 function Th({ children, align }: { children: string; align?: 'right' }) {
   return (
-    <th className={`px-4 py-2.5 text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase text-left ${align === 'right' ? 'text-right' : ''}`}>
+    <th scope="col" className={`px-4 py-2.5 text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase text-left ${align === 'right' ? 'text-right' : ''}`}>
       {children}
     </th>
   )

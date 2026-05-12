@@ -425,7 +425,7 @@ function Field({
         {required && <span className="text-[var(--c-danger-text)] ml-0.5">*</span>}
       </label>
       {children}
-      {error && <p className="text-[11px] text-[var(--c-danger-text)]">{error}</p>}
+      {error && <p role="alert" className="text-[11px] text-[var(--c-danger-text)]">{error}</p>}
     </div>
   )
 }
@@ -433,5 +433,5 @@ function Field({
 function inputClass(hasError: boolean) {
   return `w-full min-w-0 border ${
     hasError ? 'border-[var(--c-danger-text)]' : 'border-[var(--c-border-strong)]'
-  } focus:border-[var(--c-accent)] rounded-[6px] px-3 py-2 text-[16px] md:text-[13px] text-[var(--c-text-primary)] outline-none bg-[var(--c-bg-card)] transition-all duration-150 ease-out`
+  } focus:border-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-[var(--c-accent)] focus-visible:outline-offset-0 rounded-[6px] px-3 py-2 text-[16px] md:text-[13px] text-[var(--c-text-primary)] outline-none bg-[var(--c-bg-card)] transition-all duration-150 ease-out`
 }

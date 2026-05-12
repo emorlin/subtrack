@@ -313,24 +313,25 @@ function CategoriesCard() {
 export default function SettingsView() {
   return (
     <div className="p-4 md:p-6 space-y-5">
+      <h1 className="sr-only">Inställningar</h1>
       <section>
-        <p className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-3">
+        <h2 className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-3">
           Profil
-        </p>
+        </h2>
         <ProfileCard />
       </section>
 
       <section>
-        <p className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-3">
+        <h2 className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-3">
           Utseende
-        </p>
+        </h2>
         <ThemeToggle />
       </section>
 
       <section>
-        <p className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-3">
+        <h2 className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-3">
           Kategorier
-        </p>
+        </h2>
         <CategoriesCard />
       </section>
     </div>

@@ -95,7 +95,7 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
               type="date"
               value={cancelDate}
               onChange={(e) => setCancelDate(e.target.value)}
-              className="w-full border border-[var(--c-border-strong)] focus:border-[var(--c-accent)] rounded-[6px] px-3 py-2 text-[16px] md:text-[13px] outline-none bg-[var(--c-bg-card)] text-[var(--c-text-primary)]"
+              className="w-full border border-[var(--c-border-strong)] focus:border-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-[var(--c-accent)] focus-visible:outline-offset-0 rounded-[6px] px-3 py-2 text-[16px] md:text-[13px] outline-none bg-[var(--c-bg-card)] text-[var(--c-text-primary)]"
             />
           </div>
           <div className="flex gap-2">
@@ -371,7 +371,8 @@ function PriceHistorySection({ subscription }: { subscription: Subscription }) {
           type="date"
           value={date}
           onChange={(e) => { setDate(e.target.value); setFormError(null) }}
-          className="flex-1 border border-[var(--c-border-strong)] focus:border-[var(--c-accent)] rounded-[6px] px-3 py-1.5 text-[16px] md:text-[12px] text-[var(--c-text-primary)] outline-none bg-[var(--c-bg-card)] transition-all duration-150"
+          aria-label="Gäller från datum"
+          className="flex-1 border border-[var(--c-border-strong)] focus:border-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-[var(--c-accent)] focus-visible:outline-offset-0 rounded-[6px] px-3 py-1.5 text-[16px] md:text-[12px] text-[var(--c-text-primary)] outline-none bg-[var(--c-bg-card)] transition-all duration-150"
         />
         <input
           type="number"
@@ -379,7 +380,8 @@ function PriceHistorySection({ subscription }: { subscription: Subscription }) {
           onChange={(e) => { setAmount(e.target.value); setFormError(null) }}
           placeholder="kr"
           min="0"
-          className="w-20 border border-[var(--c-border-strong)] focus:border-[var(--c-accent)] rounded-[6px] px-3 py-1.5 text-[16px] md:text-[12px] text-[var(--c-text-primary)] outline-none bg-[var(--c-bg-card)] transition-all duration-150"
+          aria-label="Belopp i kronor"
+          className="w-20 border border-[var(--c-border-strong)] focus:border-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-[var(--c-accent)] focus-visible:outline-offset-0 rounded-[6px] px-3 py-1.5 text-[16px] md:text-[12px] text-[var(--c-text-primary)] outline-none bg-[var(--c-bg-card)] transition-all duration-150"
         />
         <button
           type="button"
@@ -390,7 +392,7 @@ function PriceHistorySection({ subscription }: { subscription: Subscription }) {
           {addEntry.isPending ? '…' : '+ Lägg till'}
         </button>
       </div>
-      {formError && <p className="text-[11px] text-[var(--c-danger-text)]">{formError}</p>}
+      {formError && <p role="alert" className="text-[11px] text-[var(--c-danger-text)]">{formError}</p>}
     </div>
   )
 }

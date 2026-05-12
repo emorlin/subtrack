@@ -73,11 +73,12 @@ export default function NotificationList() {
 
   return (
     <div className="p-4 md:p-6 space-y-5">
+      <h1 className="sr-only">Notiser</h1>
       {/* Upcoming renewals */}
       <section>
-        <p className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-3">
+        <h2 className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-3">
           Kommande förnyelser
-        </p>
+        </h2>
         <div className="bg-[var(--c-bg-card)] rounded-[12px] border border-[var(--c-border)] overflow-hidden">
           {upcoming.length === 0 ? (
             <p className="px-4 py-5 text-[13px] text-[var(--c-text-subtle)]">
@@ -96,9 +97,9 @@ export default function NotificationList() {
 
       {/* History */}
       <section>
-        <p className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-3">
+        <h2 className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-3">
           Historik
-        </p>
+        </h2>
         <div className="bg-[var(--c-bg-card)] rounded-[12px] border border-[var(--c-border)] overflow-hidden">
           {history.length === 0 ? (
             <p className="px-4 py-5 text-[13px] text-[var(--c-text-subtle)]">
