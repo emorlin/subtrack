@@ -14,6 +14,7 @@ export interface MonthBar {
 interface BarChartProps {
   bars: MonthBar[]
   onHover?: (bar: MonthBar | null) => void
+  onClick?: (bar: MonthBar) => void
   chartHeight?: number
 }
 
@@ -80,7 +81,7 @@ export function buildMonthBars(subscriptions: Subscription[], year: number): Mon
   })
 }
 
-export default function BarChart({ bars, onHover, chartHeight = 80 }: BarChartProps) {
+export default function BarChart({ bars, onHover, onClick, chartHeight = 80 }: BarChartProps) {
   const [hoveredMonth, setHoveredMonth] = useState<number | null>(null)
   const max = Math.max(...bars.map((b) => b.amount), 1)
 
@@ -107,9 +108,10 @@ export default function BarChart({ bars, onHover, chartHeight = 80 }: BarChartPr
         return (
           <div
             key={bar.month}
-            className="flex-1 flex flex-col items-center gap-1 relative cursor-default"
+            className="flex-1 flex flex-col items-center gap-1 relative cursor-pointer"
             onMouseEnter={() => handleEnter(bar)}
             onMouseLeave={handleLeave}
+            onClick={() => onClick?.(bar)}
           >
             {/* Tooltip */}
             {isHovered && (
