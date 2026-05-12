@@ -146,6 +146,33 @@ export function formatCurrency(amount: number, currency = 'SEK'): string {
   }).format(amount)
 }
 
+export function getLastRenewalDate(
+  startDate: string,
+  interval: SubscriptionInterval,
+  intervalCount: number
+): Date {
+  const start = new Date(startDate)
+  const today = new Date()
+
+  if (start > today) return start
+
+  const next = new Date(start)
+  let last = new Date(start)
+
+  while (next <= today) {
+    last = new Date(next)
+    if (interval === 'month') {
+      next.setMonth(next.getMonth() + intervalCount)
+    } else if (interval === 'quarter') {
+      next.setMonth(next.getMonth() + 3 * intervalCount)
+    } else {
+      next.setFullYear(next.getFullYear() + intervalCount)
+    }
+  }
+
+  return last
+}
+
 export function getNextRenewalDate(
   startDate: string,
   interval: SubscriptionInterval,

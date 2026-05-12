@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { Subscription } from '../../types'
 import { useSubscriptions } from '../../hooks/useSubscriptions'
 import { useCategories } from '../../hooks/useCategories'
-import { getNextRenewalDate, getEffectiveCurrentAmount } from '../../lib/calculations'
+import { getNextRenewalDate, getLastRenewalDate, getEffectiveCurrentAmount } from '../../lib/calculations'
 import { daysUntil } from '../../lib/dates'
 
 interface SubscriptionListProps {
@@ -173,9 +173,12 @@ function DesktopRow({
   selected: boolean
   onClick: () => void
 }) {
-  const renewal = getNextRenewalDate(sub.start_date, sub.interval, sub.interval_count)
-  const days = daysUntil(renewal)
-  const isUrgent = days <= 7
+  const isCancelled = sub.status === 'cancelled'
+  const date = isCancelled
+    ? getLastRenewalDate(sub.start_date, sub.interval, sub.interval_count)
+    : getNextRenewalDate(sub.start_date, sub.interval, sub.interval_count)
+  const days = isCancelled ? null : daysUntil(date)
+  const isUrgent = !isCancelled && days !== null && days <= 7
 
   return (
     <tr
@@ -207,14 +210,14 @@ function DesktopRow({
         {intervalLabel(sub.interval, sub.interval_count)}
       </td>
 
-      {/* Förnyelse */}
+      {/* Förnyelse / Senaste betalning */}
       <td className={`px-4 py-3 text-[13px] overflow-hidden ${isUrgent ? 'text-[#92400E] font-medium' : 'text-[#6B7280]'}`}>
-        {formatRenewalDate(renewal)}
+        {formatRenewalDate(date)}
       </td>
 
       {/* Status */}
       <td className="px-4 py-3 overflow-hidden">
-        {sub.status === 'cancelled' ? (
+        {isCancelled ? (
           <span className="bg-[#F3F4F6] text-[#6B7280] text-[10px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap">
             Avslutad
           </span>
@@ -243,9 +246,12 @@ function MobileRow({
   selected: boolean
   onClick: () => void
 }) {
-  const renewal = getNextRenewalDate(sub.start_date, sub.interval, sub.interval_count)
-  const days = daysUntil(renewal)
-  const isUrgent = days <= 7
+  const isCancelled = sub.status === 'cancelled'
+  const date = isCancelled
+    ? getLastRenewalDate(sub.start_date, sub.interval, sub.interval_count)
+    : getNextRenewalDate(sub.start_date, sub.interval, sub.interval_count)
+  const days = isCancelled ? null : daysUntil(date)
+  const isUrgent = !isCancelled && days !== null && days <= 7
 
   return (
     <div
@@ -259,7 +265,7 @@ function MobileRow({
       <div className="flex-1 min-w-0">
         <p className="text-[14px] font-medium text-[#111827] truncate underline decoration-[#374151] underline-offset-4">{sub.name}</p>
         <p className="text-[11px] text-[#6B7280]">{sub.category?.name ?? '—'}</p>
-        {sub.status === 'cancelled' ? (
+        {isCancelled ? (
           <span className="bg-[#F3F4F6] text-[#6B7280] text-[10px] font-medium px-1.5 py-0.5 rounded inline-block mt-0.5">
             Avslutad
           </span>
@@ -274,7 +280,7 @@ function MobileRow({
 
       <div className="text-right shrink-0">
         <p className="text-[14px] font-semibold text-[#111827]">{getEffectiveCurrentAmount(sub)} kr</p>
-        <p className="text-[11px] text-[#6B7280]">{formatRenewalShort(renewal)}</p>
+        <p className="text-[11px] text-[#6B7280]">{formatRenewalShort(date)}</p>
       </div>
     </div>
   )
