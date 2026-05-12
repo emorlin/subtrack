@@ -44,7 +44,7 @@ Appen är byggd som en **Progressive Web App** och kan installeras direkt från 
 
 | Funktion | Beskrivning |
 |---|---|
-| **Abonnemangsöversikt** | Lista med alla tjänster normaliserade till kr/mån för enkel jämförelse — oavsett om abonnemanget faktureras månadsvis, kvartalsvis eller årsvis. Faktiskt fakturerat belopp visas som ledtext för icke-månadsabonnemang |
+| **Abonnemangsöversikt** | Lista med alla tjänster normaliserade till kr/mån för enkel jämförelse — oavsett om abonnemanget faktureras månadsvis, kvartalsvis eller årsvis. Faktiskt fakturerat belopp visas som ledtext för icke-månadsabonnemang. Klickbara kolumnrubriker sorterar på tjänst, kategori, kr/mån eller förnyelsedatum — klicka en gång för stigande, igen för fallande |
 | **Tjänsteikoner** | Automatisk logotyp för ~130 kända tjänster (Netflix, Spotify, Adobe m.fl.) via favicon.im. Faller tillbaka på initialerbricka om tjänsten inte finns i mappningen. Täcker svenska tidningar (DN, SvD, GP, Expressen m.fl.), AI-tjänster (ChatGPT, Claude, Midjourney) och dev-verktyg |
 | **Prishistorik** | Spåra prisändringar bakåt i tiden — se exakt vad du betalat sedan starten |
 | **Kostnadstrend** | Stapeldiagram per månad och år med nedbrytning per kategori. Klicka en stapel för att se en detaljlista med alla aktiva tjänster och individuella kostnader den månaden — navigera månadsvis med piltangenter i modalen |
@@ -448,7 +448,7 @@ Subtrack är byggt med **WCAG 2.1 AA** som riktlinje och DOS-lagen (Lagen om til
 | **Laddningsstatus** | `role="status"` på laddningstexter för polite uppläsning |
 | **ARIA-states** | `aria-expanded` på kollapsibla avsnitt, `aria-pressed` på filterknappar, `aria-hidden` på dekorativa ikoner |
 | **Stapeldiagram** | Staplarna är `<button>`-element med `aria-label` per stapel; behållaren har `role="img"` med beskrivande etikett |
-| **Tabellstruktur** | `scope="col"` på alla `<th>` i abonnemangstabellen och admintabellen |
+| **Tabellstruktur** | `scope="col"` på alla `<th>` i abonnemangstabellen och admintabellen. Sorteringsbara kolumner har `aria-sort="ascending"` / `"descending"` / `"none"` — skärmläsare annonserar aktiv sortering. Sorteringsknapparna inuti `<th>` är vanliga `<button>`-element och är fullt tangentbordsnavigerbara |
 | **Fokusring** | `:focus-visible` genomgående — synlig blå kontur vid tangentbord, ingen vid musklick |
 | **Färgkontrast** | Alla textstorlekar uppfyller 4,5:1 mot bakgrunden i både ljust och mörkt läge |
 

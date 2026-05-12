@@ -1,10 +1,14 @@
 import { useState } from 'react'
+import { ArrowUp, ArrowDown, ArrowUpDown } from 'lucide-react'
 import { getDomainForService } from '../../lib/serviceIcons'
 import type { Subscription } from '../../types'
 import { useSubscriptions } from '../../hooks/useSubscriptions'
 import { useCategories } from '../../hooks/useCategories'
 import { getNextRenewalDate, getLastRenewalDate, getEffectiveCurrentAmount, toMonthlyAmount } from '../../lib/calculations'
 import { daysUntil } from '../../lib/dates'
+
+type SortKey = 'name' | 'category' | 'amount' | 'renewal'
+type SortDir = 'asc' | 'desc'
 
 interface SubscriptionListProps {
   onSelect: (sub: Subscription) => void
@@ -17,13 +21,32 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
   const { data: categories = [] } = useCategories()
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null)
   const [showCancelled, setShowCancelled] = useState(false)
+  const [sortKey, setSortKey] = useState<SortKey | null>(null)
+  const [sortDir, setSortDir] = useState<SortDir>('asc')
+
+  function handleSort(key: SortKey) {
+    if (sortKey === key) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
+    } else {
+      setSortKey(key)
+      setSortDir('asc')
+    }
+  }
 
   const filtered = activeCategoryId
     ? subscriptions.filter((s) => s.category_id === activeCategoryId)
     : subscriptions
 
-  const active = filtered.filter((s) => s.status !== 'cancelled')
-  const cancelled = filtered.filter((s) => s.status === 'cancelled')
+  const active = sortSubscriptions(
+    filtered.filter((s) => s.status !== 'cancelled'),
+    sortKey,
+    sortDir,
+  )
+  const cancelled = sortSubscriptions(
+    filtered.filter((s) => s.status === 'cancelled'),
+    sortKey,
+    sortDir,
+  )
 
   return (
     <div className="bg-[var(--c-bg-card)] rounded-[12px] border border-[var(--c-border)] overflow-hidden">
@@ -60,11 +83,11 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
             <ColGroup />
             <thead>
               <tr className="border-b border-[var(--c-border)]">
-                <Th>Tjänst</Th>
-                <Th>Kategori</Th>
-                <Th align="right">Kr/mån</Th>
+                <Th sortKey="name" currentSortKey={sortKey} currentSortDir={sortDir} onSort={handleSort}>Tjänst</Th>
+                <Th sortKey="category" currentSortKey={sortKey} currentSortDir={sortDir} onSort={handleSort}>Kategori</Th>
+                <Th align="right" sortKey="amount" currentSortKey={sortKey} currentSortDir={sortDir} onSort={handleSort}>Kr/mån</Th>
                 <Th>Intervall</Th>
-                <Th>Förnyelse</Th>
+                <Th sortKey="renewal" currentSortKey={sortKey} currentSortDir={sortDir} onSort={handleSort}>Förnyelse</Th>
                 <Th>Status</Th>
               </tr>
             </thead>
@@ -325,11 +348,38 @@ function MobileRow({
 
 // ── Helpers ────────────────────────────────────────────────
 
+function sortSubscriptions(subs: Subscription[], key: SortKey | null, dir: SortDir): Subscription[] {
+  if (!key) return subs
+  return [...subs].sort((a, b) => {
+    let cmp = 0
+    if (key === 'name') {
+      cmp = a.name.localeCompare(b.name, 'sv')
+    } else if (key === 'category') {
+      const ca = a.category?.name ?? ''
+      const cb = b.category?.name ?? ''
+      cmp = ca.localeCompare(cb, 'sv')
+    } else if (key === 'amount') {
+      const ma = toMonthlyAmount(getEffectiveCurrentAmount(a), a.interval, a.interval_count)
+      const mb = toMonthlyAmount(getEffectiveCurrentAmount(b), b.interval, b.interval_count)
+      cmp = ma - mb
+    } else if (key === 'renewal') {
+      const da = a.status === 'cancelled'
+        ? getLastRenewalDate(a.start_date, a.interval, a.interval_count)
+        : getNextRenewalDate(a.start_date, a.interval, a.interval_count)
+      const db = b.status === 'cancelled'
+        ? getLastRenewalDate(b.start_date, b.interval, b.interval_count)
+        : getNextRenewalDate(b.start_date, b.interval, b.interval_count)
+      cmp = da.getTime() - db.getTime()
+    }
+    return dir === 'asc' ? cmp : -cmp
+  })
+}
+
 function ServiceIcon({ name, size = 'md' }: { name: string; size?: 'md' | 'lg' }) {
   const [failed, setFailed] = useState(false)
   const domain = getDomainForService(name)
-  const dim = size === 'lg' ? 'w-10 h-10' : 'w-8 h-8'
-  const textDim = size === 'lg' ? 'text-[13px]' : 'text-[11px]'
+  const dim = size === 'lg' ? 'w-11 h-11' : 'w-9 h-9'
+  const textDim = size === 'lg' ? 'text-[14px]' : 'text-[12px]'
 
   if (domain && !failed) {
     return (
@@ -398,17 +448,52 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
   )
 }
 
-function Th({ children, align }: { children: string; align?: 'right' }) {
+interface ThProps {
+  children: string
+  align?: 'right'
+  sortKey?: SortKey
+  currentSortKey?: SortKey | null
+  currentSortDir?: SortDir
+  onSort?: (key: SortKey) => void
+}
+
+function Th({ children, align, sortKey, currentSortKey, currentSortDir, onSort }: ThProps) {
+  const isActive = sortKey !== undefined && currentSortKey === sortKey
+  const ariaSort: React.AriaAttributes['aria-sort'] = sortKey !== undefined
+    ? isActive
+      ? currentSortDir === 'asc' ? 'ascending' : 'descending'
+      : 'none'
+    : undefined
+
   return (
     <th
       scope="col"
-      className={`px-4 py-2.5 text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase text-left ${
+      aria-sort={ariaSort}
+      className={`px-4 py-2.5 text-[11px] font-medium tracking-wider uppercase text-left ${
         align === 'right' ? 'text-right' : ''
-      }`}
+      } ${isActive ? 'text-[var(--c-accent)]' : 'text-[var(--c-text-subtle)]'}`}
     >
-      {children}
+      {sortKey && onSort ? (
+        <button
+          type="button"
+          onClick={() => onSort(sortKey)}
+          className={`inline-flex items-center gap-1 transition-colors duration-150 hover:text-[var(--c-text-primary)] ${
+            align === 'right' ? 'flex-row-reverse' : ''
+          }`}
+        >
+          {children}
+          <SortIndicator active={isActive} dir={isActive ? currentSortDir : undefined} />
+        </button>
+      ) : (
+        children
+      )}
     </th>
   )
+}
+
+function SortIndicator({ active, dir }: { active: boolean; dir?: SortDir }) {
+  const Icon = active ? (dir === 'asc' ? ArrowUp : ArrowDown) : ArrowUpDown
+  return <Icon size={14} aria-hidden="true" className="opacity-60 shrink-0" />
 }
 
 function getInitials(name: string): string {

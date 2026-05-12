@@ -28,7 +28,7 @@ export default function About() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
           <FeatureCard
             title="Abonnemangsöversikt"
-            description="Se alla dina abonnemang normaliserade till kr/mån för enkel jämförelse — oavsett om de faktureras månadsvis, kvartalsvis eller årsvis. Faktiskt belopp visas som ledtext för icke-månadsabonnemang."
+            description="Se alla dina abonnemang normaliserade till kr/mån för enkel jämförelse — oavsett om de faktureras månadsvis, kvartalsvis eller årsvis. Klicka en kolumnrubrik (Tjänst, Kategori, Kr/mån, Förnyelse) för att sortera — en gång stigande, igen fallande."
           />
           <FeatureCard
             title="Tjänsteikoner"
@@ -421,7 +421,7 @@ export default function About() {
             ['Färgkontrast', 'Alla textstorlekar uppfyller kravet på 4,5:1 kontrastförhållande mot bakgrunden, i både ljust och mörkt läge.'],
             ['ARIA-states', 'Kollapsibla avsnitt har aria-expanded. Filterknappars aktivt läge kommuniceras via aria-pressed. Dekorativa ikoner har aria-hidden="true".'],
             ['Stapeldiagram', 'Varje stapel är ett button-element med aria-label som anger månad och belopp. Diagrambehållaren har role="img" med en beskrivande etikett.'],
-            ['Tabellstruktur', 'Alla tabellrubriker har scope="col" så skärmläsare kan koppla dataceller till rätt kolumn.'],
+            ['Tabellstruktur', 'Alla tabellrubriker har scope="col" och sorteringsbara kolumner exponerar aria-sort="ascending"/"descending"/"none" — skärmläsare annonserar aktiv sortering automatiskt.'],
             ['Fokusring', 'Synlig fokusring via :focus-visible vid tangentbordsnavigering — men inte vid musklick, för att hålla UI-n rent.'],
           ].map(([title, detail]) => (
             <div key={title} className="flex gap-2">
