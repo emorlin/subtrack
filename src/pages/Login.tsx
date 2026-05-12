@@ -26,19 +26,19 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F9FAFB]">
-      <div className="bg-white rounded-[12px] border border-[#E5E7EB] p-8 w-full max-w-sm shadow-sm">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--c-bg-app)]">
+      <div className="bg-[var(--c-bg-card)] rounded-[12px] border border-[var(--c-border)] p-8 w-full max-w-sm shadow-sm">
         <div className="text-center mb-8">
-          <h1 className="text-[24px] font-semibold text-[#111827] tracking-[-0.3px]">
+          <h1 className="text-[24px] font-semibold text-[var(--c-text-primary)] tracking-[-0.3px]">
             Subtrack
           </h1>
-          <p className="text-[#6B7280] text-[13px] mt-1">
+          <p className="text-[var(--c-text-muted)] text-[13px] mt-1">
             Håll koll på dina abonnemang
           </p>
         </div>
 
         {error && (
-          <p className="text-[#B91C1C] bg-[#FEF2F2] text-[12px] px-3 py-2 rounded-[6px] mb-4">
+          <p className="text-[var(--c-danger-text)] bg-[var(--c-danger-bg)] text-[12px] px-3 py-2 rounded-[6px] mb-4">
             {error}
           </p>
         )}
@@ -47,7 +47,7 @@ export default function Login() {
           type="button"
           onClick={handleGoogleLogin}
           disabled={loading}
-          className="w-full flex items-center justify-center gap-3 bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] px-4 py-2.5 text-[13px] font-medium hover:bg-[#F9FAFB] transition-all duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full flex items-center justify-center gap-3 bg-[var(--c-bg-card)] border border-[var(--c-border)] text-[var(--c-text-secondary)] rounded-[6px] px-4 py-2.5 text-[13px] font-medium hover:bg-[var(--c-bg-app)] transition-all duration-150 ease-out disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <GoogleIcon />
           {loading ? 'Loggar in…' : 'Fortsätt med Google'}
@@ -55,22 +55,22 @@ export default function Login() {
 
         <div className="relative my-5">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[#E5E7EB]" />
+            <div className="w-full border-t border-[var(--c-border)]" />
           </div>
           <div className="relative flex justify-center">
-            <span className="bg-white px-3 text-[11px] text-[#9CA3AF]">eller</span>
+            <span className="bg-[var(--c-bg-card)] px-3 text-[11px] text-[var(--c-text-subtle)]">eller</span>
           </div>
         </div>
 
         <button
           type="button"
           onClick={handleDemo}
-          className="w-full border border-[#1B4FD8] text-[#1B4FD8] rounded-[6px] px-4 py-2.5 text-[13px] font-medium hover:bg-[#EFF6FF] transition-all duration-150 ease-out"
+          className="w-full border border-[var(--c-accent)] text-[var(--c-accent)] rounded-[6px] px-4 py-2.5 text-[13px] font-medium hover:bg-[var(--c-accent-subtle)] transition-all duration-150 ease-out"
         >
           Utforska demo
         </button>
 
-        <p className="text-center text-[11px] text-[#9CA3AF] mt-4">
+        <p className="text-center text-[11px] text-[var(--c-text-subtle)] mt-4">
           Demo-data sparas inte och försvinner när du stänger fliken.
         </p>
       </div>

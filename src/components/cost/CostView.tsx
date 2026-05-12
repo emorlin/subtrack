@@ -109,14 +109,14 @@ export default function CostView() {
       </div>
 
       {/* Chart + breakdown */}
-      <div className="bg-white rounded-[12px] border border-[#E5E7EB] p-4 md:p-5">
+      <div className="bg-[var(--c-bg-card)] rounded-[12px] border border-[var(--c-border)] p-4 md:p-5">
         <div className="flex flex-col md:flex-row md:gap-8">
 
           {/* Bar chart */}
           <div className="flex-1 min-w-0">
             {/* Chart header with year nav */}
             <div className="flex items-center justify-between mb-3">
-              <p className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase">
+              <p className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase">
                 Månadsvis
               </p>
               <div className="flex items-center gap-1">
@@ -124,18 +124,18 @@ export default function CostView() {
                   type="button"
                   onClick={() => setSelectedYear((y) => y - 1)}
                   disabled={selectedYear <= minYear}
-                  className="w-6 h-6 flex items-center justify-center text-[#6B7280] hover:text-[#111827] disabled:opacity-25 transition-colors text-[16px] leading-none"
+                  className="w-6 h-6 flex items-center justify-center text-[var(--c-text-muted)] hover:text-[var(--c-text-primary)] disabled:opacity-25 transition-colors text-[16px] leading-none"
                 >
                   ‹
                 </button>
-                <span className="text-[13px] font-semibold text-[#111827] w-10 text-center tabular-nums">
+                <span className="text-[13px] font-semibold text-[var(--c-text-primary)] w-10 text-center tabular-nums">
                   {selectedYear}
                 </span>
                 <button
                   type="button"
                   onClick={() => setSelectedYear((y) => y + 1)}
                   disabled={selectedYear >= currentYear}
-                  className="w-6 h-6 flex items-center justify-center text-[#6B7280] hover:text-[#111827] disabled:opacity-25 transition-colors text-[16px] leading-none"
+                  className="w-6 h-6 flex items-center justify-center text-[var(--c-text-muted)] hover:text-[var(--c-text-primary)] disabled:opacity-25 transition-colors text-[16px] leading-none"
                 >
                   ›
                 </button>
@@ -145,14 +145,14 @@ export default function CostView() {
           </div>
 
           {/* Divider (desktop) */}
-          <div className="hidden md:block w-px bg-[#E5E7EB] shrink-0" />
+          <div className="hidden md:block w-px bg-[var(--c-border)] shrink-0" />
 
           {/* Category breakdown */}
           <div className="md:w-[220px] shrink-0 mt-5 md:mt-0">
-            <p className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase mb-1">
+            <p className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-1">
               Per kategori ({displayMonthLabel})
             </p>
-            <p className="text-[22px] font-semibold text-[#111827] tracking-[-0.3px] mb-3">
+            <p className="text-[22px] font-semibold text-[var(--c-text-primary)] tracking-[-0.3px] mb-3">
               {displayAmount} kr
             </p>
             <CategoryBreakdown rows={categoryRows} />
@@ -207,23 +207,23 @@ function MonthDetailModal({
 
   const total = rows.reduce((sum, r) => sum + r.amount, 0)
 
-  const navBtn = 'w-8 h-8 flex items-center justify-center text-[#6B7280] hover:text-[#111827] transition-colors text-[20px] leading-none shrink-0'
+  const navBtn = 'w-8 h-8 flex items-center justify-center text-[var(--c-text-muted)] hover:text-[var(--c-text-primary)] transition-colors text-[20px] leading-none shrink-0'
 
   const inner = (
     <>
-      <div className="relative flex items-center justify-center px-4 h-[60px] border-b border-[#E5E7EB] shrink-0">
+      <div className="relative flex items-center justify-center px-4 h-[60px] border-b border-[var(--c-border)] shrink-0">
         <div className="flex items-center gap-1">
           <button type="button" onClick={prevMonth} className={navBtn} aria-label="Föregående månad">‹</button>
           <div className="text-center">
-            <p className="text-[14px] font-semibold text-[#111827]">{monthLabel}</p>
-            <p className="text-[12px] text-[#6B7280]">{Math.round(total).toLocaleString('sv-SE')} kr / mån</p>
+            <p className="text-[14px] font-semibold text-[var(--c-text-primary)]">{monthLabel}</p>
+            <p className="text-[12px] text-[var(--c-text-muted)]">{Math.round(total).toLocaleString('sv-SE')} kr / mån</p>
           </div>
           <button type="button" onClick={nextMonth} className={navBtn} aria-label="Nästa månad">›</button>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="absolute right-4 text-[#9CA3AF] hover:text-[#374151] transition-colors"
+          className="absolute right-4 text-[var(--c-text-subtle)] hover:text-[var(--c-text-secondary)] transition-colors"
           aria-label="Stäng"
         >
           <X size={20} />
@@ -232,19 +232,19 @@ function MonthDetailModal({
 
       <div className="flex-1 overflow-y-auto">
         {rows.length === 0 ? (
-          <p className="text-[13px] text-[#6B7280] p-6 text-center">Inga aktiva tjänster denna månad</p>
+          <p className="text-[13px] text-[var(--c-text-muted)] p-6 text-center">Inga aktiva tjänster denna månad</p>
         ) : (
           <div>
             {rows.map((row, i) => (
               <div key={row.sub.id}>
-                {i > 0 && <div className="h-px bg-[#F3F4F6] mx-4" />}
+                {i > 0 && <div className="h-px bg-[var(--c-bg-subtle)] mx-4" />}
                 <div className="px-4 py-3 flex items-center gap-3">
                   <span
                     className="w-2.5 h-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: row.category?.color_hex ?? '#E5E7EB' }}
+                    style={{ backgroundColor: row.category?.color_hex ?? 'var(--c-border)' }}
                   />
-                  <span className="flex-1 text-[13px] text-[#111827] truncate">{row.sub.name}</span>
-                  <span className="text-[13px] font-medium text-[#111827] tabular-nums shrink-0">
+                  <span className="flex-1 text-[13px] text-[var(--c-text-primary)] truncate">{row.sub.name}</span>
+                  <span className="text-[13px] font-medium text-[var(--c-text-primary)] tabular-nums shrink-0">
                     {Math.round(row.amount).toLocaleString('sv-SE')} kr
                   </span>
                 </div>
@@ -258,14 +258,14 @@ function MonthDetailModal({
 
   return (
     <>
-      <div className="md:hidden fixed inset-0 bg-white z-50 flex flex-col">
+      <div className="md:hidden fixed inset-0 bg-[var(--c-bg-card)] z-50 flex flex-col">
         {inner}
       </div>
       <div
-        className="hidden md:flex fixed inset-0 bg-black/50 z-50 items-center justify-center"
+        className="hidden md:flex fixed inset-0 bg-[var(--c-overlay)] z-50 items-center justify-center"
         onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
       >
-        <div className="bg-white rounded-[16px] w-[480px] max-h-[85vh] flex flex-col shadow-xl">
+        <div className="bg-[var(--c-bg-card)] rounded-[16px] w-[480px] max-h-[85vh] flex flex-col shadow-xl">
           {inner}
         </div>
       </div>
@@ -275,11 +275,11 @@ function MonthDetailModal({
 
 function MetricCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="bg-[#F9FAFB] rounded-lg p-3">
-      <p className="text-[11px] text-[#6B7280] mb-1">{label}</p>
+    <div className="bg-[var(--c-bg-app)] rounded-lg p-3">
+      <p className="text-[11px] text-[var(--c-text-muted)] mb-1">{label}</p>
       <p
         className={`text-[20px] font-semibold tracking-[-0.3px] leading-tight ${
-          accent ? 'text-[#1B4FD8]' : 'text-[#111827]'
+          accent ? 'text-[var(--c-accent)]' : 'text-[var(--c-text-primary)]'
         }`}
       >
         {value}

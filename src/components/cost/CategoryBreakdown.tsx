@@ -23,12 +23,12 @@ export default function CategoryBreakdown({ rows }: CategoryBreakdownProps) {
           />
 
           {/* Name */}
-          <span className="text-[12px] text-[#374151] w-24 truncate shrink-0">
+          <span className="text-[12px] text-[var(--c-text-secondary)] w-24 truncate shrink-0">
             {row.name}
           </span>
 
           {/* Bar (mobile only) */}
-          <div className="md:hidden flex-1 h-1 bg-[#F3F4F6] rounded-full overflow-hidden">
+          <div className="md:hidden flex-1 h-1 bg-[var(--c-bg-subtle)] rounded-full overflow-hidden">
             <div
               className="h-full rounded-full"
               style={{
@@ -39,7 +39,7 @@ export default function CategoryBreakdown({ rows }: CategoryBreakdownProps) {
           </div>
 
           {/* Amount */}
-          <span className="text-[12px] font-medium text-[#111827] ml-auto whitespace-nowrap">
+          <span className="text-[12px] font-medium text-[var(--c-text-primary)] ml-auto whitespace-nowrap">
             {Math.round(row.amount).toLocaleString('sv-SE')} kr
           </span>
         </div>

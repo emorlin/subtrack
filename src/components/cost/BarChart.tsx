@@ -101,9 +101,9 @@ export default function BarChart({ bars, onHover, onClick, chartHeight = 80 }: B
         const isHovered = hoveredMonth === bar.month
         const barH = Math.max(Math.round((bar.amount / max) * chartHeight), bar.amount > 0 ? 4 : 2)
         const color =
-          bar.state === 'current' ? 'bg-[#1B4FD8]'
-          : bar.state === 'past'  ? 'bg-[#BFDBFE]'
-          :                         'bg-[#E5E7EB]'
+          bar.state === 'current' ? 'bg-[var(--c-accent)]'
+          : bar.state === 'past'  ? 'bg-[var(--c-accent-muted)]'
+          :                         'bg-[var(--c-border)]'
 
         return (
           <div
@@ -115,7 +115,7 @@ export default function BarChart({ bars, onHover, onClick, chartHeight = 80 }: B
           >
             {/* Tooltip */}
             {isHovered && (
-              <div className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-[#111827] text-white text-[10px] font-medium px-1.5 py-0.5 rounded-[4px] whitespace-nowrap z-10 pointer-events-none">
+              <div className="absolute bottom-full mb-1.5 left-1/2 -translate-x-1/2 bg-[var(--c-text-primary)] text-[var(--c-bg-card)] text-[10px] font-medium px-1.5 py-0.5 rounded-[4px] whitespace-nowrap z-10 pointer-events-none">
                 {Math.round(bar.amount).toLocaleString('sv-SE')} kr
               </div>
             )}
@@ -129,7 +129,7 @@ export default function BarChart({ bars, onHover, onClick, chartHeight = 80 }: B
             {/* Month label */}
             <span
               className={`text-[9px] font-medium ${
-                bar.state === 'current' ? 'text-[#1B4FD8]' : 'text-[#9CA3AF]'
+                bar.state === 'current' ? 'text-[var(--c-accent)]' : 'text-[var(--c-text-subtle)]'
               }`}
             >
               {bar.label}

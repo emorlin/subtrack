@@ -19,8 +19,8 @@ export default function Sidebar() {
           end={to === '/'}
           className={({ isActive }) =>
             isActive
-              ? 'flex items-center gap-2.5 px-4 py-2 text-[12px] font-medium text-[#1B4FD8] bg-[#EFF6FF] border-r-2 border-[#1B4FD8] transition-all duration-150 ease-out'
-              : 'flex items-center gap-2.5 px-4 py-2 text-[12px] text-[#6B7280] hover:bg-[#F9FAFB] transition-all duration-150 ease-out'
+              ? 'flex items-center gap-2.5 px-4 py-2 text-[12px] font-medium text-[var(--c-accent)] bg-[var(--c-accent-subtle)] border-r-2 border-[var(--c-accent)] transition-all duration-150 ease-out'
+              : 'flex items-center gap-2.5 px-4 py-2 text-[12px] text-[var(--c-text-muted)] hover:bg-[var(--c-bg-app)] transition-all duration-150 ease-out'
           }
         >
           {({ isActive }) => (

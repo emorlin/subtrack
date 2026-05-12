@@ -36,7 +36,7 @@ const INITIAL: FormState = {
 
 interface Props {
   onClose: () => void
-  subscription?: Subscription // pre-populate for edit mode
+  subscription?: Subscription
 }
 
 function subscriptionToFormState(sub: Subscription): FormState {
@@ -139,11 +139,11 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
 
   const inner = (
     <>
-      <div className="relative flex items-center justify-center px-4 h-14 border-b border-[#E5E7EB] shrink-0">
-        <span className="text-[14px] font-semibold text-[#111827]">
+      <div className="relative flex items-center justify-center px-4 h-14 border-b border-[var(--c-border)] shrink-0">
+        <span className="text-[14px] font-semibold text-[var(--c-text-primary)]">
           {isEdit ? 'Redigera abonnemang' : 'Nytt abonnemang'}
         </span>
-        <button type="button" onClick={onClose} className="absolute right-4 text-[#9CA3AF] hover:text-[#374151] transition-colors" aria-label="Stäng">
+        <button type="button" onClick={onClose} className="absolute right-4 text-[var(--c-text-subtle)] hover:text-[var(--c-text-secondary)] transition-colors" aria-label="Stäng">
           <X size={20} />
         </button>
       </div>
@@ -153,12 +153,12 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
       <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-4 space-y-4">
         {stepContent}
       </div>
-      <div className="px-4 py-4 border-t border-[#E5E7EB] shrink-0">
+      <div className="px-4 py-4 border-t border-[var(--c-border)] shrink-0">
         {step < 2 ? (
           <button
             type="button"
             onClick={handleNext}
-            className="w-full bg-[#1B4FD8] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out"
+            className="w-full bg-[var(--c-accent)] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out"
           >
             Nästa →
           </button>
@@ -167,7 +167,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
             type="button"
             onClick={handleSave}
             disabled={isSaving}
-            className="w-full bg-[#1B4FD8] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out disabled:opacity-50"
+            className="w-full bg-[var(--c-accent)] text-white rounded-[6px] py-3 text-[14px] font-medium transition-all duration-150 ease-out disabled:opacity-50"
           >
             {isSaving ? 'Sparar…' : isEdit ? 'Uppdatera' : 'Spara abonnemang'}
           </button>
@@ -178,11 +178,11 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
 
   return (
     <>
-      <div className="md:hidden fixed inset-0 bg-white z-50 flex flex-col">
+      <div className="md:hidden fixed inset-0 bg-[var(--c-bg-card)] z-50 flex flex-col">
         {inner}
       </div>
-      <div className="hidden md:flex fixed inset-0 bg-black/50 z-50 items-center justify-center" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
-        <div className="bg-white rounded-[16px] w-[560px] max-h-[90vh] flex flex-col shadow-xl">
+      <div className="hidden md:flex fixed inset-0 bg-[var(--c-overlay)] z-50 items-center justify-center" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
+        <div className="bg-[var(--c-bg-card)] rounded-[16px] w-[560px] max-h-[90vh] flex flex-col shadow-xl">
           {inner}
         </div>
       </div>
@@ -205,18 +205,16 @@ function StepIndicator({ step }: { step: number }) {
           <div className="flex flex-col items-center">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-medium transition-all duration-150 ${
-                step > s.num
-                  ? 'bg-[#1B4FD8] text-white'
-                  : step === s.num
-                  ? 'bg-[#1B4FD8] text-white'
-                  : 'bg-[#F3F4F6] text-[#9CA3AF]'
+                step >= s.num
+                  ? 'bg-[var(--c-accent)] text-white'
+                  : 'bg-[var(--c-bg-subtle)] text-[var(--c-text-subtle)]'
               }`}
             >
               {step > s.num ? '✓' : s.num}
             </div>
             <span
               className={`text-[10px] mt-1 font-medium ${
-                step === s.num ? 'text-[#1B4FD8]' : 'text-[#9CA3AF]'
+                step === s.num ? 'text-[var(--c-accent)]' : 'text-[var(--c-text-subtle)]'
               }`}
             >
               {s.label}
@@ -225,7 +223,7 @@ function StepIndicator({ step }: { step: number }) {
           {i < steps.length - 1 && (
             <div
               className={`flex-1 h-px mt-4 mx-1 transition-all duration-150 ${
-                step > s.num ? 'bg-[#1B4FD8]' : 'bg-[#E5E7EB]'
+                step > s.num ? 'bg-[var(--c-accent)]' : 'bg-[var(--c-border)]'
               }`}
             />
           )}
@@ -250,7 +248,6 @@ function BasicInfoStep({
 
   return (
     <>
-      {/* Tjänstens namn */}
       <Field label="Tjänstens namn" required error={errors.name}>
         <input
           type="text"
@@ -261,7 +258,6 @@ function BasicInfoStep({
         />
       </Field>
 
-      {/* Kategori + Kostnad (desktop: side by side) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field label="Kategori" required>
           <select
@@ -290,7 +286,6 @@ function BasicInfoStep({
         </Field>
       </div>
 
-      {/* Intervall + Startdatum */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field label="Intervall" required>
           <select
@@ -316,12 +311,11 @@ function BasicInfoStep({
             className={inputClass(!!errors.start_date)}
           />
           {!errors.start_date && (
-            <p className="text-[11px] text-[#9CA3AF] mt-1">Datumet du började betala</p>
+            <p className="text-[11px] text-[var(--c-text-subtle)] mt-1">Datumet du började betala</p>
           )}
         </Field>
       </div>
 
-      {/* Bindningstid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Field label="Bindningstid">
           <select
@@ -338,7 +332,6 @@ function BasicInfoStep({
         </Field>
       </div>
 
-      {/* Påminnelse — döljs om abonnemanget är avslutat */}
       {!form.is_cancelled && (
         <Field label="Påminnelse">
           <select
@@ -354,8 +347,7 @@ function BasicInfoStep({
         </Field>
       )}
 
-      {/* Historiskt abonnemang */}
-      <div className="border-t border-[#E5E7EB] pt-4">
+      <div className="border-t border-[var(--c-border)] pt-4">
         <label className="flex items-center gap-2.5 cursor-pointer select-none">
           <input
             type="checkbox"
@@ -364,9 +356,9 @@ function BasicInfoStep({
               update('is_cancelled', e.target.checked)
               if (!e.target.checked) update('cancelled_date', '')
             }}
-            className="w-4 h-4 rounded accent-[#1B4FD8]"
+            className="w-4 h-4 rounded accent-[var(--c-accent)]"
           />
-          <span className="text-[13px] text-[#6B7280]">Abonnemanget är avslutat</span>
+          <span className="text-[13px] text-[var(--c-text-muted)]">Abonnemanget är avslutat</span>
         </label>
 
         {form.is_cancelled && (
@@ -414,8 +406,7 @@ function ConfirmStep({
 
   return (
     <div className="space-y-4">
-      {/* Summary */}
-      <div className="bg-[#F9FAFB] rounded-[8px] divide-y divide-[#E5E7EB]">
+      <div className="bg-[var(--c-bg-app)] rounded-[8px] divide-y divide-[var(--c-border)]">
         <SummaryRow label="Tjänst" value={form.name} />
         <SummaryRow label="Kategori" value={category?.name ?? '—'} />
         <SummaryRow label="Kostnad" value={`${form.amount} kr / ${intervalMap[intervalKey] ?? form.interval}`} />
@@ -424,7 +415,6 @@ function ConfirmStep({
         <SummaryRow label="Påminnelse" value={`${form.reminder_days_before} dagar innan`} />
       </div>
 
-      {/* Notes */}
       <Field label="Kommentar (valfri)">
         <textarea
           value={form.notes}
@@ -441,8 +431,8 @@ function ConfirmStep({
 function SummaryRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between px-3 py-2">
-      <span className="text-[12px] text-[#6B7280]">{label}</span>
-      <span className="text-[13px] font-medium text-[#111827]">{value}</span>
+      <span className="text-[12px] text-[var(--c-text-muted)]">{label}</span>
+      <span className="text-[13px] font-medium text-[var(--c-text-primary)]">{value}</span>
     </div>
   )
 }
@@ -462,18 +452,18 @@ function Field({
 }) {
   return (
     <div className="space-y-1 min-w-0">
-      <label className="block text-[12px] font-medium text-[#374151]">
+      <label className="block text-[12px] font-medium text-[var(--c-text-secondary)]">
         {label}
-        {required && <span className="text-[#B91C1C] ml-0.5">*</span>}
+        {required && <span className="text-[var(--c-danger-text)] ml-0.5">*</span>}
       </label>
       {children}
-      {error && <p className="text-[11px] text-[#B91C1C]">{error}</p>}
+      {error && <p className="text-[11px] text-[var(--c-danger-text)]">{error}</p>}
     </div>
   )
 }
 
 function inputClass(hasError: boolean) {
   return `w-full min-w-0 border ${
-    hasError ? 'border-[#B91C1C]' : 'border-[#D1D5DB]'
-  } focus:border-[#1B4FD8] rounded-[6px] px-3 py-2 text-[16px] md:text-[13px] text-[#111827] outline-none bg-white transition-all duration-150 ease-out`
+    hasError ? 'border-[var(--c-danger-text)]' : 'border-[var(--c-border-strong)]'
+  } focus:border-[var(--c-accent)] rounded-[6px] px-3 py-2 text-[16px] md:text-[13px] text-[var(--c-text-primary)] outline-none bg-[var(--c-bg-card)] transition-all duration-150 ease-out`
 }

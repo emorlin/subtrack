@@ -64,9 +64,9 @@ export default function Dashboard() {
 
 function MetricCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className="bg-[#F9FAFB] rounded-lg p-3">
-      <p className="text-[11px] text-[#6B7280] mb-1">{label}</p>
-      <p className={`text-[20px] font-semibold tracking-[-0.3px] ${accent ? 'text-[#1B4FD8]' : 'text-[#111827]'}`}>
+    <div className="bg-[var(--c-bg-app)] rounded-lg p-3">
+      <p className="text-[11px] text-[var(--c-text-muted)] mb-1">{label}</p>
+      <p className={`text-[20px] font-semibold tracking-[-0.3px] ${accent ? 'text-[var(--c-accent)]' : 'text-[var(--c-text-primary)]'}`}>
         {value}
       </p>
     </div>

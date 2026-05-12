@@ -21,9 +21,9 @@ interface Props {
 type ActionState = 'none' | 'cancel' | 'delete'
 
 const STATUS_BADGE: Record<string, { label: string; className: string }> = {
-  active:    { label: 'Aktiv',     className: 'bg-[#F0FDF4] text-[#166534]' },
-  paused:    { label: 'Pausad',    className: 'bg-[#FFFBEB] text-[#92400E]' },
-  cancelled: { label: 'Avslutad', className: 'bg-[#F3F4F6] text-[#6B7280]' },
+  active:    { label: 'Aktiv',     className: 'bg-[var(--c-success-bg)] text-[var(--c-success-text)]' },
+  paused:    { label: 'Pausad',    className: 'bg-[var(--c-warning-bg)] text-[var(--c-warning-text)]' },
+  cancelled: { label: 'Avslutad', className: 'bg-[var(--c-bg-subtle)] text-[var(--c-text-muted)]' },
 }
 
 function todayString() {
@@ -82,16 +82,16 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
   const actionPanel = (
     <>
       {actionState === 'cancel' && (
-        <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-[8px] p-4 space-y-3">
-          <p className="text-[13px] font-medium text-[#92400E]">Avsluta {subscription.name}?</p>
-          <p className="text-[12px] text-[#6B7280]">Abonnemanget sparas kvar i historiken.</p>
+        <div className="bg-[var(--c-warning-bg)] border border-[var(--c-warning-border)] rounded-[8px] p-4 space-y-3">
+          <p className="text-[13px] font-medium text-[var(--c-warning-text)]">Avsluta {subscription.name}?</p>
+          <p className="text-[12px] text-[var(--c-text-muted)]">Abonnemanget sparas kvar i historiken.</p>
           <div className="space-y-1">
-            <label className="block text-[12px] font-medium text-[#374151]">Sista betalningsdag</label>
+            <label className="block text-[12px] font-medium text-[var(--c-text-secondary)]">Sista betalningsdag</label>
             <input
               type="date"
               value={cancelDate}
               onChange={(e) => setCancelDate(e.target.value)}
-              className="w-full border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-2 text-[16px] md:text-[13px] outline-none bg-white"
+              className="w-full border border-[var(--c-border-strong)] focus:border-[var(--c-accent)] rounded-[6px] px-3 py-2 text-[16px] md:text-[13px] outline-none bg-[var(--c-bg-card)] text-[var(--c-text-primary)]"
             />
           </div>
           <div className="flex gap-2">
@@ -99,14 +99,14 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
               type="button"
               onClick={handleCancel}
               disabled={isCancelling}
-              className="flex-1 bg-[#92400E] text-white rounded-[6px] py-2 text-[13px] font-medium disabled:opacity-50 transition-all duration-150"
+              className="flex-1 bg-[var(--c-warning-text)] text-white rounded-[6px] py-2 text-[13px] font-medium disabled:opacity-50 transition-all duration-150"
             >
               {isCancelling ? 'Avslutar…' : 'Avsluta'}
             </button>
             <button
               type="button"
               onClick={() => setActionState('none')}
-              className="flex-1 bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] py-2 text-[13px] font-medium"
+              className="flex-1 bg-[var(--c-bg-card)] border border-[var(--c-border)] text-[var(--c-text-secondary)] rounded-[6px] py-2 text-[13px] font-medium"
             >
               Avbryt
             </button>
@@ -115,22 +115,22 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
       )}
 
       {actionState === 'delete' && (
-        <div className="bg-[#FEF2F2] rounded-[8px] p-4 space-y-3">
-          <p className="text-[13px] text-[#B91C1C] font-medium">Radera {subscription.name} permanent?</p>
-          <p className="text-[12px] text-[#6B7280]">All data och prishistorik tas bort för alltid.</p>
+        <div className="bg-[var(--c-danger-bg)] rounded-[8px] p-4 space-y-3">
+          <p className="text-[13px] text-[var(--c-danger-text)] font-medium">Radera {subscription.name} permanent?</p>
+          <p className="text-[12px] text-[var(--c-text-muted)]">All data och prishistorik tas bort för alltid.</p>
           <div className="flex gap-2">
             <button
               type="button"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="flex-1 bg-[#B91C1C] text-white rounded-[6px] py-2 text-[13px] font-medium disabled:opacity-50 transition-all duration-150"
+              className="flex-1 bg-[var(--c-danger-text)] text-white rounded-[6px] py-2 text-[13px] font-medium disabled:opacity-50 transition-all duration-150"
             >
               {isDeleting ? 'Raderar…' : 'Ja, radera'}
             </button>
             <button
               type="button"
               onClick={() => setActionState('none')}
-              className="flex-1 bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] py-2 text-[13px] font-medium"
+              className="flex-1 bg-[var(--c-bg-card)] border border-[var(--c-border)] text-[var(--c-text-secondary)] rounded-[6px] py-2 text-[13px] font-medium"
             >
               Avbryt
             </button>
@@ -142,8 +142,8 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
 
   const inner = (
     <>
-      <div className="h-14 px-4 border-b border-[#E5E7EB] flex items-center justify-end shrink-0">
-        <button type="button" onClick={onClose} className="text-[#9CA3AF] hover:text-[#374151] transition-colors" aria-label="Stäng">
+      <div className="h-14 px-4 border-b border-[var(--c-border)] flex items-center justify-end shrink-0">
+        <button type="button" onClick={onClose} className="text-[var(--c-text-subtle)] hover:text-[var(--c-text-secondary)] transition-colors" aria-label="Stäng">
           <X size={20} />
         </button>
       </div>
@@ -152,12 +152,12 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
           <ServiceIcon name={subscription.name} size="xl" />
           <div>
             <div className="flex items-center gap-2">
-              <p className="text-[18px] font-semibold text-[#111827]">{subscription.name}</p>
+              <p className="text-[18px] font-semibold text-[var(--c-text-primary)]">{subscription.name}</p>
               <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded ${badge.className}`}>
                 {badge.label}
               </span>
             </div>
-            <p className="text-[13px] text-[#6B7280]">{subscription.category?.name ?? '—'}</p>
+            <p className="text-[13px] text-[var(--c-text-muted)]">{subscription.category?.name ?? '—'}</p>
           </div>
         </div>
         {!isCancelled && (
@@ -165,14 +165,14 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
             <button
               type="button"
               onClick={onEdit}
-              className="flex-1 bg-white border border-[#E5E7EB] text-[#374151] rounded-[6px] py-2 text-[13px] font-medium hover:bg-[#F9FAFB] transition-all duration-150 ease-out"
+              className="flex-1 bg-[var(--c-bg-card)] border border-[var(--c-border)] text-[var(--c-text-secondary)] rounded-[6px] py-2 text-[13px] font-medium hover:bg-[var(--c-bg-app)] transition-all duration-150 ease-out"
             >
               Redigera
             </button>
             <button
               type="button"
               onClick={() => setActionState(actionState === 'cancel' ? 'none' : 'cancel')}
-              className="flex-1 bg-[#FFFBEB] text-[#92400E] rounded-[6px] py-2 text-[13px] font-medium hover:opacity-80 transition-all duration-150 ease-out"
+              className="flex-1 bg-[var(--c-warning-bg)] text-[var(--c-warning-text)] rounded-[6px] py-2 text-[13px] font-medium hover:opacity-80 transition-all duration-150 ease-out"
             >
               Avsluta
             </button>
@@ -184,14 +184,14 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
               type="button"
               onClick={handleReactivate}
               disabled={isReactivating}
-              className="flex-1 bg-[#EFF6FF] text-[#1B4FD8] border border-[#BFDBFE] rounded-[6px] py-2 text-[13px] font-medium disabled:opacity-50 transition-all duration-150 ease-out"
+              className="flex-1 bg-[var(--c-accent-subtle)] text-[var(--c-accent)] border border-[var(--c-accent-muted)] rounded-[6px] py-2 text-[13px] font-medium disabled:opacity-50 transition-all duration-150 ease-out"
             >
               {isReactivating ? 'Återaktiverar…' : 'Återaktivera'}
             </button>
             <button
               type="button"
               onClick={() => setActionState(actionState === 'delete' ? 'none' : 'delete')}
-              className="flex-1 bg-[#FEF2F2] text-[#B91C1C] rounded-[6px] py-2 text-[13px] font-medium hover:opacity-80 transition-all duration-150 ease-out"
+              className="flex-1 bg-[var(--c-danger-bg)] text-[var(--c-danger-text)] rounded-[6px] py-2 text-[13px] font-medium hover:opacity-80 transition-all duration-150 ease-out"
             >
               Radera
             </button>
@@ -208,11 +208,11 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
 
   return (
     <>
-      <div className="md:hidden fixed inset-0 bg-white z-40 flex flex-col">
+      <div className="md:hidden fixed inset-0 bg-[var(--c-bg-card)] z-40 flex flex-col">
         {inner}
       </div>
-      <div className="hidden md:flex fixed inset-0 bg-black/50 z-40 items-center justify-center" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
-        <div className="bg-white rounded-[16px] w-[480px] max-h-[85vh] flex flex-col shadow-xl">
+      <div className="hidden md:flex fixed inset-0 bg-[var(--c-overlay)] z-40 items-center justify-center" onClick={(e) => { if (e.target === e.currentTarget) onClose() }}>
+        <div className="bg-[var(--c-bg-card)] rounded-[16px] w-[480px] max-h-[85vh] flex flex-col shadow-xl">
           {inner}
         </div>
       </div>
@@ -226,7 +226,7 @@ function ServiceIcon({ name, size }: { name: string; size: 'lg' | 'xl' }) {
   const initials = getInitials(name)
   const dim = size === 'xl' ? 'w-12 h-12 text-[14px]' : 'w-10 h-10 text-[13px]'
   return (
-    <div className={`${dim} rounded-[10px] bg-[#F3F4F6] flex items-center justify-center font-medium text-[#374151] shrink-0`}>
+    <div className={`${dim} rounded-[10px] bg-[var(--c-bg-subtle)] flex items-center justify-center font-medium text-[var(--c-text-secondary)] shrink-0`}>
       {initials}
     </div>
   )
@@ -234,8 +234,8 @@ function ServiceIcon({ name, size }: { name: string; size: 'lg' | 'xl' }) {
 
 function RenewalWarning({ days, amount, date }: { days: number; amount: number; date: Date }) {
   return (
-    <div className="bg-[#FFFBEB] border border-[#FDE68A] rounded-[8px] p-3">
-      <p className="text-[13px] text-[#92400E] font-medium">
+    <div className="bg-[var(--c-warning-bg)] border border-[var(--c-warning-border)] rounded-[8px] p-3">
+      <p className="text-[13px] text-[var(--c-warning-text)] font-medium">
         Förnyas automatiskt om {days} dagar — {amount} kr dras{' '}
         {date.toLocaleDateString('sv-SE', { day: 'numeric', month: 'long' })}
       </p>
@@ -260,11 +260,11 @@ function DetailRows({ subscription, totalPaid, renewal, effectiveAmount }: {
     { label: 'Påminnelse', value: `${subscription.reminder_days_before} dagar` },
   ]
   return (
-    <div className="divide-y divide-[#E5E7EB]">
+    <div className="divide-y divide-[var(--c-border)]">
       {rows.map(({ label, value }) => (
         <div key={label} className="flex justify-between py-2.5">
-          <span className="text-[12px] text-[#6B7280]">{label}</span>
-          <span className="text-[13px] font-medium text-[#111827] text-right">{value}</span>
+          <span className="text-[12px] text-[var(--c-text-muted)]">{label}</span>
+          <span className="text-[13px] font-medium text-[var(--c-text-primary)] text-right">{value}</span>
         </div>
       ))}
     </div>
@@ -273,8 +273,8 @@ function DetailRows({ subscription, totalPaid, renewal, effectiveAmount }: {
 
 function Notes({ text }: { text: string }) {
   return (
-    <div className="border-l-2 border-[#1B4FD8] pl-3">
-      <p className="text-[13px] text-[#374151] leading-relaxed">{text}</p>
+    <div className="border-l-2 border-[var(--c-accent)] pl-3">
+      <p className="text-[13px] text-[var(--c-text-secondary)] leading-relaxed">{text}</p>
     </div>
   )
 }
@@ -291,8 +291,6 @@ function PriceHistorySection({ subscription }: { subscription: Subscription }) {
     (a, b) => new Date(a.effective_from).getTime() - new Date(b.effective_from).getTime()
   )
 
-  // Show the subscription's starting price as an implicit baseline entry
-  // when no price_history entry covers the start date or earlier
   const showBaseline =
     history.length === 0 ||
     new Date(history[0].effective_from) > new Date(subscription.start_date)
@@ -316,39 +314,39 @@ function PriceHistorySection({ subscription }: { subscription: Subscription }) {
 
   return (
     <div className="space-y-2">
-      <p className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase">Prishistorik</p>
+      <p className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase">Prishistorik</p>
 
       {(showBaseline || history.length > 0) && (
-        <div className="border border-[#E5E7EB] rounded-[8px] overflow-hidden divide-y divide-[#E5E7EB]">
+        <div className="border border-[var(--c-border)] rounded-[8px] overflow-hidden divide-y divide-[var(--c-border)]">
           {showBaseline && (
-            <div className="flex items-center justify-between px-3 py-2 bg-[#F9FAFB]">
-              <span className="text-[12px] text-[#9CA3AF]">
+            <div className="flex items-center justify-between px-3 py-2 bg-[var(--c-bg-app)]">
+              <span className="text-[12px] text-[var(--c-text-subtle)]">
                 {new Date(subscription.start_date).toLocaleDateString('sv-SE', {
                   day: 'numeric', month: 'short', year: 'numeric',
                 })}
                 {' '}(start)
               </span>
-              <span className="text-[13px] font-medium text-[#9CA3AF]">
+              <span className="text-[13px] font-medium text-[var(--c-text-subtle)]">
                 {subscription.amount} kr
               </span>
             </div>
           )}
           {history.map((entry) => (
             <div key={entry.id} className="flex items-center justify-between px-3 py-2">
-              <span className="text-[12px] text-[#6B7280]">
+              <span className="text-[12px] text-[var(--c-text-muted)]">
                 {new Date(entry.effective_from).toLocaleDateString('sv-SE', {
                   day: 'numeric', month: 'short', year: 'numeric',
                 })}
               </span>
               <div className="flex items-center gap-3">
-                <span className="text-[13px] font-medium text-[#111827]">
+                <span className="text-[13px] font-medium text-[var(--c-text-primary)]">
                   {entry.amount} kr
                 </span>
                 <button
                   type="button"
                   onClick={() => deleteEntry.mutate(entry.id)}
                   disabled={deleteEntry.isPending}
-                  className="text-[#D1D5DB] hover:text-[#B91C1C] transition-colors text-[12px] leading-none"
+                  className="text-[var(--c-border-strong)] hover:text-[var(--c-danger-text)] transition-colors text-[12px] leading-none"
                   aria-label="Ta bort"
                 >
                   ✕
@@ -359,13 +357,12 @@ function PriceHistorySection({ subscription }: { subscription: Subscription }) {
         </div>
       )}
 
-      {/* Add form */}
       <div className="flex gap-2">
         <input
           type="date"
           value={date}
           onChange={(e) => { setDate(e.target.value); setFormError(null) }}
-          className="flex-1 border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-1.5 text-[16px] md:text-[12px] text-[#111827] outline-none bg-white transition-all duration-150"
+          className="flex-1 border border-[var(--c-border-strong)] focus:border-[var(--c-accent)] rounded-[6px] px-3 py-1.5 text-[16px] md:text-[12px] text-[var(--c-text-primary)] outline-none bg-[var(--c-bg-card)] transition-all duration-150"
         />
         <input
           type="number"
@@ -373,18 +370,18 @@ function PriceHistorySection({ subscription }: { subscription: Subscription }) {
           onChange={(e) => { setAmount(e.target.value); setFormError(null) }}
           placeholder="kr"
           min="0"
-          className="w-20 border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-1.5 text-[16px] md:text-[12px] text-[#111827] outline-none bg-white transition-all duration-150"
+          className="w-20 border border-[var(--c-border-strong)] focus:border-[var(--c-accent)] rounded-[6px] px-3 py-1.5 text-[16px] md:text-[12px] text-[var(--c-text-primary)] outline-none bg-[var(--c-bg-card)] transition-all duration-150"
         />
         <button
           type="button"
           onClick={handleAdd}
           disabled={!amount || !date || addEntry.isPending}
-          className="bg-[#1B4FD8] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium disabled:opacity-40 transition-all duration-150 ease-out whitespace-nowrap"
+          className="bg-[var(--c-accent)] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium disabled:opacity-40 transition-all duration-150 ease-out whitespace-nowrap"
         >
           {addEntry.isPending ? '…' : '+ Lägg till'}
         </button>
       </div>
-      {formError && <p className="text-[11px] text-[#B91C1C]">{formError}</p>}
+      {formError && <p className="text-[11px] text-[var(--c-danger-text)]">{formError}</p>}
     </div>
   )
 }

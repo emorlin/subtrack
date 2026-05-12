@@ -9,6 +9,7 @@ import {
 } from '../../hooks/useCategories'
 import { useAuth, signOut } from '../../hooks/useAuth'
 import { useDemoContext } from '../../contexts/DemoContext'
+import { useTheme } from '../../hooks/useTheme'
 import type { Category } from '../../types'
 
 const PRESET_COLORS = [
@@ -40,11 +41,11 @@ function ProfileCard() {
   const email = isDemoMode ? 'demo@subtrack.app' : (user?.email ?? '')
   const avatarUrl = isDemoMode ? null : (user?.user_metadata?.avatar_url as string | undefined)
   const initial = name.charAt(0).toUpperCase()
-  const avatarBg = isDemoMode ? 'bg-[#E0E7FF]' : 'bg-[#EFF6FF]'
-  const avatarText = isDemoMode ? 'text-[#4338CA]' : 'text-[#1B4FD8]'
+  const avatarBg = isDemoMode ? 'bg-[var(--c-demo-avatar-bg)]' : 'bg-[var(--c-accent-subtle)]'
+  const avatarText = isDemoMode ? 'text-[var(--c-demo-avatar-text)]' : 'text-[var(--c-accent)]'
 
   return (
-    <div className="bg-white rounded-[12px] border border-[#E5E7EB] p-4 flex items-center gap-4">
+    <div className="bg-[var(--c-bg-card)] rounded-[12px] border border-[var(--c-border)] p-4 flex items-center gap-4">
       {avatarUrl ? (
         <img
           src={avatarUrl}
@@ -57,24 +58,56 @@ function ProfileCard() {
         </div>
       )}
       <div className="flex-1 min-w-0">
-        <p className="text-[14px] font-semibold text-[#111827] truncate">{name}</p>
-        <p className="text-[12px] text-[#6B7280] truncate">{email}</p>
+        <p className="text-[14px] font-semibold text-[var(--c-text-primary)] truncate">{name}</p>
+        <p className="text-[12px] text-[var(--c-text-muted)] truncate">{email}</p>
       </div>
       {isDemoMode ? (
         <button
           onClick={exitDemo}
-          className="bg-[#1B4FD8] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium hover:bg-[#1a46c2] transition-all duration-150 ease-out shrink-0"
+          className="bg-[var(--c-accent)] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium hover:bg-[var(--c-accent-hover)] transition-all duration-150 ease-out shrink-0"
         >
           Logga in
         </button>
       ) : (
         <button
           onClick={handleSignOut}
-          className="border border-[#E5E7EB] text-[#6B7280] rounded-[6px] px-3 py-1.5 text-[12px] hover:bg-[#F9FAFB] transition-all duration-150 ease-out shrink-0"
+          className="border border-[var(--c-border)] text-[var(--c-text-muted)] rounded-[6px] px-3 py-1.5 text-[12px] hover:bg-[var(--c-bg-app)] transition-all duration-150 ease-out shrink-0"
         >
           Logga ut
         </button>
       )}
+    </div>
+  )
+}
+
+// ─── Appearance ───────────────────────────────────────────────────────────────
+
+function ThemeToggle() {
+  const { theme, toggle } = useTheme()
+  const isDark = theme === 'dark'
+
+  return (
+    <div className="bg-[var(--c-bg-card)] rounded-[12px] border border-[var(--c-border)] p-4 flex items-center justify-between">
+      <div>
+        <p className="text-[13px] font-medium text-[var(--c-text-primary)]">Mörkt läge</p>
+        <p className="text-[12px] text-[var(--c-text-muted)] mt-0.5">Anpassa appens utseende</p>
+      </div>
+      <button
+        type="button"
+        onClick={toggle}
+        className={`relative w-11 h-6 rounded-full transition-all duration-200 ${
+          isDark ? 'bg-[var(--c-accent)]' : 'bg-[var(--c-border-strong)]'
+        }`}
+        aria-label={isDark ? 'Stäng av mörkt läge' : 'Aktivera mörkt läge'}
+        role="switch"
+        aria-checked={isDark}
+      >
+        <span
+          className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
+            isDark ? 'translate-x-5' : 'translate-x-0'
+          }`}
+        />
+      </button>
     </div>
   )
 }
@@ -96,7 +129,7 @@ function ColorPicker({
           type="button"
           onClick={() => onChange(c)}
           className={`w-5 h-5 rounded-full transition-all duration-150 ${
-            value === c ? 'ring-2 ring-offset-1 ring-[#111827]' : 'hover:scale-110'
+            value === c ? 'ring-2 ring-offset-1 ring-[var(--c-text-primary)]' : 'hover:scale-110'
           }`}
           style={{ backgroundColor: c }}
         />
@@ -124,7 +157,7 @@ function CategoryForm({
   }
 
   return (
-    <div className="px-4 py-3 space-y-2.5 bg-[#F9FAFB]">
+    <div className="px-4 py-3 space-y-2.5 bg-[var(--c-bg-app)]">
       <ColorPicker value={color} onChange={setColor} />
       <div className="flex items-center gap-2">
         <input
@@ -132,7 +165,7 @@ function CategoryForm({
           onChange={(e) => setName(e.target.value)}
           placeholder="Kategorinamn"
           autoFocus
-          className="flex-1 min-w-0 border border-[#D1D5DB] focus:border-[#1B4FD8] rounded-[6px] px-3 py-1.5 text-[16px] md:text-[13px] outline-none bg-white"
+          className="flex-1 min-w-0 border border-[var(--c-border-strong)] focus:border-[var(--c-accent)] rounded-[6px] px-3 py-1.5 text-[16px] md:text-[13px] outline-none bg-[var(--c-bg-card)] text-[var(--c-text-primary)]"
           onKeyDown={(e) => {
             if (e.key === 'Enter') submit()
             if (e.key === 'Escape') onCancel()
@@ -142,14 +175,14 @@ function CategoryForm({
           type="button"
           onClick={submit}
           disabled={!name.trim()}
-          className="bg-[#1B4FD8] text-white rounded-[6px] px-3 py-1.5 text-[13px] font-medium disabled:opacity-40 transition-all duration-150 ease-out hover:bg-[#1a46c2] shrink-0"
+          className="bg-[var(--c-accent)] text-white rounded-[6px] px-3 py-1.5 text-[13px] font-medium disabled:opacity-40 transition-all duration-150 ease-out hover:bg-[var(--c-accent-hover)] shrink-0"
         >
           {initial ? 'Spara' : 'Lägg till'}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="text-[13px] text-[#6B7280] hover:text-[#374151] transition-colors shrink-0"
+          className="text-[13px] text-[var(--c-text-muted)] hover:text-[var(--c-text-secondary)] transition-colors shrink-0"
         >
           Avbryt
         </button>
@@ -177,20 +210,20 @@ function CategoryRow({
         className="w-3 h-3 rounded-full shrink-0"
         style={{ backgroundColor: cat.color_hex }}
       />
-      <span className="flex-1 text-[13px] text-[#111827]">{cat.name}</span>
+      <span className="flex-1 text-[13px] text-[var(--c-text-primary)]">{cat.name}</span>
 
       {confirming ? (
         <div className="flex items-center gap-2 shrink-0">
-          <span className="text-[12px] text-[#6B7280]">Ta bort?</span>
+          <span className="text-[12px] text-[var(--c-text-muted)]">Ta bort?</span>
           <button
             onClick={onDelete}
-            className="text-[12px] font-medium text-[#B91C1C] hover:underline"
+            className="text-[12px] font-medium text-[var(--c-danger-text)] hover:underline"
           >
             Ja
           </button>
           <button
             onClick={() => setConfirming(false)}
-            className="text-[12px] text-[#6B7280] hover:underline"
+            className="text-[12px] text-[var(--c-text-muted)] hover:underline"
           >
             Nej
           </button>
@@ -199,14 +232,14 @@ function CategoryRow({
         <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={onEdit}
-            className="text-[#9CA3AF] hover:text-[#374151] transition-colors"
+            className="text-[var(--c-text-subtle)] hover:text-[var(--c-text-secondary)] transition-colors"
             aria-label="Redigera"
           >
             <Pencil size={14} />
           </button>
           <button
             onClick={() => setConfirming(true)}
-            className="text-[#9CA3AF] hover:text-[#B91C1C] transition-colors"
+            className="text-[var(--c-text-subtle)] hover:text-[var(--c-danger-text)] transition-colors"
             aria-label="Ta bort"
           >
             <Trash2 size={14} />
@@ -229,10 +262,10 @@ function CategoriesCard() {
   const [isAdding, setIsAdding] = useState(false)
 
   return (
-    <div className="bg-white rounded-[12px] border border-[#E5E7EB] overflow-hidden">
+    <div className="bg-[var(--c-bg-card)] rounded-[12px] border border-[var(--c-border)] overflow-hidden">
       {categories.map((cat, i) => (
         <div key={cat.id}>
-          {i > 0 && <div className="h-px bg-[#F3F4F6] mx-4" />}
+          {i > 0 && <div className="h-px bg-[var(--c-bg-subtle)] mx-4" />}
           {editingId === cat.id ? (
             <CategoryForm
               initial={cat}
@@ -253,7 +286,7 @@ function CategoriesCard() {
       ))}
 
       {/* Add form / button */}
-      {categories.length > 0 && <div className="h-px bg-[#F3F4F6]" />}
+      {categories.length > 0 && <div className="h-px bg-[var(--c-bg-subtle)]" />}
       {isAdding ? (
         <CategoryForm
           onSave={(name, color_hex) => {
@@ -266,7 +299,7 @@ function CategoriesCard() {
         <button
           type="button"
           onClick={() => { setEditingId(null); setIsAdding(true) }}
-          className="w-full px-4 py-3 text-left text-[13px] text-[#1B4FD8] font-medium hover:bg-[#EFF6FF] transition-colors duration-150"
+          className="w-full px-4 py-3 text-left text-[13px] text-[var(--c-accent)] font-medium hover:bg-[var(--c-accent-subtle)] transition-colors duration-150"
         >
           + Lägg till kategori
         </button>
@@ -281,14 +314,21 @@ export default function SettingsView() {
   return (
     <div className="p-4 md:p-6 space-y-5">
       <section>
-        <p className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase mb-3">
+        <p className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-3">
           Profil
         </p>
         <ProfileCard />
       </section>
 
       <section>
-        <p className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase mb-3">
+        <p className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-3">
+          Utseende
+        </p>
+        <ThemeToggle />
+      </section>
+
+      <section>
+        <p className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase mb-3">
           Kategorier
         </p>
         <CategoriesCard />
@@ -296,4 +336,3 @@ export default function SettingsView() {
     </div>
   )
 }
-

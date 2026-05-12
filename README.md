@@ -52,6 +52,7 @@ Appen är byggd som en **Progressive Web App** och kan installeras direkt från 
 | **PWA / Hemskärm** | Installerbar som app på iOS och Android |
 | **Responsiv** | Sticky bottom nav + FAB på mobil, sidebar + sidopanel på desktop. Modaler: fullskärm (mobil) / fast bredd (desktop) |
 | **Demo-läge** | Utforska appen utan konto — hårdkodad data, inga Supabase-anrop |
+| **Mörkt läge** | Fullt mörkt tema via CSS-variabler. Växla i Inställningar → Utseende — valet sparas i `localStorage`, systempreferens används som standard |
 
 ---
 
@@ -137,7 +138,8 @@ subtrack/
 │   │   ├── useSubscriptions.ts        # CRUD + useAddPriceHistory + useDeletePriceHistory
 │   │   ├── useCategories.ts
 │   │   ├── useNotifications.ts
-│   │   └── useAuth.ts
+│   │   ├── useAuth.ts
+│   │   └── useTheme.ts                # Temabyte light/dark, localStorage-persistens
 │   ├── lib/
 │   │   ├── supabase.ts                # Initialiserad Supabase-klient
 │   │   ├── calculations.ts            # Beräkningsfunktioner (se nedan)
@@ -536,23 +538,28 @@ Varje push till `main` triggar en ny deploy automatiskt.
 
 ## Designsystem
 
-Subtrack följer ett strikt designsystem definierat i `CLAUDE.md`.
+Subtrack följer ett strikt designsystem definierat i `CLAUDE.md`. Alla färger exponeras som CSS-variabler i `src/index.css` och Tailwind-klasser refererar till dem via `bg-[var(--c-xxx)]` / `text-[var(--c-xxx)]`.
 
-### Färgpalett
+### Temabyte (mörkt läge)
 
-| Token | Hex | Användning |
-|---|---|---|
-| Accent | `#1B4FD8` | Knappar, aktiva states, accenter |
-| Accent subtil | `#EFF6FF` | Hover-bakgrund, badge-bakgrund |
-| Text primär | `#111827` | Rubriker, primärtext |
-| Text sekundär | `#6B7280` | Etiketter, metadata |
-| Text tertiär | `#9CA3AF` | Platshållare, hjälptext |
-| Bakgrund app | `#F9FAFB` | Sidbakgrund |
-| Bakgrund kort | `#FFFFFF` | Kortkomponenter |
-| Kantlinje | `#E5E7EB` | Borders |
-| Grön | `#166534` / `#F0FDF4` | Aktiv status |
-| Amber | `#92400E` / `#FFFBEB` | Varning |
-| Röd | `#B91C1C` / `#FEF2F2` | Fel, ta bort |
+Temat sätts med `data-theme="dark"` på `<html>`-elementet. En inline `<script>` i `index.html` applicerar rätt tema synkront innan React mountas för att undvika flimmer. `useTheme`-hooken hanterar toggle + `localStorage`-persistens och faller tillbaka på `prefers-color-scheme` om inget sparat val finns.
+
+### Färgpalett (CSS-variabler)
+
+| CSS-variabel | Ljust läge | Mörkt läge | Användning |
+|---|---|---|---|
+| `--c-accent` | `#1B4FD8` | `#3B82F6` | Knappar, aktiva states |
+| `--c-accent-subtle` | `#EFF6FF` | `#1E3A8A` | Hover-bakgrund, badge |
+| `--c-bg-app` | `#F9FAFB` | `#0F172A` | Sidbakgrund |
+| `--c-bg-card` | `#FFFFFF` | `#1E293B` | Kortkomponenter |
+| `--c-bg-subtle` | `#F3F4F6` | `#334155` | Dividers, subtil bakgrund |
+| `--c-text-primary` | `#111827` | `#F1F5F9` | Rubriker, primärtext |
+| `--c-text-muted` | `#6B7280` | `#94A3B8` | Etiketter, metadata |
+| `--c-text-subtle` | `#9CA3AF` | `#64748B` | Platshållare, hjälptext |
+| `--c-border` | `#E5E7EB` | `#334155` | Borders |
+| `--c-success-*` | grön | mörkgrön | Aktiv status |
+| `--c-warning-*` | amber | mörk amber | Varning |
+| `--c-danger-*` | röd | mörkröd | Fel, ta bort |
 
 ### Typsnitt
 

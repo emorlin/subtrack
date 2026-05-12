@@ -14,14 +14,14 @@ export default function TopBar({ action }: TopBarProps) {
 
   return (
     <header
-      className="bg-white border-b border-[#E5E7EB] shrink-0"
+      className="bg-[var(--c-bg-card)] border-b border-[var(--c-border)] shrink-0"
       style={{ paddingTop: 'env(safe-area-inset-top)' }}
     >
       <div className="h-14 flex items-center px-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5">
           <SubtrackIcon />
-          <span className="text-[15px] font-semibold text-[#111827] tracking-[-0.3px]">
+          <span className="text-[15px] font-semibold text-[var(--c-text-primary)] tracking-[-0.3px]">
             Subtrack
           </span>
         </Link>
@@ -32,15 +32,15 @@ export default function TopBar({ action }: TopBarProps) {
             <>
               <div className="hidden md:flex items-center gap-2">
                 <DemoAvatar size={28} />
-                <span className="text-[13px] text-[#6B7280]">Alex Svensson</span>
+                <span className="text-[13px] text-[var(--c-text-muted)]">Alex Svensson</span>
               </div>
-              <span className="hidden md:inline text-[11px] font-medium text-[#92400E] bg-[#FFFBEB] border border-[#FDE68A] px-2 py-0.5 rounded-[4px]">
+              <span className="hidden md:inline text-[11px] font-medium text-[var(--c-warning-text)] bg-[var(--c-warning-bg)] border border-[var(--c-warning-border)] px-2 py-0.5 rounded-[4px]">
                 Demo
               </span>
               <button
                 type="button"
                 onClick={exitDemo}
-                className="bg-[#1B4FD8] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium transition-all duration-150 ease-out hover:bg-[#1a46c2]"
+                className="bg-[var(--c-accent)] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium transition-all duration-150 ease-out hover:bg-[var(--c-accent-hover)]"
               >
                 Logga in
               </button>
@@ -50,7 +50,7 @@ export default function TopBar({ action }: TopBarProps) {
               {/* Avatar + name */}
               <div className="flex items-center gap-2">
                 <Avatar user={user} size={28} />
-                <span className="text-[13px] text-[#6B7280]">
+                <span className="text-[13px] text-[var(--c-text-muted)]">
                   {user?.user_metadata?.full_name ?? user?.email ?? ''}
                 </span>
               </div>
@@ -87,10 +87,10 @@ function Avatar({ user, size }: { user: ReturnType<typeof useAuth>['user']; size
   }
   return (
     <div
-      className="rounded-full bg-[#EFF6FF] flex items-center justify-center shrink-0"
+      className="rounded-full bg-[var(--c-accent-subtle)] flex items-center justify-center shrink-0"
       style={{ width: size, height: size }}
     >
-      <span style={{ fontSize: size * 0.45 }} className="font-semibold text-[#1B4FD8] leading-none">
+      <span style={{ fontSize: size * 0.45 }} className="font-semibold text-[var(--c-accent)] leading-none">
         {initial}
       </span>
     </div>
@@ -100,10 +100,10 @@ function Avatar({ user, size }: { user: ReturnType<typeof useAuth>['user']; size
 function DemoAvatar({ size }: { size: number }) {
   return (
     <div
-      className="rounded-full bg-[#E0E7FF] flex items-center justify-center shrink-0"
+      className="rounded-full bg-[var(--c-demo-avatar-bg)] flex items-center justify-center shrink-0"
       style={{ width: size, height: size }}
     >
-      <span style={{ fontSize: size * 0.45 }} className="font-semibold text-[#4338CA] leading-none">
+      <span style={{ fontSize: size * 0.45 }} className="font-semibold text-[var(--c-demo-avatar-text)] leading-none">
         A
       </span>
     </div>
@@ -112,7 +112,7 @@ function DemoAvatar({ size }: { size: number }) {
 
 function SubtrackIcon() {
   return (
-    <div className="w-8 h-8 bg-[#1B4FD8] rounded-[8px] flex items-center justify-center shrink-0">
+    <div className="w-8 h-8 bg-[var(--c-accent)] rounded-[8px] flex items-center justify-center shrink-0">
       <Wallet size={18} color="white" strokeWidth={2} aria-hidden="true" />
     </div>
   )

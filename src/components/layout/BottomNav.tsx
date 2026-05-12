@@ -11,7 +11,7 @@ const navItems = [
 
 export default function BottomNav() {
   return (
-    <nav className="bg-white border-t border-[#E5E7EB] flex" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <nav className="bg-[var(--c-bg-card)] border-t border-[var(--c-border)] flex" style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
       {navItems.map(({ label, to, icon: Icon }) => (
         <NavLink
           key={to}
@@ -24,7 +24,7 @@ export default function BottomNav() {
               <Icon active={isActive} />
               <span
                 className={`text-[10px] font-medium ${
-                  isActive ? 'text-[#1B4FD8]' : 'text-[#9CA3AF]'
+                  isActive ? 'text-[var(--c-accent)]' : 'text-[var(--c-text-subtle)]'
                 }`}
               >
                 {label}

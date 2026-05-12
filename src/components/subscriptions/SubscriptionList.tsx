@@ -25,9 +25,9 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
   const cancelled = filtered.filter((s) => s.status === 'cancelled')
 
   return (
-    <div className="bg-white rounded-[12px] border border-[#E5E7EB] overflow-hidden">
+    <div className="bg-[var(--c-bg-card)] rounded-[12px] border border-[var(--c-border)] overflow-hidden">
       {/* Category filter row */}
-      <div className="flex items-center gap-2 px-4 py-3 border-b border-[#E5E7EB] overflow-x-auto">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--c-border)] overflow-x-auto">
         <FilterPill
           label="Alla"
           active={activeCategoryId === null}
@@ -44,7 +44,7 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
         <button
           type="button"
           onClick={onAdd}
-          className="ml-auto shrink-0 bg-[#1B4FD8] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium transition-all duration-150 ease-out hover:bg-[#1a46c2] hidden md:block"
+          className="ml-auto shrink-0 bg-[var(--c-accent)] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium transition-all duration-150 ease-out hover:bg-[var(--c-accent-hover)] hidden md:block"
         >
           + Lägg till
         </button>
@@ -58,7 +58,7 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
           <table className="w-full table-fixed">
             <ColGroup />
             <thead>
-              <tr className="border-b border-[#E5E7EB]">
+              <tr className="border-b border-[var(--c-border)]">
                 <Th>Tjänst</Th>
                 <Th>Kategori</Th>
                 <Th align="right">Kostnad</Th>
@@ -86,7 +86,7 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
             <button
               type="button"
               onClick={() => setShowCancelled((v) => !v)}
-              className="w-full flex items-center justify-between px-4 py-3 border-t border-[#E5E7EB] text-[12px] text-[#6B7280] hover:bg-[#F9FAFB] transition-colors"
+              className="w-full flex items-center justify-between px-4 py-3 border-t border-[var(--c-border)] text-[12px] text-[var(--c-text-muted)] hover:bg-[var(--c-bg-app)] transition-colors"
             >
               <span>Avslutade ({cancelled.length})</span>
               <span>{showCancelled ? '▲' : '▼'}</span>
@@ -116,8 +116,8 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
           <EmptyState onAdd={onAdd} />
         ) : (
           <>
-            <div className="flex items-center justify-between px-4 py-2 border-b border-[#E5E7EB]">
-              <span className="text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-[var(--c-border)]">
+              <span className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase">
                 Tjänster
               </span>
             </div>
@@ -138,7 +138,7 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
             <button
               type="button"
               onClick={() => setShowCancelled((v) => !v)}
-              className="w-full flex items-center justify-between px-4 py-3 border-t border-[#E5E7EB] text-[12px] text-[#6B7280]"
+              className="w-full flex items-center justify-between px-4 py-3 border-t border-[var(--c-border)] text-[12px] text-[var(--c-text-muted)]"
             >
               <span>Avslutade ({cancelled.length})</span>
               <span>{showCancelled ? '▲' : '▼'}</span>
@@ -183,50 +183,50 @@ function DesktopRow({
   return (
     <tr
       onClick={onClick}
-      className={`border-b border-[#E5E7EB] cursor-pointer transition-all duration-150 ease-out ${
-        selected ? 'bg-[#EFF6FF]' : 'hover:bg-[#F9FAFB]'
+      className={`border-b border-[var(--c-border)] cursor-pointer transition-all duration-150 ease-out ${
+        selected ? 'bg-[var(--c-accent-subtle)]' : 'hover:bg-[var(--c-bg-app)]'
       }`}
     >
       {/* Tjänst */}
       <td className="px-4 py-3 overflow-hidden">
         <div className="flex items-center gap-3 min-w-0">
           <ServiceIcon name={sub.name} />
-          <span className="text-[13px] font-medium text-[#111827] truncate underline decoration-[#374151] underline-offset-4">{sub.name}</span>
+          <span className="text-[13px] font-medium text-[var(--c-text-primary)] truncate underline decoration-[var(--c-text-secondary)] underline-offset-4">{sub.name}</span>
         </div>
       </td>
 
       {/* Kategori */}
-      <td className="px-4 py-3 text-[13px] text-[#6B7280] truncate overflow-hidden">
+      <td className="px-4 py-3 text-[13px] text-[var(--c-text-muted)] truncate overflow-hidden">
         {sub.category?.name ?? '—'}
       </td>
 
       {/* Kostnad */}
-      <td className="px-4 py-3 text-right text-[13px] font-semibold text-[#111827] whitespace-nowrap overflow-hidden">
+      <td className="px-4 py-3 text-right text-[13px] font-semibold text-[var(--c-text-primary)] whitespace-nowrap overflow-hidden">
         {getEffectiveCurrentAmount(sub)} kr
       </td>
 
       {/* Intervall */}
-      <td className="px-4 py-3 text-[13px] text-[#6B7280] overflow-hidden">
+      <td className="px-4 py-3 text-[13px] text-[var(--c-text-muted)] overflow-hidden">
         {intervalLabel(sub.interval, sub.interval_count)}
       </td>
 
       {/* Förnyelse / Senaste betalning */}
-      <td className={`px-4 py-3 text-[13px] overflow-hidden ${isUrgent ? 'text-[#92400E] font-medium' : 'text-[#6B7280]'}`}>
+      <td className={`px-4 py-3 text-[13px] overflow-hidden ${isUrgent ? 'text-[var(--c-warning-text)] font-medium' : 'text-[var(--c-text-muted)]'}`}>
         {formatRenewalDate(date)}
       </td>
 
       {/* Status */}
       <td className="px-4 py-3 overflow-hidden">
         {isCancelled ? (
-          <span className="bg-[#F3F4F6] text-[#6B7280] text-[10px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap">
+          <span className="bg-[var(--c-bg-subtle)] text-[var(--c-text-muted)] text-[10px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap">
             Avslutad
           </span>
         ) : isUrgent ? (
-          <span className="bg-[#FFFBEB] text-[#92400E] text-[10px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap">
+          <span className="bg-[var(--c-warning-bg)] text-[var(--c-warning-text)] text-[10px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap">
             {days} dagar
           </span>
         ) : (
-          <span className="bg-[#F0FDF4] text-[#166534] text-[10px] font-medium px-1.5 py-0.5 rounded">
+          <span className="bg-[var(--c-success-bg)] text-[var(--c-success-text)] text-[10px] font-medium px-1.5 py-0.5 rounded">
             Aktiv
           </span>
         )}
@@ -256,31 +256,31 @@ function MobileRow({
   return (
     <div
       onClick={onClick}
-      className={`flex items-center gap-3 px-4 py-3 border-b border-[#E5E7EB] cursor-pointer transition-all duration-150 ease-out ${
-        selected ? 'bg-[#EFF6FF]' : 'active:bg-[#F9FAFB]'
+      className={`flex items-center gap-3 px-4 py-3 border-b border-[var(--c-border)] cursor-pointer transition-all duration-150 ease-out ${
+        selected ? 'bg-[var(--c-accent-subtle)]' : 'active:bg-[var(--c-bg-app)]'
       }`}
     >
       <ServiceIcon name={sub.name} size="lg" />
 
       <div className="flex-1 min-w-0">
-        <p className="text-[14px] font-medium text-[#111827] truncate underline decoration-[#374151] underline-offset-4">{sub.name}</p>
-        <p className="text-[11px] text-[#6B7280]">{sub.category?.name ?? '—'}</p>
+        <p className="text-[14px] font-medium text-[var(--c-text-primary)] truncate underline decoration-[var(--c-text-secondary)] underline-offset-4">{sub.name}</p>
+        <p className="text-[11px] text-[var(--c-text-muted)]">{sub.category?.name ?? '—'}</p>
         {isCancelled ? (
-          <span className="bg-[#F3F4F6] text-[#6B7280] text-[10px] font-medium px-1.5 py-0.5 rounded inline-block mt-0.5">
+          <span className="bg-[var(--c-bg-subtle)] text-[var(--c-text-muted)] text-[10px] font-medium px-1.5 py-0.5 rounded inline-block mt-0.5">
             Avslutad
           </span>
         ) : isUrgent ? (
-          <span className="text-[11px] text-[#92400E] font-medium">{days} dagar kvar</span>
+          <span className="text-[11px] text-[var(--c-warning-text)] font-medium">{days} dagar kvar</span>
         ) : (
-          <span className="bg-[#F0FDF4] text-[#166534] text-[10px] font-medium px-1.5 py-0.5 rounded inline-block mt-0.5">
+          <span className="bg-[var(--c-success-bg)] text-[var(--c-success-text)] text-[10px] font-medium px-1.5 py-0.5 rounded inline-block mt-0.5">
             Aktiv
           </span>
         )}
       </div>
 
       <div className="text-right shrink-0">
-        <p className="text-[14px] font-semibold text-[#111827]">{getEffectiveCurrentAmount(sub)} kr</p>
-        <p className="text-[11px] text-[#6B7280]">{formatRenewalShort(date)}</p>
+        <p className="text-[14px] font-semibold text-[var(--c-text-primary)]">{getEffectiveCurrentAmount(sub)} kr</p>
+        <p className="text-[11px] text-[var(--c-text-muted)]">{formatRenewalShort(date)}</p>
       </div>
     </div>
   )
@@ -293,7 +293,7 @@ function ServiceIcon({ name, size = 'md' }: { name: string; size?: 'md' | 'lg' }
   const dim = size === 'lg' ? 'w-10 h-10 text-[13px]' : 'w-8 h-8 text-[11px]'
   return (
     <div
-      className={`${dim} rounded-[10px] bg-[#F3F4F6] flex items-center justify-center font-medium text-[#374151] shrink-0`}
+      className={`${dim} rounded-[10px] bg-[var(--c-bg-subtle)] flex items-center justify-center font-medium text-[var(--c-text-secondary)] shrink-0`}
     >
       {initials}
     </div>
@@ -307,8 +307,8 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
       onClick={onClick}
       className={`shrink-0 px-3 py-1 rounded-full text-[12px] font-medium transition-all duration-150 ease-out ${
         active
-          ? 'bg-[#1B4FD8] text-white'
-          : 'bg-white border border-[#E5E7EB] text-[#374151] hover:border-[#D1D5DB]'
+          ? 'bg-[var(--c-accent)] text-white'
+          : 'bg-[var(--c-bg-card)] border border-[var(--c-border)] text-[var(--c-text-secondary)] hover:border-[var(--c-border-strong)]'
       }`}
     >
       {label}
@@ -319,12 +319,12 @@ function FilterPill({ label, active, onClick }: { label: string; active: boolean
 function ColGroup() {
   return (
     <colgroup>
-      <col style={{ width: '38%' }} />  {/* Tjänst */}
-      <col style={{ width: '18%' }} />  {/* Kategori */}
-      <col style={{ width: '11%' }} />  {/* Kostnad */}
-      <col style={{ width: '12%' }} />  {/* Intervall */}
-      <col style={{ width: '14%' }} />  {/* Förnyelse */}
-      <col style={{ width: '7%' }}  />  {/* Status */}
+      <col style={{ width: '38%' }} />
+      <col style={{ width: '18%' }} />
+      <col style={{ width: '11%' }} />
+      <col style={{ width: '12%' }} />
+      <col style={{ width: '14%' }} />
+      <col style={{ width: '7%' }}  />
     </colgroup>
   )
 }
@@ -332,12 +332,12 @@ function ColGroup() {
 function EmptyState({ onAdd }: { onAdd: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-      <p className="text-[14px] font-medium text-[#111827] mb-1">Inga abonnemang ännu</p>
-      <p className="text-[13px] text-[#6B7280] mb-4">Lägg till ditt första för att komma igång</p>
+      <p className="text-[14px] font-medium text-[var(--c-text-primary)] mb-1">Inga abonnemang ännu</p>
+      <p className="text-[13px] text-[var(--c-text-muted)] mb-4">Lägg till ditt första för att komma igång</p>
       <button
         type="button"
         onClick={onAdd}
-        className="bg-[#1B4FD8] text-white rounded-[6px] px-4 py-2 text-[13px] font-medium transition-all duration-150 ease-out hover:bg-[#1a46c2]"
+        className="bg-[var(--c-accent)] text-white rounded-[6px] px-4 py-2 text-[13px] font-medium transition-all duration-150 ease-out hover:bg-[var(--c-accent-hover)]"
       >
         + Lägg till abonnemang
       </button>
@@ -348,7 +348,7 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
 function Th({ children, align }: { children: string; align?: 'right' }) {
   return (
     <th
-      className={`px-4 py-2.5 text-[11px] font-medium text-[#9CA3AF] tracking-wider uppercase text-left ${
+      className={`px-4 py-2.5 text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase text-left ${
         align === 'right' ? 'text-right' : ''
       }`}
     >
