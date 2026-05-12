@@ -101,7 +101,12 @@ export default function CostView() {
           onClose={() => setSelectedBar(null)}
         />
       )}
-      <h1 className="sr-only">Kostnad</h1>
+      <div>
+        <h1 className="text-[20px] font-semibold text-[var(--c-text-primary)] tracking-[-0.3px]">Kostnadsutveckling</h1>
+        <p className="text-[13px] text-[var(--c-text-muted)] mt-1 leading-relaxed">
+          Vad du betalar per månad och hur kostnaden förändras över tid. Klicka på en stapel för att se vilka tjänster som var aktiva och vad de kostade just den månaden.
+        </p>
+      </div>
       {/* Metric cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <MetricCard label={ytdLabel} value={`${Math.round(ytd).toLocaleString('sv-SE')} kr`} accent />
