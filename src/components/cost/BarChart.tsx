@@ -25,13 +25,12 @@ export function isActiveInMonth(sub: Subscription, year: number, month: number):
   const start = new Date(sub.start_date)
   if (start > monthEnd) return false
 
-  if (sub.end_date) {
-    const end = new Date(sub.end_date)
-    if (end < monthStart) return false
-  } else if (sub.status === 'cancelled') {
-    // Use updated_at as proxy for when it was cancelled
-    const cancelledAt = new Date(sub.updated_at)
-    if (cancelledAt < monthStart) return false
+  if (sub.status === 'cancelled') {
+    // end_date is authoritative when set; otherwise fall back to updated_at
+    const cutoff = sub.end_date
+      ? new Date(sub.end_date)
+      : new Date(sub.updated_at)
+    if (cutoff < monthStart) return false
   }
 
   return true

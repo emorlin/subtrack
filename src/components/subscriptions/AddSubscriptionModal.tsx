@@ -12,7 +12,6 @@ interface FormState {
   interval: SubscriptionInterval
   interval_count: number
   start_date: string
-  binding_months: string
   reminder_days_before: string
   notes: string
   is_cancelled: boolean
@@ -27,7 +26,6 @@ const INITIAL: FormState = {
   interval: 'month',
   interval_count: 1,
   start_date: '',
-  binding_months: '0',
   reminder_days_before: '3',
   notes: '',
   is_cancelled: false,
@@ -48,7 +46,6 @@ function subscriptionToFormState(sub: Subscription): FormState {
     interval: sub.interval,
     interval_count: sub.interval_count,
     start_date: sub.start_date,
-    binding_months: '0',
     reminder_days_before: String(sub.reminder_days_before),
     notes: sub.notes ?? '',
     is_cancelled: sub.status === 'cancelled',
@@ -96,15 +93,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
   }
 
   function buildFormData(): SubscriptionFormData {
-    const bindingMonths = Number(form.binding_months)
-    let end_date: string | null = null
-    if (form.is_cancelled && form.cancelled_date) {
-      end_date = form.cancelled_date
-    } else if (bindingMonths > 0 && form.start_date) {
-      const end = new Date(form.start_date)
-      end.setMonth(end.getMonth() + bindingMonths)
-      end_date = end.toISOString().split('T')[0]
-    }
+    const end_date = (form.is_cancelled && form.cancelled_date) ? form.cancelled_date : null
     return {
       name: form.name.trim(),
       category_id: form.category_id || null,
@@ -316,22 +305,6 @@ function BasicInfoStep({
         </Field>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Field label="Bindningstid">
-          <select
-            value={form.binding_months}
-            onChange={(e) => update('binding_months', e.target.value)}
-            className={inputClass(false)}
-          >
-            <option value="0">Ingen / löpande</option>
-            <option value="3">3 månader</option>
-            <option value="6">6 månader</option>
-            <option value="12">12 månader</option>
-            <option value="24">24 månader</option>
-          </select>
-        </Field>
-      </div>
-
       {!form.is_cancelled && (
         <Field label="Påminnelse">
           <select
@@ -396,14 +369,6 @@ function ConfirmStep({
     'year:1': 'Årsvis',
   }
   const intervalKey = `${form.interval}:${form.interval_count}`
-  const bindingMap: Record<string, string> = {
-    '0': 'Ingen / löpande',
-    '3': '3 månader',
-    '6': '6 månader',
-    '12': '12 månader',
-    '24': '24 månader',
-  }
-
   return (
     <div className="space-y-4">
       <div className="bg-[var(--c-bg-app)] rounded-[8px] divide-y divide-[var(--c-border)]">
@@ -411,7 +376,6 @@ function ConfirmStep({
         <SummaryRow label="Kategori" value={category?.name ?? '—'} />
         <SummaryRow label="Kostnad" value={`${form.amount} kr / ${intervalMap[intervalKey] ?? form.interval}`} />
         <SummaryRow label="Startdatum" value={form.start_date} />
-        <SummaryRow label="Bindningstid" value={bindingMap[form.binding_months] ?? '—'} />
         <SummaryRow label="Påminnelse" value={`${form.reminder_days_before} dagar innan`} />
       </div>
 
