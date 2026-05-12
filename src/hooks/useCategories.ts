@@ -11,9 +11,12 @@ export function useCategories() {
   return useQuery<Category[]>({
     queryKey: QUERY_KEY,
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Not authenticated')
       const { data, error } = await supabase
         .from('categories')
         .select('*')
+        .eq('user_id', user.id)
         .order('sort_order', { ascending: true })
       if (error) throw error
       return data as Category[]
@@ -66,10 +69,12 @@ export function useUpdateCategory() {
         )
         return updated
       }
+      const { data: { user } } = await supabase.auth.getUser()
       const { data, error } = await supabase
         .from('categories')
         .update(updates)
         .eq('id', id)
+        .eq('user_id', user!.id)
         .select()
         .single()
       if (error) throw error
@@ -92,7 +97,8 @@ export function useDeleteCategory() {
         queryClient.setQueryData<Category[]>(QUERY_KEY, (old = []) => old.filter(c => c.id !== id))
         return id
       }
-      const { error } = await supabase.from('categories').delete().eq('id', id)
+      const { data: { user } } = await supabase.auth.getUser()
+      const { error } = await supabase.from('categories').delete().eq('id', id).eq('user_id', user!.id)
       if (error) throw error
       return id
     },

@@ -11,9 +11,12 @@ export function useSubscriptions() {
   return useQuery<Subscription[]>({
     queryKey: QUERY_KEY,
     queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Not authenticated')
       const { data, error } = await supabase
         .from('subscriptions')
         .select('*, category:categories(*), price_history(*)')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: true })
       if (error) throw error
       return data as Subscription[]
@@ -68,10 +71,12 @@ export function useUpdateSubscription() {
         )
         return { id, ...form } as Subscription
       }
+      const { data: { user } } = await supabase.auth.getUser()
       const { data, error } = await supabase
         .from('subscriptions')
         .update(form)
         .eq('id', id)
+        .eq('user_id', user!.id)
         .select('*, category:categories(*)')
         .single()
       if (error) throw error
@@ -90,7 +95,8 @@ export function useDeleteSubscription() {
         queryClient.setQueryData<Subscription[]>(QUERY_KEY, (old = []) => old.filter(s => s.id !== id))
         return
       }
-      const { error } = await supabase.from('subscriptions').delete().eq('id', id)
+      const { data: { user } } = await supabase.auth.getUser()
+      const { error } = await supabase.from('subscriptions').delete().eq('id', id).eq('user_id', user!.id)
       if (error) throw error
     },
     onSuccess: () => { if (!isDemoMode) queryClient.invalidateQueries({ queryKey: QUERY_KEY }) },
@@ -108,10 +114,12 @@ export function useCancelSubscription() {
         )
         return {} as Subscription
       }
+      const { data: { user } } = await supabase.auth.getUser()
       const { data, error } = await supabase
         .from('subscriptions')
         .update({ status: 'cancelled', end_date })
         .eq('id', id)
+        .eq('user_id', user!.id)
         .select('*, category:categories(*)')
         .single()
       if (error) throw error
@@ -132,10 +140,12 @@ export function useReactivateSubscription() {
         )
         return {} as Subscription
       }
+      const { data: { user } } = await supabase.auth.getUser()
       const { data, error } = await supabase
         .from('subscriptions')
         .update({ status: 'active', end_date: null })
         .eq('id', id)
+        .eq('user_id', user!.id)
         .select('*, category:categories(*)')
         .single()
       if (error) throw error
