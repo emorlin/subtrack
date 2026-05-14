@@ -75,6 +75,10 @@ export default function About() {
             description="Ladda ner alla abonnemang som en CSV-fil med ett klick — knappen finns i filtreringsraden på översiktssidan. Filen öppnas direkt i Excel med rätt teckenkodning (UTF-8 BOM, semikolonavgränsning) och innehåller tjänst, kategori, belopp, intervall, kr/mån, status, startdatum, nästa förnyelse och anteckningar."
           />
           <FeatureCard
+            title="Provperiodsspårning"
+            description="Märk ett abonnemang som gratisperiod med ett slutdatum — 0 kr tillåts som belopp. En amber badge i listan visar hur många dagar som återstår. Har provperioden löpt ut visas en banner på startsidan: 'Provperioden för X har gått ut — är du fortfarande prenumerant?' med knapparna 'Ja, jag betalar nu' och 'Nej, jag avslutade'. Provperioder nära sitt slut (≤ 2 dagar) lyfts som röda påminnelser i notiser-fliken."
+          />
+          <FeatureCard
             title="Demo-läge"
             description="Prova appen utan att skapa ett konto. Hårdkodad exempeldata med 8 abonnemang och en demoanvändare (Alex Svensson) med avatar och namn i topbaren. Alla skrivoperationer fungerar men sparas bara i minnet."
           />
@@ -181,6 +185,7 @@ export default function About() {
               { col: 'interval_count', type: 'int', note: 'Ex. 1 = varje månad, 3 = var 3:e' },
               { col: 'start_date', type: 'date', note: 'Abonnemangets startdatum' },
               { col: 'end_date', type: 'date', note: 'Bindningstidens slut, nullable' },
+              { col: 'trial_ends_at', type: 'date', note: 'Provperiodens slutdatum, nullable' },
               { col: 'status', type: "text CHECK ('active','paused','cancelled')", note: '' },
               { col: 'reminder_days_before', type: 'int', note: 'Default 3 dagar' },
               { col: 'notes', type: 'text', note: 'Valfri kommentar' },

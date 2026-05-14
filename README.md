@@ -56,6 +56,7 @@ Appen är byggd som en **Progressive Web App** och kan installeras direkt från 
 | **PWA / Hemskärm** | Installerbar som app på iOS och Android |
 | **Responsiv** | Sticky bottom nav + FAB på mobil, sidebar + sidopanel på desktop. Modaler: fullskärm (mobil) / fast bredd (desktop). Abonnemangstabellen scrollar horisontellt på tablet när den inte får plats |
 | **Exportera CSV** | Ladda ner alla abonnemang som en CSV-fil med ett klick — öppnas direkt i Excel med rätt teckenkodning (UTF-8 BOM, semikolonavgränsning). Innehåller tjänst, kategori, belopp, intervall, kr/mån, status, startdatum, nästa förnyelse och anteckningar |
+| **Provperiodsspårning** | Märk ett abonnemang som gratisperiod med ett slutdatum (0 kr tillåts som belopp). Amber badge i listan visar "Provperiod — X dagar kvar". När provperioden löper ut dyker en banner upp på startsidan: "Provperioden för X har gått ut — är du fortfarande prenumerant?" med valen "Ja, jag betalar nu" eller "Nej, jag avslutade". Provperioder som slutar inom 2 dagar lyfts som röda påminnelser i notiser-fliken |
 | **Demo-läge** | Utforska appen utan konto — hårdkodad data, inga Supabase-anrop |
 | **Mörkt läge** | Fullt mörkt tema via CSS-variabler. Växla i Inställningar → Utseende — valet sparas i `localStorage`, systempreferens används som standard |
 | **Admin-vy** | Dold sida på `/admin` med användaröversikt: antal registrerade konton, totalt antal abonnemang, aktiva/avslutade. Syns bara för appägaren via UUID-baserad guard och dedikerade RLS-policies |
@@ -230,6 +231,7 @@ create table subscriptions (
   interval_count       int default 1,
   start_date           date not null,
   end_date             date,
+  trial_ends_at        date,
   status               text default 'active' check (status in ('active','paused','cancelled')),
   reminder_days_before int default 3,
   notes                text,

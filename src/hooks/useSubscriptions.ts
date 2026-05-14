@@ -37,6 +37,7 @@ export function useAddSubscription() {
           id: crypto.randomUUID(),
           user_id: DEMO_USER_ID,
           ...form,
+          trial_ends_at: form.trial_ends_at ?? null,
           status: form.status ?? 'active',
           category,
           price_history: [],

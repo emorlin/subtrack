@@ -40,19 +40,33 @@ export function useNotifications() {
 
   const active = subscriptions.filter((s) => s.status === 'active')
 
-  const upcoming: UpcomingRenewal[] = active
+  // Trial endings within 2 days injected as high-urgency renewals
+  const trialUpcoming: UpcomingRenewal[] = active
+    .filter((s) => s.trial_ends_at)
     .map((s) => {
-      const nextDate = getNextRenewalDate(s.start_date, s.interval, s.interval_count)
-      const ms = nextDate.getTime() - today.getTime()
-      const daysUntil = Math.ceil(ms / (1000 * 60 * 60 * 24))
-      return { subscription: s, nextDate, daysUntil }
+      const trialDate = new Date(s.trial_ends_at!)
+      const ms = trialDate.getTime() - today.getTime()
+      const days = Math.ceil(ms / (1000 * 60 * 60 * 24))
+      return { subscription: s, nextDate: trialDate, daysUntil: days }
     })
-    .filter((r) => r.daysUntil <= 30)
-    .map((r) => ({
-      ...r,
-      urgency: (r.daysUntil <= 3 ? 'red' : r.daysUntil <= 7 ? 'amber' : 'blue') as UpcomingRenewal['urgency'],
-    }))
-    .sort((a, b) => a.daysUntil - b.daysUntil)
+    .filter((r) => r.daysUntil >= 0 && r.daysUntil <= 2)
+    .map((r) => ({ ...r, urgency: 'red' as UpcomingRenewal['urgency'] }))
+
+  const upcoming: UpcomingRenewal[] = [
+    ...trialUpcoming,
+    ...active
+      .map((s) => {
+        const nextDate = getNextRenewalDate(s.start_date, s.interval, s.interval_count)
+        const ms = nextDate.getTime() - today.getTime()
+        const daysUntil = Math.ceil(ms / (1000 * 60 * 60 * 24))
+        return { subscription: s, nextDate, daysUntil }
+      })
+      .filter((r) => r.daysUntil <= 30)
+      .map((r) => ({
+        ...r,
+        urgency: (r.daysUntil <= 3 ? 'red' : r.daysUntil <= 7 ? 'amber' : 'blue') as UpcomingRenewal['urgency'],
+      })),
+  ].sort((a, b) => a.daysUntil - b.daysUntil)
 
   const history: PastRenewal[] = active
     .map((s) => {

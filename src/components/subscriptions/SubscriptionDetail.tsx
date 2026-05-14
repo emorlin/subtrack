@@ -263,6 +263,7 @@ function DetailRows({ subscription, totalPaid, renewal, effectiveAmount }: {
   const rows = [
     { label: 'Kostnad', value: `${effectiveAmount} kr / ${intervalShort[subscription.interval] ?? subscription.interval}` },
     { label: 'Startdatum', value: formatDate(subscription.start_date) },
+    ...(subscription.trial_ends_at ? [{ label: 'Provperiod slutar', value: formatDate(subscription.trial_ends_at) }] : []),
     ...(!isCancelled ? [{ label: 'Nästa förnyelse', value: formatDate(renewal) }] : []),
     ...(subscription.end_date ? [{ label: isCancelled ? 'Avslutades' : 'Bindningstid t.o.m.', value: formatDate(subscription.end_date) }] : []),
     { label: 'Totalt betalt', value: `${Math.round(totalPaid).toLocaleString('sv-SE')} kr` },

@@ -1,6 +1,6 @@
 export type SubscriptionInterval = 'month' | 'quarter' | 'year'
 export type SubscriptionStatus = 'active' | 'paused' | 'cancelled'
-export type NotificationType = 'renewal_reminder' | 'price_change' | 'cancelled'
+export type NotificationType = 'renewal_reminder' | 'price_change' | 'cancelled' | 'trial_ending'
 
 export interface Profile {
   id: string
@@ -40,6 +40,7 @@ export interface Subscription {
   interval_count: number
   start_date: string
   end_date: string | null
+  trial_ends_at: string | null
   legacy_amount_paid: number | null
   status: SubscriptionStatus
   notes: string | null
@@ -74,6 +75,7 @@ export interface SubscriptionFormData {
   interval_count: number
   start_date: string
   end_date: string | null
+  trial_ends_at?: string | null
   legacy_amount_paid: number | null
   notes: string | null
   reminder_days_before: number

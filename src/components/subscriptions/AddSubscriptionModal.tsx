@@ -18,6 +18,8 @@ interface FormState {
   notes: string
   is_cancelled: boolean
   cancelled_date: string
+  is_trial: boolean
+  trial_ends_at: string
 }
 
 const INITIAL: FormState = {
@@ -32,6 +34,8 @@ const INITIAL: FormState = {
   notes: '',
   is_cancelled: false,
   cancelled_date: '',
+  is_trial: false,
+  trial_ends_at: '',
 }
 
 interface Props {
@@ -52,6 +56,8 @@ function subscriptionToFormState(sub: Subscription): FormState {
     notes: sub.notes ?? '',
     is_cancelled: sub.status === 'cancelled',
     cancelled_date: sub.end_date ?? '',
+    is_trial: !!sub.trial_ends_at,
+    trial_ends_at: sub.trial_ends_at ?? '',
   }
 }
 
@@ -85,7 +91,8 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
   function validateStep1(): boolean {
     const errs: typeof errors = {}
     if (!form.name.trim()) errs.name = 'Namn krävs'
-    if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) <= 0)
+    const minAmount = form.is_trial ? 0 : 0.01
+    if (!form.amount || isNaN(Number(form.amount)) || Number(form.amount) < minAmount)
       errs.amount = 'Ange ett giltigt belopp'
     if (!form.start_date) errs.start_date = 'Startdatum krävs'
     setErrors(errs)
@@ -99,6 +106,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
 
   function buildFormData(): SubscriptionFormData {
     const end_date = (form.is_cancelled && form.cancelled_date) ? form.cancelled_date : null
+    const trial_ends_at = (form.is_trial && form.trial_ends_at) ? form.trial_ends_at : null
     return {
       name: form.name.trim(),
       category_id: form.category_id || null,
@@ -108,6 +116,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
       interval_count: form.interval_count,
       start_date: form.start_date,
       end_date,
+      trial_ends_at,
       legacy_amount_paid: null,
       notes: form.notes.trim() || null,
       reminder_days_before: Number(form.reminder_days_before),
@@ -316,7 +325,34 @@ function BasicInfoStep({
         </Field>
       )}
 
-      <div className="border-t border-[var(--c-border)] pt-4">
+      <div className="border-t border-[var(--c-border)] pt-4 space-y-3">
+        <div role="group" aria-label="Abonnemangsstatus">
+        <label className="flex items-center gap-2.5 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={form.is_trial}
+            onChange={(e) => {
+              update('is_trial', e.target.checked)
+              if (!e.target.checked) update('trial_ends_at', '')
+              if (e.target.checked) { update('is_cancelled', false); update('cancelled_date', '') }
+            }}
+            className="w-4 h-4 rounded accent-[var(--c-accent)]"
+          />
+          <span className="text-[13px] text-[var(--c-text-muted)]">Jag är i en gratisperiod</span>
+        </label>
+
+        {form.is_trial && (
+          <Field label="Gratisperioden slutar">
+            <input
+              type="date"
+              value={form.trial_ends_at}
+              onChange={(e) => update('trial_ends_at', e.target.value)}
+              className={inputClass(false)}
+            />
+            <p className="text-[11px] text-[var(--c-text-subtle)] mt-1">Du får en påminnelse dagen innan</p>
+          </Field>
+        )}
+
         <label className="flex items-center gap-2.5 cursor-pointer select-none">
           <input
             type="checkbox"
@@ -324,6 +360,7 @@ function BasicInfoStep({
             onChange={(e) => {
               update('is_cancelled', e.target.checked)
               if (!e.target.checked) update('cancelled_date', '')
+              if (e.target.checked) { update('is_trial', false); update('trial_ends_at', '') }
             }}
             className="w-4 h-4 rounded accent-[var(--c-accent)]"
           />
@@ -331,17 +368,16 @@ function BasicInfoStep({
         </label>
 
         {form.is_cancelled && (
-          <div className="mt-3">
-            <Field label="Avslutades (sista betalning)">
-              <input
-                type="date"
-                value={form.cancelled_date}
-                onChange={(e) => update('cancelled_date', e.target.value)}
-                className={inputClass(false)}
-              />
-            </Field>
-          </div>
+          <Field label="Avslutades (sista betalning)">
+            <input
+              type="date"
+              value={form.cancelled_date}
+              onChange={(e) => update('cancelled_date', e.target.value)}
+              className={inputClass(false)}
+            />
+          </Field>
         )}
+        </div>
       </div>
     </>
   )

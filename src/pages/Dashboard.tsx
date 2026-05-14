@@ -4,6 +4,7 @@ import { usePageTitle } from '../hooks/usePageTitle'
 import SubscriptionList from '../components/subscriptions/SubscriptionList'
 import AddSubscriptionModal from '../components/subscriptions/AddSubscriptionModal'
 import SubscriptionDetail from '../components/subscriptions/SubscriptionDetail'
+import TrialExpiredBanner from '../components/subscriptions/TrialExpiredBanner'
 import { useSubscriptions } from '../hooks/useSubscriptions'
 import { toMonthlyAmount, getEffectiveCurrentAmount } from '../lib/calculations'
 
@@ -41,6 +42,7 @@ export default function Dashboard() {
           Prisnformation om dina tjänster. Klicka på en tjänst för att se detaljer, ändra pris eller lägga till historik.
         </p>
       </div>
+      <TrialExpiredBanner subscriptions={subscriptions} />
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <MetricCard label="Per månad" value={`${Math.round(monthlyTotal)} kr`} accent />
         <MetricCard label="Per år" value={`${Math.round(monthlyTotal * 12).toLocaleString('sv-SE')} kr`} />

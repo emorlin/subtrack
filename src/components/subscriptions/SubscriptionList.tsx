@@ -221,6 +221,8 @@ function DesktopRow({
   const amount = getEffectiveCurrentAmount(sub)
   const monthly = Math.round(toMonthlyAmount(amount, sub.interval, sub.interval_count))
   const isMonthly = sub.interval === 'month' && sub.interval_count === 1
+  const trialDays = sub.trial_ends_at ? daysUntil(new Date(sub.trial_ends_at)) : null
+  const isActiveTrial = trialDays !== null && trialDays >= 0
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() }
@@ -239,7 +241,14 @@ function DesktopRow({
       <td className="px-4 py-3 overflow-hidden">
         <div className="flex items-center gap-3 min-w-0">
           <ServiceIcon name={sub.name} />
-          <span className="text-[13px] font-medium text-[var(--c-text-primary)] truncate underline decoration-[var(--c-text-secondary)] underline-offset-4">{sub.name}</span>
+          <div className="min-w-0">
+            <span className="text-[13px] font-medium text-[var(--c-text-primary)] truncate underline decoration-[var(--c-text-secondary)] underline-offset-4 block">{sub.name}</span>
+            {isActiveTrial && (
+              <span className="text-[10px] text-[var(--c-warning-text)] font-medium">
+                Provperiod — {trialDays === 0 ? 'slutar idag' : `${trialDays} dag${trialDays === 1 ? '' : 'ar'} kvar`}
+              </span>
+            )}
+          </div>
         </div>
       </td>
 
@@ -276,6 +285,10 @@ function DesktopRow({
           <span className="bg-[var(--c-bg-subtle)] text-[var(--c-text-muted)] text-[10px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap">
             Avslutad
           </span>
+        ) : isActiveTrial ? (
+          <span className="bg-[var(--c-warning-bg)] text-[var(--c-warning-text)] text-[10px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap">
+            Provperiod
+          </span>
         ) : isUrgent ? (
           <span className="bg-[var(--c-warning-bg)] text-[var(--c-warning-text)] text-[10px] font-medium px-1.5 py-0.5 rounded whitespace-nowrap">
             {days} dagar
@@ -310,6 +323,8 @@ function MobileRow({
   const amount = getEffectiveCurrentAmount(sub)
   const monthly = Math.round(toMonthlyAmount(amount, sub.interval, sub.interval_count))
   const isMonthly = sub.interval === 'month' && sub.interval_count === 1
+  const trialDays = sub.trial_ends_at ? daysUntil(new Date(sub.trial_ends_at)) : null
+  const isActiveTrial = trialDays !== null && trialDays >= 0
 
   function handleKeyDown(e: React.KeyboardEvent) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick() }
@@ -333,6 +348,10 @@ function MobileRow({
         {isCancelled ? (
           <span className="bg-[var(--c-bg-subtle)] text-[var(--c-text-muted)] text-[10px] font-medium px-1.5 py-0.5 rounded inline-block mt-0.5">
             Avslutad
+          </span>
+        ) : isActiveTrial ? (
+          <span className="bg-[var(--c-warning-bg)] text-[var(--c-warning-text)] text-[10px] font-medium px-1.5 py-0.5 rounded inline-block mt-0.5">
+            Provperiod — {trialDays === 0 ? 'slutar idag' : `${trialDays} dag${trialDays === 1 ? '' : 'ar'} kvar`}
           </span>
         ) : isUrgent ? (
           <span className="text-[11px] text-[var(--c-warning-text)] font-medium">{days} dagar kvar</span>
