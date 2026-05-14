@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import { IconHome, IconCost, IconBell, IconSettings, IconAbout, IconAdmin } from './NavIcons'
 import { useIsAdmin } from '../../hooks/useAdmin'
+import { useNotificationCount } from '../../hooks/useNotifications'
 
 const navItems = [
   { label: 'Översikt', to: '/', icon: IconHome },
@@ -17,6 +18,7 @@ const linkClass = (isActive: boolean) =>
 
 export default function Sidebar() {
   const isAdmin = useIsAdmin()
+  const notifCount = useNotificationCount()
 
   return (
     <nav aria-label="Huvudnavigation" className="pt-2 flex flex-col h-full">
@@ -27,6 +29,11 @@ export default function Sidebar() {
               <>
                 <Icon active={isActive} />
                 {label}
+                {label === 'Notiser' && notifCount > 0 && (
+                  <span className="ml-auto bg-[#B91C1C] text-white text-[10px] font-semibold rounded-full min-w-[16px] h-4 px-1 flex items-center justify-center leading-none">
+                    {notifCount > 9 ? '9+' : notifCount}
+                  </span>
+                )}
               </>
             )}
           </NavLink>

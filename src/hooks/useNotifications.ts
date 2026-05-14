@@ -64,7 +64,7 @@ export function useNotifications() {
       .filter((r) => r.daysUntil <= 30)
       .map((r) => ({
         ...r,
-        urgency: (r.daysUntil <= 3 ? 'red' : r.daysUntil <= 7 ? 'amber' : 'blue') as UpcomingRenewal['urgency'],
+        urgency: (r.daysUntil <= (r.subscription.reminder_days_before ?? 3) ? 'red' : 'blue') as UpcomingRenewal['urgency'],
       })),
   ].sort((a, b) => a.daysUntil - b.daysUntil)
 
@@ -79,4 +79,9 @@ export function useNotifications() {
     .sort((a, b) => a.daysAgo - b.daysAgo)
 
   return { upcoming, history }
+}
+
+export function useNotificationCount(): number {
+  const { upcoming } = useNotifications()
+  return upcoming.filter((r) => r.urgency === 'red').length
 }

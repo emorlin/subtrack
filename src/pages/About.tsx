@@ -52,7 +52,7 @@ export default function About() {
           />
           <FeatureCard
             title="Påminnelser"
-            description="Automatiska notiser inför förnyelsedatum — konfigurerbart antal dagar i förväg per abonnemang. Historik visar skickade och lästa notiser."
+            description="Alla förnyelser inom 30 dagar visas i notis-fliken. Inställningen 'dagar i förväg' per abonnemang styr när posten markeras röd — inom ditt inställda fönster = röd, annars blå. En röd sifferbadge på Notiser-ikonen i navigationen visar antalet aktiva påminnelser."
           />
           <FeatureCard
             title="Kategorier"
@@ -289,12 +289,12 @@ export default function About() {
       <section>
         <SectionHeader icon={<Bell size={16} strokeWidth={2} />} title="Påminnelse­system" />
         <p className="text-[13px] text-[var(--c-text-secondary)] leading-relaxed mt-3">
-          Varje abonnemang har ett <strong>reminder_days_before</strong>-fält (default 3 dagar). Systemet beräknar nästa förnyelsedatum utifrån startdatum och intervall, och skapar en notis i <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">notifications</code>-tabellen med rätt <em>scheduled_at</em>. Notis­fliken i appen visar:
+          Varje abonnemang har ett <strong>reminder_days_before</strong>-fält (default 3 dagar). Nästa förnyelsedatum beräknas utifrån startdatum och intervall. Notis­fliken visar:
         </p>
         <ul className="mt-3 space-y-1.5 text-[13px] text-[var(--c-text-secondary)] list-none">
-          <li className="flex gap-2"><span className="text-[var(--c-accent)] font-semibold shrink-0">·</span><span><strong>Kommande förnyelser</strong> — abonnemang som förnyas inom de närmaste 30 dagarna, sorterade på datum.</span></li>
-          <li className="flex gap-2"><span className="text-[var(--c-accent)] font-semibold shrink-0">·</span><span><strong>Historik</strong> — tidigare notiser med information om vad som hände och när.</span></li>
-          <li className="flex gap-2"><span className="text-[var(--c-accent)] font-semibold shrink-0">·</span><span><strong>Oläst-indikator</strong> — en blå prick i topbaren på mobil visas tills notiser markerats som lästa.</span></li>
+          <li className="flex gap-2"><span className="text-[var(--c-accent)] font-semibold shrink-0">·</span><span><strong>Kommande förnyelser</strong> — alla abonnemang som förnyas inom 30 dagar, sorterade på datum. Röd markering = inom din inställda påminnelseperiod. Blå = kommande men ännu inte i påminnelsefönstret.</span></li>
+          <li className="flex gap-2"><span className="text-[var(--c-accent)] font-semibold shrink-0">·</span><span><strong>Historik</strong> — senaste förnyelserna de 60 dagarna bakåt.</span></li>
+          <li className="flex gap-2"><span className="text-[var(--c-accent)] font-semibold shrink-0">·</span><span><strong>Nav-badge</strong> — en röd sifferbadge på Notiser-ikonen i sidebaren (desktop) och bottom nav (mobil) visar antalet röda påminnelser, dvs. förnyelser som är inom respektive abonnemangs inställda påminnelsefönster.</span></li>
         </ul>
       </section>
 
