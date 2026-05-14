@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useId } from 'react'
+import { useState, useEffect, useRef, useId, Fragment } from 'react'
 import { X } from 'lucide-react'
 import ServiceNameCombobox from '../ui/ServiceNameCombobox'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
@@ -188,7 +188,7 @@ function StepIndicator({ step }: { step: number }) {
   return (
     <div className="flex items-start">
       {steps.map((s, i) => (
-        <div key={s.num} className="flex items-start flex-1">
+        <Fragment key={s.num}>
           <div className="flex flex-col items-center">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-[13px] font-medium transition-all duration-150 ${
@@ -209,12 +209,12 @@ function StepIndicator({ step }: { step: number }) {
           </div>
           {i < steps.length - 1 && (
             <div
-              className={`flex-1 h-px mt-4 mx-1 transition-all duration-150 ${
+              className={`flex-1 h-px mt-4 mx-2 transition-all duration-150 ${
                 step > s.num ? 'bg-[var(--c-accent)]' : 'bg-[var(--c-border)]'
               }`}
             />
           )}
-        </div>
+        </Fragment>
       ))}
     </div>
   )
