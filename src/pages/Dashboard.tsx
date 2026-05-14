@@ -38,7 +38,7 @@ export default function Dashboard() {
       <div>
         <h1 className="text-[20px] font-semibold text-[var(--c-text-primary)] tracking-[-0.3px]">Abonnemang</h1>
         <p className="text-[13px] text-[var(--c-text-muted)] mt-1 leading-relaxed">
-          Alla dina tjänster samlade på ett ställe, normaliserade till månadskostnad för enkel jämförelse. Klicka på en tjänst för att se detaljer, ändra pris eller lägga till historik.
+          Prisnformation om dina och tjänster. Klicka på en tjänst för att se detaljer, ändra pris eller lägga till historik.
         </p>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
