@@ -151,7 +151,7 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
           <X size={20} />
         </button>
       </div>
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4">
         <div className="flex items-center gap-3">
           <ServiceIcon name={subscription.name} size="xl" />
           <div>
@@ -212,7 +212,7 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
 
   return (
     <div
-      className="fixed inset-0 z-40 flex flex-col md:bg-[var(--c-overlay)] md:items-center md:justify-center"
+      className="fixed inset-0 z-40 md:flex md:items-center md:justify-center md:bg-[var(--c-overlay)]"
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
@@ -221,7 +221,7 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="flex flex-col flex-1 md:flex-none bg-[var(--c-bg-card)] md:w-[480px] md:max-h-[85vh] md:rounded-[16px] md:shadow-xl focus:outline-none"
+        className="absolute inset-0 flex flex-col bg-[var(--c-bg-card)] md:relative md:inset-auto md:w-[480px] md:max-h-[85vh] md:rounded-[16px] md:shadow-xl focus:outline-none"
       >
         {inner}
       </div>

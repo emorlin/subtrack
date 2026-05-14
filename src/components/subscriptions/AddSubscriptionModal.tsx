@@ -126,7 +126,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col md:bg-[var(--c-overlay)] md:items-center md:justify-center"
+      className="fixed inset-0 z-50 md:flex md:items-center md:justify-center md:bg-[var(--c-overlay)]"
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
       <div
@@ -135,7 +135,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
         aria-modal="true"
         aria-labelledby={titleId}
         tabIndex={-1}
-        className="flex flex-col flex-1 md:flex-none bg-[var(--c-bg-card)] md:w-[560px] md:max-h-[90vh] md:rounded-[16px] md:shadow-xl focus:outline-none"
+        className="absolute inset-0 flex flex-col bg-[var(--c-bg-card)] md:relative md:inset-auto md:w-[560px] md:max-h-[90vh] md:rounded-[16px] md:shadow-xl focus:outline-none"
       >
         <div className="relative flex items-center justify-center px-4 h-14 border-b border-[var(--c-border)] shrink-0">
           <span id={titleId} className="text-[14px] font-semibold text-[var(--c-text-primary)]">
@@ -148,7 +148,7 @@ export default function AddSubscriptionModal({ onClose, subscription }: Props) {
         <div className="px-6 py-4 shrink-0">
           <StepIndicator step={step} />
         </div>
-        <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-4 space-y-4">
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden px-4 pb-4 space-y-4">
           {step === 1 && <BasicInfoStep form={form} update={update} errors={errors} />}
           {step === 2 && <ConfirmStep form={form} update={update} />}
         </div>
