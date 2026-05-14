@@ -411,8 +411,10 @@ Inloggningssidan erbjuder en "Utforska demo"-knapp för den som vill prova appen
 | Microsoft 365 | Produktivitet | 1 149 kr/år | Aktiv |
 | Headspace | Hälsa | 79 kr/mån | Pausad |
 | HBO Max | Streaming | 89 kr/mån | Avslutad |
+| Cursor | Mjukvara | 199 kr/mån | Provperiod utgången (igår) — triggar banner |
+| Perplexity | Mjukvara | 149 kr/mån | Provperiod aktiv (5 dagar kvar) |
 
-Startdatumen är valda så att notiser-vyn visar flera kommande förnyelser (2–18 dagar) och historikposter.
+Startdatumen är valda så att notiser-vyn visar flera kommande förnyelser (2–18 dagar) och historikposter. Cursor och Perplexity har dynamiska datum beräknade relativt till idag (`dateAgo` / `dateFromNow`) — Cursors provperiod är alltid utgången och Perplexitys är alltid 5 dagar framåt, oavsett vilket datum demon körs.
 
 ### Hur det fungerar tekniskt
 

@@ -387,6 +387,8 @@ export default function About() {
               <li>Microsoft 365 — 1 149 kr/år (familjeplan)</li>
               <li>Headspace — pausad</li>
               <li>HBO Max — avslutad</li>
+              <li>Cursor — provperiod utgången (triggar banner)</li>
+              <li>Perplexity — provperiod aktiv, 5 dagar kvar</li>
             </ul>
           </div>
           <div className="bg-[var(--c-bg-app)] rounded-[10px] border border-[var(--c-border)] p-4">

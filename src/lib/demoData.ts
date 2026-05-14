@@ -2,6 +2,18 @@ import type { Subscription, Category } from '../types'
 
 const USER_ID = 'd0000000-0000-0000-0000-000000000001'
 
+function dateAgo(n: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() - n)
+  return d.toISOString().slice(0, 10)
+}
+
+function dateFromNow(n: number): string {
+  const d = new Date()
+  d.setDate(d.getDate() + n)
+  return d.toISOString().slice(0, 10)
+}
+
 export const DEMO_CATEGORIES: Category[] = [
   { id: 'd1cat0000-0000-0000-0000-000000000001', user_id: USER_ID, name: 'Streaming',     color_hex: '#EF4444', sort_order: 0, created_at: '2021-01-01T00:00:00Z' },
   { id: 'd1cat0000-0000-0000-0000-000000000002', user_id: USER_ID, name: 'Musik',         color_hex: '#8B5CF6', sort_order: 1, created_at: '2021-01-01T00:00:00Z' },
@@ -212,6 +224,50 @@ export const DEMO_SUBSCRIPTIONS: Subscription[] = [
     reminder_days_before: 3,
     created_at: '2022-03-01T00:00:00Z',
     updated_at: '2024-01-01T00:00:00Z',
+    price_history: [],
+  },
+  // Provperiod som gick ut igår — triggar TrialExpiredBanner
+  {
+    id: 'd2sub0000-0000-0000-0000-000000000009',
+    user_id: USER_ID,
+    category_id: C.software.id,
+    category: C.software,
+    name: 'Cursor',
+    amount: 199,
+    currency: 'SEK',
+    interval: 'month',
+    interval_count: 1,
+    start_date: dateAgo(30),
+    end_date: null,
+    trial_ends_at: dateAgo(1),
+    legacy_amount_paid: null,
+    status: 'active',
+    notes: 'AI-kodeditor, provade gratis i 30 dagar',
+    reminder_days_before: 3,
+    created_at: new Date(dateAgo(30)).toISOString(),
+    updated_at: new Date(dateAgo(30)).toISOString(),
+    price_history: [],
+  },
+  // Provperiod som pågår — visas med amber badge i listan
+  {
+    id: 'd2sub0000-0000-0000-0000-000000000010',
+    user_id: USER_ID,
+    category_id: C.software.id,
+    category: C.software,
+    name: 'Perplexity',
+    amount: 149,
+    currency: 'SEK',
+    interval: 'month',
+    interval_count: 1,
+    start_date: dateAgo(9),
+    end_date: null,
+    trial_ends_at: dateFromNow(5),
+    legacy_amount_paid: null,
+    status: 'active',
+    notes: null,
+    reminder_days_before: 1,
+    created_at: new Date(dateAgo(9)).toISOString(),
+    updated_at: new Date(dateAgo(9)).toISOString(),
     price_history: [],
   },
 ]

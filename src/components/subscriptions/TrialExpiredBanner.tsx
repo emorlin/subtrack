@@ -38,7 +38,7 @@ export default function TrialExpiredBanner({ subscriptions }: Props) {
       className="bg-[var(--c-warning-bg)] border border-[var(--c-warning-text)] border-opacity-30 rounded-[12px] p-4 flex flex-col gap-3"
     >
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 w-2 h-2 rounded-full bg-[var(--c-warning-text)] shrink-0" aria-hidden="true" />
+        <span className="mt-[5px] w-2 h-2 rounded-full bg-[var(--c-warning-text)] shrink-0" aria-hidden="true" />
         <div className="min-w-0">
           <p className="text-[13px] font-semibold text-[var(--c-warning-text)]">
             Provperioden för {sub.name} har gått ut
@@ -60,7 +60,7 @@ export default function TrialExpiredBanner({ subscriptions }: Props) {
           onClick={handleKeep}
           disabled={isSaving}
           aria-label={`Ja, jag betalar nu för ${sub.name}`}
-          className="flex-1 bg-[var(--c-warning-text)] text-white rounded-[6px] py-2 text-[12px] font-medium disabled:opacity-50 transition-all duration-150 ease-out"
+          className="bg-[var(--c-warning-text)] text-white rounded-[6px] px-3 py-1.5 text-[12px] font-medium disabled:opacity-50 transition-all duration-150 ease-out"
         >
           Ja, jag betalar nu
         </button>
@@ -69,7 +69,7 @@ export default function TrialExpiredBanner({ subscriptions }: Props) {
           onClick={handleCancel}
           disabled={isSaving}
           aria-label={`Nej, jag avslutade ${sub.name}`}
-          className="flex-1 bg-white border border-[var(--c-warning-text)] border-opacity-40 text-[var(--c-warning-text)] rounded-[6px] py-2 text-[12px] font-medium disabled:opacity-50 transition-all duration-150 ease-out"
+          className="bg-white border border-[var(--c-warning-text)] border-opacity-40 text-[var(--c-warning-text)] rounded-[6px] px-3 py-1.5 text-[12px] font-medium disabled:opacity-50 transition-all duration-150 ease-out"
         >
           Nej, jag avslutade
         </button>
