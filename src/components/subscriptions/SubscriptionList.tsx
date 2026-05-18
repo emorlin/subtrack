@@ -98,7 +98,7 @@ export default function SubscriptionList({ onSelect, selectedId, onAdd }: Subscr
                 <Th sortKey="category" currentSortKey={sortKey} currentSortDir={sortDir} onSort={handleSort}>Kategori</Th>
                 <Th align="right" sortKey="amount" currentSortKey={sortKey} currentSortDir={sortDir} onSort={handleSort}>Kr/mån</Th>
                 <Th>Intervall</Th>
-                <Th sortKey="renewal" currentSortKey={sortKey} currentSortDir={sortDir} onSort={handleSort}>Förnyelse</Th>
+                <Th sortKey="renewal" currentSortKey={sortKey} currentSortDir={sortDir} onSort={handleSort}>Datum</Th>
                 <Th>Status</Th>
               </tr>
             </thead>
@@ -214,7 +214,7 @@ function DesktopRow({
 }) {
   const isCancelled = sub.status === 'cancelled'
   const date = isCancelled
-    ? getLastRenewalDate(sub.start_date, sub.interval, sub.interval_count)
+    ? sub.end_date ? new Date(sub.end_date) : getLastRenewalDate(sub.start_date, sub.interval, sub.interval_count)
     : getNextRenewalDate(sub.start_date, sub.interval, sub.interval_count)
   const days = isCancelled ? null : daysUntil(date)
   const isUrgent = !isCancelled && days !== null && days <= 7
@@ -316,7 +316,7 @@ function MobileRow({
 }) {
   const isCancelled = sub.status === 'cancelled'
   const date = isCancelled
-    ? getLastRenewalDate(sub.start_date, sub.interval, sub.interval_count)
+    ? sub.end_date ? new Date(sub.end_date) : getLastRenewalDate(sub.start_date, sub.interval, sub.interval_count)
     : getNextRenewalDate(sub.start_date, sub.interval, sub.interval_count)
   const days = isCancelled ? null : daysUntil(date)
   const isUrgent = !isCancelled && days !== null && days <= 7
@@ -394,10 +394,10 @@ function sortSubscriptions(subs: Subscription[], key: SortKey | null, dir: SortD
       cmp = ma - mb
     } else if (key === 'renewal') {
       const da = a.status === 'cancelled'
-        ? getLastRenewalDate(a.start_date, a.interval, a.interval_count)
+        ? a.end_date ? new Date(a.end_date) : getLastRenewalDate(a.start_date, a.interval, a.interval_count)
         : getNextRenewalDate(a.start_date, a.interval, a.interval_count)
       const db = b.status === 'cancelled'
-        ? getLastRenewalDate(b.start_date, b.interval, b.interval_count)
+        ? b.end_date ? new Date(b.end_date) : getLastRenewalDate(b.start_date, b.interval, b.interval_count)
         : getNextRenewalDate(b.start_date, b.interval, b.interval_count)
       cmp = da.getTime() - db.getTime()
     }

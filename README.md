@@ -44,7 +44,7 @@ Appen är byggd som en **Progressive Web App** och kan installeras direkt från 
 
 | Funktion | Beskrivning |
 |---|---|
-| **Abonnemangsöversikt** | Lista med alla tjänster normaliserade till kr/mån för enkel jämförelse — oavsett om abonnemanget faktureras månadsvis, kvartalsvis eller årsvis. Faktiskt fakturerat belopp visas som ledtext för icke-månadsabonnemang. Klickbara kolumnrubriker sorterar på tjänst, kategori, kr/mån eller förnyelsedatum — klicka en gång för stigande, igen för fallande |
+| **Abonnemangsöversikt** | Lista med alla tjänster normaliserade till kr/mån för enkel jämförelse — oavsett om abonnemanget faktureras månadsvis, kvartalsvis eller årsvis. Faktiskt fakturerat belopp visas som ledtext för icke-månadsabonnemang. Klickbara kolumnrubriker sorterar på tjänst, kategori, kr/mån eller datum — klicka en gång för stigande, igen för fallande. Avslutade abonnemang visar senaste betaldatum (end_date) i datumkolumnen istället för ett framtida förnyelsedatum |
 | **Tjänsteikoner** | Automatisk logotyp för ~130 kända tjänster (Netflix, Spotify, Adobe m.fl.) via favicon.im. Faller tillbaka på initialerbricka om tjänsten inte finns i mappningen. Täcker svenska tidningar (DN, SvD, GP, Expressen m.fl.), AI-tjänster (ChatGPT, Claude, Midjourney) och dev-verktyg |
 | **Type-ahead** | Autocomplete på tjänstnamnet när man lägger till eller redigerar ett abonnemang. Filtrerar ~130 kända tjänster i realtid med ikonförhandsvisning i rullgardinen — prioriterar träffar som börjar med sökordet. Byggt med `@headlessui/react` för fullständig tillgänglighet (ARIA combobox-mönster, tangentbordsnavigering) |
 | **Prishistorik** | Spåra prisändringar bakåt i tiden — se exakt vad du betalat sedan starten |

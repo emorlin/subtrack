@@ -28,7 +28,7 @@ export default function About() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
           <FeatureCard
             title="Abonnemangsöversikt"
-            description="Se alla dina abonnemang normaliserade till kr/mån för enkel jämförelse — oavsett om de faktureras månadsvis, kvartalsvis eller årsvis. Klicka en kolumnrubrik (Tjänst, Kategori, Kr/mån, Förnyelse) för att sortera — en gång stigande, igen fallande."
+            description="Se alla dina abonnemang normaliserade till kr/mån för enkel jämförelse — oavsett om de faktureras månadsvis, kvartalsvis eller årsvis. Klicka en kolumnrubrik (Tjänst, Kategori, Kr/mån, Datum) för att sortera — en gång stigande, igen fallande. Avslutade abonnemang visar senaste betaldatum i datumkolumnen istället för ett framtida förnyelsedatum."
           />
           <FeatureCard
             title="Tjänsteikoner"
