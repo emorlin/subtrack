@@ -40,7 +40,7 @@ export default function About() {
           />
           <FeatureCard
             title="Prishistorik"
-            description="Spåra prisändringar över tid. Lägg till historiska priser för att se exakt vad du betalat sedan starten, inte bara nuvarande pris."
+            description="Spåra prisändringar över tid. Lägg till, redigera och ta bort prisposter direkt i detaljvyn — penna-ikonen öppnar inline-redigering av datum och belopp, papperskorgen tar bort posten. Beräkningen av totalt betalt uppdateras automatiskt."
           />
           <FeatureCard
             title="Kostnadstrend"

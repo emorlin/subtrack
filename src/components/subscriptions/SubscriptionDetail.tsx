@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useId } from 'react'
-import { X } from 'lucide-react'
+import { X, Trash2, Pencil, Check } from 'lucide-react'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
 import type { Subscription } from '../../types'
 import { calculateTotalPaid, getNextRenewalDate, getEffectiveCurrentAmount } from '../../lib/calculations'
@@ -11,6 +11,7 @@ import {
   useReactivateSubscription,
   useAddPriceHistory,
   useDeletePriceHistory,
+  useUpdatePriceHistory,
 } from '../../hooks/useSubscriptions'
 
 interface Props {
@@ -308,9 +309,13 @@ function PriceHistorySection({ subscription }: { subscription: Subscription }) {
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editAmount, setEditAmount] = useState('')
+  const [editDate, setEditDate] = useState('')
 
   const addEntry = useAddPriceHistory()
   const deleteEntry = useDeletePriceHistory()
+  const updateEntry = useUpdatePriceHistory()
 
   const history = [...(subscription.price_history ?? [])].sort(
     (a, b) => new Date(a.effective_from).getTime() - new Date(b.effective_from).getTime()
@@ -337,6 +342,25 @@ function PriceHistorySection({ subscription }: { subscription: Subscription }) {
     )
   }
 
+  function startEdit(entry: { id: string; amount: number; effective_from: string }) {
+    setEditingId(entry.id)
+    setEditAmount(String(entry.amount))
+    setEditDate(entry.effective_from)
+  }
+
+  function handleSaveEdit() {
+    if (!editingId || !editAmount || !editDate) return
+    updateEntry.mutate(
+      { id: editingId, amount: Number(editAmount), effective_from: editDate },
+      {
+        onSuccess: () => setEditingId(null),
+        onError: (err) => setFormError(err instanceof Error ? err.message : 'Något gick fel'),
+      }
+    )
+  }
+
+  const inputClass = 'border border-[var(--c-border-strong)] focus:border-[var(--c-accent)] focus-visible:outline-2 focus-visible:outline-[var(--c-accent)] focus-visible:outline-offset-0 rounded-[6px] px-2 py-1 text-[16px] md:text-[12px] text-[var(--c-text-primary)] outline-none bg-[var(--c-bg-card)] transition-all duration-150'
+
   return (
     <div className="space-y-2">
       <p className="text-[11px] font-medium text-[var(--c-text-subtle)] tracking-wider uppercase">Prishistorik</p>
@@ -357,26 +381,74 @@ function PriceHistorySection({ subscription }: { subscription: Subscription }) {
             </div>
           )}
           {history.map((entry) => (
-            <div key={entry.id} className="flex items-center justify-between px-3 py-2">
-              <span className="text-[12px] text-[var(--c-text-muted)]">
-                {new Date(entry.effective_from).toLocaleDateString('sv-SE', {
-                  day: 'numeric', month: 'short', year: 'numeric',
-                })}
-              </span>
-              <div className="flex items-center gap-3">
-                <span className="text-[13px] font-medium text-[var(--c-text-primary)]">
-                  {entry.amount} kr
-                </span>
-                <button
-                  type="button"
-                  onClick={() => deleteEntry.mutate(entry.id)}
-                  disabled={deleteEntry.isPending}
-                  className="text-[var(--c-border-strong)] hover:text-[var(--c-danger-text)] transition-colors text-[12px] leading-none"
-                  aria-label="Ta bort"
-                >
-                  ✕
-                </button>
-              </div>
+            <div key={entry.id} className="px-3 py-2">
+              {editingId === entry.id ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="date"
+                    value={editDate}
+                    onChange={(e) => setEditDate(e.target.value)}
+                    aria-label="Gäller från datum"
+                    className={`flex-1 ${inputClass}`}
+                  />
+                  <input
+                    type="number"
+                    value={editAmount}
+                    onChange={(e) => setEditAmount(e.target.value)}
+                    min="0"
+                    placeholder="kr"
+                    aria-label="Belopp i kronor"
+                    className={`w-20 ${inputClass}`}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleSaveEdit}
+                    disabled={updateEntry.isPending}
+                    className="w-7 h-7 flex items-center justify-center rounded-[6px] text-[var(--c-success-text)] hover:bg-[var(--c-success-bg)] transition-all duration-150 ease-out disabled:opacity-40"
+                    aria-label="Spara"
+                  >
+                    <Check size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditingId(null)}
+                    className="w-7 h-7 flex items-center justify-center rounded-[6px] text-[var(--c-text-subtle)] hover:bg-[var(--c-bg-subtle)] transition-all duration-150 ease-out"
+                    aria-label="Avbryt"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <span className="text-[12px] text-[var(--c-text-muted)]">
+                    {new Date(entry.effective_from).toLocaleDateString('sv-SE', {
+                      day: 'numeric', month: 'short', year: 'numeric',
+                    })}
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-[13px] font-medium text-[var(--c-text-primary)] mr-2">
+                      {entry.amount} kr
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => startEdit(entry)}
+                      className="w-7 h-7 flex items-center justify-center rounded-[6px] text-[var(--c-text-subtle)] hover:bg-[var(--c-accent-subtle)] hover:text-[var(--c-accent)] transition-all duration-150 ease-out"
+                      aria-label="Redigera prispost"
+                    >
+                      <Pencil size={14} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => deleteEntry.mutate(entry.id)}
+                      disabled={deleteEntry.isPending}
+                      className="w-7 h-7 flex items-center justify-center rounded-[6px] text-[var(--c-text-subtle)] hover:bg-[var(--c-danger-bg)] hover:text-[var(--c-danger-text)] transition-all duration-150 ease-out disabled:opacity-40"
+                      aria-label="Ta bort prispost"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           ))}
         </div>

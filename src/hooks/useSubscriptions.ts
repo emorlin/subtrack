@@ -203,3 +203,26 @@ export function useDeletePriceHistory() {
     onSuccess: () => { if (!isDemoMode) queryClient.invalidateQueries({ queryKey: QUERY_KEY }) },
   })
 }
+
+export function useUpdatePriceHistory() {
+  const { isDemoMode } = useDemoContext()
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, amount, effective_from }: { id: string; amount: number; effective_from: string }) => {
+      if (isDemoMode) {
+        queryClient.setQueryData<Subscription[]>(QUERY_KEY, (old = []) =>
+          old.map(s => ({
+            ...s,
+            price_history: (s.price_history ?? []).map(ph =>
+              ph.id === id ? { ...ph, amount, effective_from } : ph
+            ),
+          }))
+        )
+        return
+      }
+      const { error } = await supabase.from('price_history').update({ amount, effective_from }).eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => { if (!isDemoMode) queryClient.invalidateQueries({ queryKey: QUERY_KEY }) },
+  })
+}
