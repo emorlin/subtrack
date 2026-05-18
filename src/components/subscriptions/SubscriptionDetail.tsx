@@ -3,6 +3,7 @@ import { X } from 'lucide-react'
 import { useFocusTrap } from '../../hooks/useFocusTrap'
 import type { Subscription } from '../../types'
 import { calculateTotalPaid, getNextRenewalDate, getEffectiveCurrentAmount } from '../../lib/calculations'
+import { getDomainForService } from '../../lib/serviceIcons'
 import { formatDate, daysUntil } from '../../lib/dates'
 import {
   useDeleteSubscription,
@@ -232,11 +233,25 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
 // ── Sub-components ────────────────────────────────────────────
 
 function ServiceIcon({ name, size }: { name: string; size: 'lg' | 'xl' }) {
-  const initials = getInitials(name)
+  const [failed, setFailed] = useState(false)
+  const domain = getDomainForService(name)
   const dim = size === 'xl' ? 'w-12 h-12 text-[14px]' : 'w-10 h-10 text-[13px]'
+
+  if (domain && !failed) {
+    return (
+      <img
+        src={`https://favicon.im/${domain}?larger=true`}
+        alt=""
+        aria-hidden="true"
+        onError={() => setFailed(true)}
+        className={`${dim} rounded-[10px] object-contain bg-white shrink-0`}
+      />
+    )
+  }
+
   return (
     <div className={`${dim} rounded-[10px] bg-[var(--c-bg-subtle)] flex items-center justify-center font-medium text-[var(--c-text-secondary)] shrink-0`}>
-      {initials}
+      {getInitials(name)}
     </div>
   )
 }
