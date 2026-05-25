@@ -110,6 +110,7 @@ export default function About() {
           <TechRow name="Supabase JS v2" role="Databas­klient" detail="Typat klient-API mot Postgres. Hanterar auth, real-time och direkt SQL-frågor via .from().select()." />
           <TechRow name="lucide-react" role="Ikoner" detail="Konsekventa SVG-ikoner med justerbar size och strokeWidth. Används i nav, knappar och detaljvyer." />
           <TechRow name="Vercel" role="Hosting" detail="Edge-deploy av den statiska bundlen. SPA-rewrites i vercel.json skickar alla sökvägar till index.html." />
+          <TechRow name="Vitest" role="Tester" detail="Enhetstester för beräknings- och diagramlogik. Integrerat i Vite-ekosystemet — inga extra konfigurationsfiler. Kör med npm test." />
         </div>
       </section>
 
@@ -259,7 +260,7 @@ export default function About() {
       <section>
         <SectionHeader icon={<Calculator size={16} strokeWidth={2} />} title="Beräkningslogik" />
         <p className="text-[13px] text-[var(--c-text-secondary)] leading-relaxed mt-3 mb-4">
-          All beräkningslogik bor i <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px] text-[var(--c-text-primary)]">src/lib/calculations.ts</code>. Funktionerna är rena (inga sidoeffekter) och kan testas isolerat.
+          All beräkningslogik bor i <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px] text-[var(--c-text-primary)]">src/lib/calculations.ts</code>. Funktionerna är rena (inga sidoeffekter) och täcks av automatiska enhetstester med Vitest — totalt 44 testfall för beräknings- och diagramlogik. Kör <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px] text-[var(--c-text-primary)]">npm test</code> för att köra alla tester.
         </p>
         <div className="space-y-3">
           <CalcCard

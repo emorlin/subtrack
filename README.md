@@ -25,6 +25,7 @@
 - [Demo-läge](#demo-läge)
 - [Tillgänglighet](#tillgänglighet)
 - [Komma igång](#komma-igång)
+- [Automatiska tester](#automatiska-tester)
 - [Miljövariabler](#miljövariabler)
 - [Supabase — setup](#supabase--setup)
 - [Bygga & driftsätta](#bygga--driftsätta)
@@ -76,6 +77,7 @@ Appen är byggd som en **Progressive Web App** och kan installeras direkt från 
 | @supabase/supabase-js | 2 | Typat klient-API mot Postgres, hanterar auth och queries |
 | lucide-react | — | Konsekventa SVG-ikoner i nav, knappar och detaljvyer |
 | Vercel | — | Edge-deploy av den statiska bundlen |
+| Vitest | 4 | Enhetstester för beräknings- och diagramlogik |
 
 ---
 
@@ -502,11 +504,44 @@ Appen är nu tillgänglig på [http://localhost:5173](http://localhost:5173).
 ### Tillgängliga kommandon
 
 ```bash
-npm run dev       # Startar Vite dev-server med HMR
-npm run build     # TypeScript-check + produktionsbuild till dist/
-npm run preview   # Förhandsgranska produktionsbundlen lokalt
-npm run lint      # ESLint på hela kodbasen
+npm run dev         # Startar Vite dev-server med HMR
+npm run build       # TypeScript-check + produktionsbuild till dist/
+npm run preview     # Förhandsgranska produktionsbundlen lokalt
+npm run lint        # ESLint på hela kodbasen
+npm test            # Kör alla tester (en gång)
+npm run test:watch  # Kör tester i watch-läge under utveckling
 ```
+
+---
+
+## Automatiska tester
+
+Subtrack använder **Vitest** för enhetstester av beräknings- och diagramlogik — de delar av koden som är rena funktioner utan UI eller nätverksanrop och där buggar är svårast att fånga manuellt.
+
+### Vad som testas
+
+| Fil | Funktioner som täcks |
+|---|---|
+| `src/lib/calculations.test.ts` | `toMonthlyAmount`, `calculateTotalPaid`, `getEffectiveCurrentAmount`, `getNextRenewalDate`, `getLastRenewalDate` |
+| `src/components/cost/BarChart.test.ts` | `isActiveInMonth`, `getAmountForMonth`, `buildMonthBars` |
+
+**44 testfall** täcker bland annat:
+
+- Normalisering av månads-, kvartals- och årsintervall till kr/månad
+- `calculateTotalPaid` med prishistorik, avslutade och pausade abonnemang, legacy-belopp
+- Att framtida prishistorikposter ignoreras
+- Att beräkningens cutoff är `end_date` för avslutade och `updated_at` för pausade (inte alltid `today`)
+- Att aktiva, pausade och avslutade abonnemang hanteras korrekt i stapeldiagrammet per månad
+- Korrekt förnyelsedatum för månads-, kvartals- och årsintervall
+
+### Kör testerna
+
+```bash
+npm test              # Kör samtliga tester (en gång)
+npm run test:watch    # Watch-läge — testerna körs automatiskt vid filsparning
+```
+
+Testerna är konfigurerade i `vite.config.ts` och använder `vi.useFakeTimers()` / `vi.setSystemTime()` för deterministiska datumberäkningar.
 
 ---
 
