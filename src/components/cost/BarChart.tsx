@@ -94,7 +94,7 @@ export default function BarChart({ bars, onHover, onClick, chartHeight = 80 }: B
   }
 
   return (
-    <div role="img" aria-label="Stapeldiagram: månadsvis kostnad" className="flex items-end gap-1">
+    <div role="img" aria-label="Stapeldiagram: månadsvis kostnad" className="flex items-end gap-1" style={{ minHeight: chartHeight + 24 }}>
       {bars.map((bar) => {
         const isActive = activeMonth === bar.month
         const barH = Math.max(Math.round((bar.amount / max) * chartHeight), bar.amount > 0 ? 4 : 2)
