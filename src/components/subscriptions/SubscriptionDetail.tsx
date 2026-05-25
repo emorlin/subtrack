@@ -203,7 +203,7 @@ export default function SubscriptionDetail({ subscription, onClose, onEdit, onDe
             </button>
           </div>
         )}
-        {isUrgent && <RenewalWarning days={days} amount={subscription.amount} date={renewal} />}
+        {isUrgent && <RenewalWarning days={days} amount={effectiveAmount} date={renewal} />}
         <DetailRows subscription={subscription} totalPaid={totalPaid} renewal={renewal} effectiveAmount={effectiveAmount} />
         <PriceHistorySection subscription={subscription} />
         {subscription.notes && <Notes text={subscription.notes} />}
