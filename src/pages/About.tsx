@@ -1,22 +1,266 @@
-import { Database, Shield, Server, Smartphone, Globe, Code2, Layers, Calculator, Bell, RefreshCw, Lock, MonitorPlay, Eye } from 'lucide-react'
+import { useState } from 'react'
+import { Database, Shield, Server, Smartphone, Globe, Code2, Layers, Calculator, Bell, RefreshCw, Lock, MonitorPlay, Eye, PlusCircle, BarChart2, Settings, Tag, CreditCard } from 'lucide-react'
 import { usePageTitle } from '../hooks/usePageTitle'
+
+type Tab = 'guide' | 'tech'
 
 export default function About() {
   usePageTitle('Om appen')
-  return (
-    <div className="max-w-3xl mx-auto px-4 py-8 pb-16 space-y-12">
+  const [tab, setTab] = useState<Tab>('guide')
 
-      {/* Hero */}
-      <section>
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 bg-[var(--c-accent)] rounded-[10px] flex items-center justify-center shrink-0">
-            <Code2 size={20} color="white" strokeWidth={2} />
-          </div>
-          <div>
-            <h1 className="text-[22px] font-semibold text-[var(--c-text-primary)] tracking-[-0.4px]">Om Subtrack</h1>
-            <p className="text-[13px] text-[var(--c-text-muted)]">Version 1.0 · Byggd 2026</p>
-          </div>
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-8 pb-16">
+
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 bg-[var(--c-accent)] rounded-[10px] flex items-center justify-center shrink-0">
+          <Code2 size={20} color="white" strokeWidth={2} />
         </div>
+        <div>
+          <h1 className="text-[22px] font-semibold text-[var(--c-text-primary)] tracking-[-0.4px]">Om Subtrack</h1>
+          <p className="text-[13px] text-[var(--c-text-muted)]">Version 1.0 · Byggd 2026</p>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div role="tablist" aria-label="Om appen" className="flex border-b border-[var(--c-border)] mb-8">
+        <TabButton id="tab-guide" panelId="panel-guide" arrowTargetId="tab-tech" label="Användarguide" active={tab === 'guide'} onClick={() => setTab('guide')} onArrow={() => setTab('tech')} />
+        <TabButton id="tab-tech" panelId="panel-tech" arrowTargetId="tab-guide" label="Teknisk info" active={tab === 'tech'} onClick={() => setTab('tech')} onArrow={() => setTab('guide')} />
+      </div>
+
+      <div role="tabpanel" id="panel-guide" aria-labelledby="tab-guide" hidden={tab !== 'guide'} tabIndex={0}>
+        <UserGuide />
+      </div>
+      <div role="tabpanel" id="panel-tech" aria-labelledby="tab-tech" hidden={tab !== 'tech'} tabIndex={0}>
+        <TechInfo />
+      </div>
+
+    </div>
+  )
+}
+
+function TabButton({ id, panelId, arrowTargetId, label, active, onClick, onArrow }: {
+  id: string
+  panelId: string
+  arrowTargetId: string
+  label: string
+  active: boolean
+  onClick: () => void
+  onArrow: () => void
+}) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      id={id}
+      aria-selected={active}
+      aria-controls={panelId}
+      tabIndex={active ? 0 : -1}
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+          e.preventDefault()
+          onArrow()
+          document.getElementById(arrowTargetId)?.focus()
+        }
+      }}
+      className={`px-4 py-2.5 text-[13px] font-medium border-b-2 -mb-px transition-colors ${
+        active
+          ? 'border-[var(--c-accent)] text-[var(--c-accent)]'
+          : 'border-transparent text-[var(--c-text-muted)] hover:text-[var(--c-text-secondary)]'
+      }`}
+    >
+      {label}
+    </button>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Användarguide
+// ---------------------------------------------------------------------------
+
+function UserGuide() {
+  return (
+    <div className="space-y-10">
+
+      {/* Intro */}
+      <section>
+        <p className="text-[14px] text-[var(--c-text-secondary)] leading-relaxed">
+          Subtrack hjälper dig hålla koll på alla dina löpande abonnemang — vad de kostar, när de förnyas och hur priserna förändrats över tid. Den här guiden förklarar hur du kommer igång och hur de olika delarna av appen fungerar.
+        </p>
+      </section>
+
+      {/* Kom igång */}
+      <section>
+        <SectionHeader icon={<PlusCircle size={16} strokeWidth={2} />} title="Kom igång — lägg till ditt första abonnemang" />
+        <p className="text-[13px] text-[var(--c-text-secondary)] leading-relaxed mt-3 mb-4">
+          Tryck på knappen <strong>+ Lägg till</strong> (övre högra hörnet på desktop, knappen ovanför navigationen på mobil) för att öppna formuläret.
+        </p>
+        <div className="space-y-2">
+          {[
+            ['Tjänst', 'Börja skriva tjänstens namn — appen föreslår automatiskt kända tjänster som Netflix, Spotify och Adobe med rätt ikon. Välj ur listan eller skriv ett eget namn.'],
+            ['Kostnad & intervall', 'Ange vad du betalar och hur ofta — månadsvis, kvartalsvis eller årsvis. Alla belopp normaliseras till kr/mån i översikten så du enkelt kan jämföra.'],
+            ['Startdatum', 'Datumet du tecknade abonnemanget. Används för att beräkna totalt betalt och nästa förnyelse.'],
+            ['Kategori', 'Välj en befintlig kategori (Streaming, Mjukvara, Musik etc.) eller skapa en ny i Inställningar. Kategorin visas i listan och i kostnadsvyns stapeldiagram.'],
+            ['Påminnelse', 'Välj hur många dagar i förväg du vill bli påmind inför förnyelse. Standard är 3 dagar.'],
+            ['Anteckningar', 'Valfritt fritextfält — bra för kontonummer, vilken plan du har, eller om någon annan delar på abonnemanget.'],
+          ].map(([title, desc], i) => (
+            <div key={i} className="flex gap-3 bg-[var(--c-bg-app)] rounded-[10px] border border-[var(--c-border)] p-3.5">
+              <span className="w-5 h-5 rounded-full bg-[var(--c-accent-subtle)] text-[var(--c-accent)] text-[11px] font-semibold flex items-center justify-center shrink-0 mt-0.5">{i + 1}</span>
+              <div>
+                <p className="text-[13px] font-semibold text-[var(--c-text-primary)]">{title}</p>
+                <p className="text-[12px] text-[var(--c-text-muted)] leading-relaxed mt-0.5">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Översikten */}
+      <section>
+        <SectionHeader icon={<Layers size={16} strokeWidth={2} />} title="Abonnemangsöversikten" />
+        <p className="text-[13px] text-[var(--c-text-secondary)] leading-relaxed mt-3 mb-4">
+          Startsidan visar alla dina abonnemang. Klicka på en rad för att öppna detaljvyn där du kan redigera, lägga till prishistorik, pausa eller avsluta abonnemanget.
+        </p>
+        <div className="space-y-3">
+          <GuideCard title="Belopp i kr/mån">
+            Alla abonnemang visas normaliserade till kr per månad oavsett hur de faktureras. Ett årsabonnemang på 1 200 kr visas som 100 kr/mån — så du alltid kan jämföra äpplen med äpplen. Under beloppet ser du det faktiska fakturerade beloppet (t.ex. "1 200 kr/år").
+          </GuideCard>
+          <GuideCard title="Statusbadge">
+            Varje abonnemang har en badge: <strong>Aktiv</strong> (grön), <strong>Pausad</strong> (amber) eller <strong>Avslutad</strong> (röd). Avslutade abonnemang visas längst ner i listan med datum för sista betalning.
+          </GuideCard>
+          <GuideCard title="Sortering">
+            Klicka på en kolumnrubrik (Tjänst, Kategori, Kr/mån, Datum) för att sortera listan — klicka en gång för stigande ordning, igen för fallande.
+          </GuideCard>
+          <GuideCard title="Provperiod">
+            Om ett abonnemang har en aktiv provperiod visas en amber badge med hur många dagar som återstår. Har provperioden gått ut visas en banner på startsidan med frågan om du fortfarande betalar.
+          </GuideCard>
+        </div>
+      </section>
+
+      {/* Prishistorik */}
+      <section>
+        <SectionHeader icon={<CreditCard size={16} strokeWidth={2} />} title="Prishistorik" />
+        <p className="text-[13px] text-[var(--c-text-secondary)] leading-relaxed mt-3 mb-4">
+          Har priset på ett abonnemang höjts? Öppna detaljvyn och lägg till en prisändring. Appen beräknar då totalt betalt korrekt — med rätt pris för varje tidsperiod.
+        </p>
+        <div className="space-y-3">
+          <GuideCard title="Lägg till en prisändring">
+            I detaljvyn, scrolla ner till avsnittet "Prishistorik" och tryck <strong>+ Lägg till</strong>. Ange det nya priset och datumet det börjar gälla. Du kan lägga till hur många poster som helst.
+          </GuideCard>
+          <GuideCard title="Redigera eller ta bort">
+            Tryck på pennikonen bredvid en post för att ändra datum eller belopp direkt i listan. Papperskorgen tar bort posten. Ändringarna slår igenom direkt i totalkostnadsberäkningen.
+          </GuideCard>
+          <GuideCard title="Totalt betalt">
+            I detaljvyn visas "Totalt betalt sedan start" — ett belopp som beräknas med hänsyn till alla prisperioder. Om du lade till abonnemanget med ett manuellt historikbelopp räknas det som bas.
+          </GuideCard>
+        </div>
+      </section>
+
+      {/* Kostnadsvyn */}
+      <section>
+        <SectionHeader icon={<BarChart2 size={16} strokeWidth={2} />} title="Kostnadsvyn" />
+        <p className="text-[13px] text-[var(--c-text-secondary)] leading-relaxed mt-3 mb-4">
+          Kostnadssidan (andra fliken i navigationen) visar hur mycket du betalar per månad och hur det förändrats över tid.
+        </p>
+        <div className="space-y-3">
+          <GuideCard title="Stapeldiagrammet">
+            Varje stapel representerar en månads totalkostnad. Fyllda staplar = redan passerade månader. Den ljusare = aktuell månad. Bleka = prognoser för resten av året baserat på dina aktiva abonnemang.
+          </GuideCard>
+          <GuideCard title="Klicka på en stapel">
+            Öppnar en detaljmodal för den månaden med en lista över alla aktiva abonnemang och deras individuella kostnader. Navigera månadsvis med pilknapparna, stäng med Esc.
+          </GuideCard>
+          <GuideCard title="Byt år">
+            Använd piltangenterna bredvid årtalet i diagrammets övre hörn för att se historiska år — appen visar bara år du haft minst ett aktivt abonnemang.
+          </GuideCard>
+          <GuideCard title="Kategorifördelning">
+            Till höger om diagrammet (under på mobil) visas kostnaden för den valda månaden nedbruten per kategori. Håll muspekaren över en stapel för att se just den månaden.
+          </GuideCard>
+          <GuideCard title="Insikter">
+            Under diagrammet visas upp till tre automatiska insikter: t.ex. vilken tjänst som höjt priset mest, hur stor del en kategori utgör av totalen, eller kassaflödet de närmaste 30 dagarna.
+          </GuideCard>
+        </div>
+      </section>
+
+      {/* Påminnelser */}
+      <section>
+        <SectionHeader icon={<Bell size={16} strokeWidth={2} />} title="Påminnelser" />
+        <p className="text-[13px] text-[var(--c-text-secondary)] leading-relaxed mt-3 mb-4">
+          Notisfliken visar alla kommande förnyelser och nylig historik — utan att du behöver göra något.
+        </p>
+        <div className="space-y-3">
+          <GuideCard title="Röd vs blå markering">
+            Förnyelser inom 30 dagar visas alltid. <strong>Röd</strong> markering betyder att du är inom det påminnelsefönster du ställt in för just det abonnemanget (t.ex. 3 dagar). <strong>Blå</strong> betyder att förnyelsen är på gång men inte kritiskt nära ännu.
+          </GuideCard>
+          <GuideCard title="Badge i navigationen">
+            En röd sifferbadge på Notiser-ikonen visar hur många abonnemang som är inom sitt röda påminnelsefönster — du ser det direkt utan att behöva öppna fliken.
+          </GuideCard>
+          <GuideCard title="Ändra påminnelsedagar">
+            Öppna detaljvyn för ett abonnemang och välj hur många dagar i förväg du vill se röd markering. Vill du bli varnad en vecka i förväg, sätt det till 7.
+          </GuideCard>
+        </div>
+      </section>
+
+      {/* Kategorier & inställningar */}
+      <section>
+        <SectionHeader icon={<Tag size={16} strokeWidth={2} />} title="Kategorier" />
+        <p className="text-[13px] text-[var(--c-text-secondary)] leading-relaxed mt-3 mb-4">
+          Kategorier hjälper dig gruppera abonnemang och se kostnadsfördelningen i stapeldiagrammet.
+        </p>
+        <div className="space-y-3">
+          <GuideCard title="Standardkategorier">
+            När du registrerar dig skapas automatiskt sex kategorier: Streaming, Mjukvara, Musik, Lagring, Produktivitet och Hälsa — med varsitt färg. Du kan redigera och byta färg på dem i Inställningar.
+          </GuideCard>
+          <GuideCard title="Skapa en ny kategori">
+            Gå till Inställningar → Kategorier, tryck på plusikonen, ange ett namn och välj en färg. Den nya kategorin dyker direkt upp i formuläret nästa gång du lägger till ett abonnemang.
+          </GuideCard>
+        </div>
+      </section>
+
+      {/* Inställningar */}
+      <section>
+        <SectionHeader icon={<Settings size={16} strokeWidth={2} />} title="Inställningar" />
+        <div className="space-y-3 mt-4">
+          <GuideCard title="Mörkt läge">
+            Under Utseende kan du växla mellan ljust och mörkt tema. Valet sparas automatiskt och systempreferensen används som standard om du inte gjort ett val.
+          </GuideCard>
+          <GuideCard title="Exportera CSV">
+            I filtreringsraden på översiktssidan finns en knapp för att ladda ner alla dina abonnemang som en CSV-fil. Filen öppnas direkt i Excel med rätt teckenkodning.
+          </GuideCard>
+          <GuideCard title="Installera som app">
+            På iPhone: öppna Subtrack i Safari, tryck dela-knappen och välj "Lägg till på hemskärmen". Appen startar då utan webbläsarens krom, precis som en vanlig app.
+          </GuideCard>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <div className="border-t border-[var(--c-border)] pt-6 text-center space-y-2">
+        <a
+          href="https://github.com/emorlin/subtrack"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 text-[13px] text-[var(--c-accent)] hover:underline"
+        >
+          <GitHubIcon />
+          github.com/emorlin/subtrack
+        </a>
+        <p className="text-[12px] text-[var(--c-text-subtle)]">Subtrack · Byggd med React, TypeScript, Supabase & Vercel · 2026</p>
+      </div>
+
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------------------
+// Teknisk info
+// ---------------------------------------------------------------------------
+
+function TechInfo() {
+  return (
+    <div className="space-y-12">
+
+      {/* Intro */}
+      <section>
         <p className="text-[14px] text-[var(--c-text-secondary)] leading-relaxed">
           Subtrack är en personlig webb-app för att hålla koll på löpande abonnemang och prenumerationer. Den löser ett konkret problem: det är lätt att tappa koll på vilka tjänster man betalar för, vad de kostar i dag jämfört med när man tecknade dem, och när de förnyas. Subtrack samlar allt på ett ställe — med fullständig prishistorik, kostnadstrend per kategori och automatiska påminnelser inför förnyelse.
         </p>
@@ -148,7 +392,6 @@ export default function About() {
       <section>
         <SectionHeader icon={<Database size={16} strokeWidth={2} />} title="Databasmodell" />
         <p className="text-[13px] text-[var(--c-text-muted)] mt-2 mb-4">Postgres via Supabase. Alla tabeller har Row Level Security aktiverat.</p>
-
         <div className="space-y-4">
           <TableCard
             name="profiles"
@@ -227,31 +470,11 @@ export default function About() {
             Subtrack använder Supabase Row Level Security (RLS) för att garantera att varje användare bara kan läsa och skriva sin egen data — oavsett vad klienten skickar. RLS aktiveras på samtliga tabeller och policyn kontrolleras av Postgres, inte av applikationskoden.
           </p>
           <div className="bg-[var(--c-bg-app)] rounded-[10px] border border-[var(--c-border)] p-4 space-y-3">
-            <SecurityItem
-              icon={<Lock size={13} strokeWidth={2} color="var(--c-accent)" />}
-              title="auth.uid() = user_id"
-              detail="Varje RLS-policy kontrollerar att den inloggade användarens UUID matchar user_id-kolumnen. Ingen kan läsa en annan användares abonnemang, kategorier eller notiser."
-            />
-            <SecurityItem
-              icon={<Lock size={13} strokeWidth={2} color="var(--c-accent)" />}
-              title="Kaskaderad åtkomstkontroll på price_history"
-              detail="price_history har ingen direkt user_id. Policyn använder en EXISTS-subquery mot subscriptions för att verifiera ägarskap — om subscription_id inte tillhör dig når du inte price_history-raden."
-            />
-            <SecurityItem
-              icon={<Lock size={13} strokeWidth={2} color="var(--c-accent)" />}
-              title="Anon-nyckel utan superrättigheter"
-              detail="Klienten autentiserar med Supabase anon-nyckel. Den ger bara tillgång till det RLS tillåter. Service role-nyckeln (som kan kringgå RLS) används aldrig i klientkoden."
-            />
-            <SecurityItem
-              icon={<Lock size={13} strokeWidth={2} color="var(--c-accent)" />}
-              title="OAuth via Supabase Auth"
-              detail="Inga lösenord lagras. Google hanterar autentiseringen och skickar en JWT till Supabase som validerar den. Sessions hanteras av Supabase med automatisk refresh."
-            />
-            <SecurityItem
-              icon={<Lock size={13} strokeWidth={2} color="var(--c-accent)" />}
-              title="Admin-guard i tvålager"
-              detail="Admin-vyn skyddas både av en React-guard (user.id === ADMIN_ID) och av dedikerade RLS-policies i Postgres som matchar samma UUID. Ingen annan användare kan se eller hämta övriga användares profiler — varken via appen eller direkt mot Supabase."
-            />
+            <SecurityItem icon={<Lock size={13} strokeWidth={2} color="var(--c-accent)" />} title="auth.uid() = user_id" detail="Varje RLS-policy kontrollerar att den inloggade användarens UUID matchar user_id-kolumnen. Ingen kan läsa en annan användares abonnemang, kategorier eller notiser." />
+            <SecurityItem icon={<Lock size={13} strokeWidth={2} color="var(--c-accent)" />} title="Kaskaderad åtkomstkontroll på price_history" detail="price_history har ingen direkt user_id. Policyn använder en EXISTS-subquery mot subscriptions för att verifiera ägarskap — om subscription_id inte tillhör dig når du inte price_history-raden." />
+            <SecurityItem icon={<Lock size={13} strokeWidth={2} color="var(--c-accent)" />} title="Anon-nyckel utan superrättigheter" detail="Klienten autentiserar med Supabase anon-nyckel. Den ger bara tillgång till det RLS tillåter. Service role-nyckeln (som kan kringgå RLS) används aldrig i klientkoden." />
+            <SecurityItem icon={<Lock size={13} strokeWidth={2} color="var(--c-accent)" />} title="OAuth via Supabase Auth" detail="Inga lösenord lagras. Google hanterar autentiseringen och skickar en JWT till Supabase som validerar den. Sessions hanteras av Supabase med automatisk refresh." />
+            <SecurityItem icon={<Lock size={13} strokeWidth={2} color="var(--c-accent)" />} title="Admin-guard i tvålager" detail="Admin-vyn skyddas både av en React-guard (user.id === ADMIN_ID) och av dedikerade RLS-policies i Postgres som matchar samma UUID. Ingen annan användare kan se eller hämta övriga användares profiler — varken via appen eller direkt mot Supabase." />
           </div>
         </div>
       </section>
@@ -263,26 +486,10 @@ export default function About() {
           All beräkningslogik bor i <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px] text-[var(--c-text-primary)]">src/lib/calculations.ts</code>. Funktionerna är rena (inga sidoeffekter) och täcks av automatiska enhetstester med Vitest — totalt 44 testfall för beräknings- och diagramlogik. Kör <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px] text-[var(--c-text-primary)]">npm test</code> för att köra alla tester.
         </p>
         <div className="space-y-3">
-          <CalcCard
-            name="toMonthlyAmount(amount, interval, intervalCount)"
-            description="Normaliserar ett belopp till kr/månad för att kunna jämföra abonnemang med olika intervall. Årsabonnemang på 1 200 kr ger 100 kr/månad. Kvartalsabonnemang på 300 kr ger också 100 kr/månad."
-            formula="(amount × periodsPerYear[interval] / intervalCount) / 12"
-          />
-          <CalcCard
-            name="getEffectiveCurrentAmount(subscription)"
-            description="Returnerar det pris som gäller idag. Om price_history finns hittas den senaste posten vars effective_from ≤ dagens datum. Annars returneras subscription.amount (grundpriset)."
-            formula="Senaste price_history.amount där effective_from ≤ today, annars subscription.amount"
-          />
-          <CalcCard
-            name="getAmountForMonth(subscription, year, month)"
-            description="Används av stapeldiagrammet för att visa det historiskt korrekta priset för en specifik månad. Söker i price_history efter den post som gällde just den månaden."
-            formula="Senaste price_history.amount där effective_from ≤ månadens sista dag"
-          />
-          <CalcCard
-            name="calculateTotalPaid(subscription)"
-            description="Beräknar totalt betalt belopp sedan startdatum. Tar hänsyn till prishistoriken — om priset ändrades 2020-01-01 används det gamla priset för perioden dessförinnan och det nya för perioden efter."
-            formula="Σ (perioder × belopp) per prisperiod, itererat kronologiskt"
-          />
+          <CalcCard name="toMonthlyAmount(amount, interval, intervalCount)" description="Normaliserar ett belopp till kr/månad för att kunna jämföra abonnemang med olika intervall. Årsabonnemang på 1 200 kr ger 100 kr/månad. Kvartalsabonnemang på 300 kr ger också 100 kr/månad." formula="(amount × periodsPerYear[interval] / intervalCount) / 12" />
+          <CalcCard name="getEffectiveCurrentAmount(subscription)" description="Returnerar det pris som gäller idag. Om price_history finns hittas den senaste posten vars effective_from ≤ dagens datum. Annars returneras subscription.amount (grundpriset)." formula="Senaste price_history.amount där effective_from ≤ today, annars subscription.amount" />
+          <CalcCard name="getAmountForMonth(subscription, year, month)" description="Används av stapeldiagrammet för att visa det historiskt korrekta priset för en specifik månad. Söker i price_history efter den post som gällde just den månaden." formula="Senaste price_history.amount där effective_from ≤ månadens sista dag" />
+          <CalcCard name="calculateTotalPaid(subscription)" description="Beräknar totalt betalt belopp sedan startdatum. Tar hänsyn till prishistoriken — om priset ändrades 2020-01-01 används det gamla priset för perioden dessförinnan och det nya för perioden efter." formula="Σ (perioder × belopp) per prisperiod, itererat kronologiskt" />
         </div>
       </section>
 
@@ -295,7 +502,7 @@ export default function About() {
         <ul className="mt-3 space-y-1.5 text-[13px] text-[var(--c-text-secondary)] list-none">
           <li className="flex gap-2"><span className="text-[var(--c-accent)] font-semibold shrink-0">·</span><span><strong>Kommande förnyelser</strong> — alla abonnemang som förnyas inom 30 dagar, sorterade på datum. Röd markering = inom din inställda påminnelseperiod. Blå = kommande men ännu inte i påminnelsefönstret.</span></li>
           <li className="flex gap-2"><span className="text-[var(--c-accent)] font-semibold shrink-0">·</span><span><strong>Historik</strong> — senaste förnyelserna de 60 dagarna bakåt.</span></li>
-          <li className="flex gap-2"><span className="text-[var(--c-accent)] font-semibold shrink-0">·</span><span><strong>Nav-badge</strong> — en röd sifferbadge på Notiser-ikonen i sidebaren (desktop) och bottom nav (mobil) visar antalet röda påminnelser, dvs. förnyelser som är inom respektive abonnemangs inställda påminnelsefönster.</span></li>
+          <li className="flex gap-2"><span className="text-[var(--c-accent)] font-semibold shrink-0">·</span><span><strong>Nav-badge</strong> — en röd sifferbadge på Notiser-ikonen i sidebaren (desktop) och bottom nav (mobil) visar antalet röda påminnelser.</span></li>
         </ul>
       </section>
 
@@ -309,7 +516,6 @@ export default function About() {
               <li>Bottom navigation med 5 flikar</li>
               <li>Full-width "Lägg till"-knapp ovanför nav</li>
               <li>Detaljvy och modaler som fullskärm</li>
-              <li>Kortvisning med svep-interaktion</li>
               <li>Safe area-insets för iOS notch och home indicator</li>
               <li>Inputfält har font-size 16px (förhindrar iOS Safari-zoom)</li>
             </ul>
@@ -328,7 +534,7 @@ export default function About() {
         <div className="mt-3 bg-[var(--c-accent-subtle)] rounded-[10px] border border-[var(--c-accent-muted)] p-4">
           <p className="text-[12px] font-semibold text-[var(--c-accent)] mb-1">PWA — Progressive Web App</p>
           <p className="text-[13px] text-[var(--c-text-secondary)]">
-            Appen har en <code className="bg-[var(--c-bg-card)] px-1 py-0.5 rounded text-[12px]">manifest.json</code> och korrekt meta-taggar för iOS. På iPhone: öppna appen i Safari → dela → "Lägg till på hemskärmen". Appen startar sedan i standalone-läge utan Safari-krom, med blå status­bar och Subtrack-ikon. Safe area-insets hanteras med <code className="bg-[var(--c-bg-card)] px-1 py-0.5 rounded text-[12px]">env(safe-area-inset-top/bottom)</code> i CSS.
+            Appen har en <code className="bg-[var(--c-bg-card)] px-1 py-0.5 rounded text-[12px]">manifest.json</code> och korrekt meta-taggar för iOS. På iPhone: öppna appen i Safari → dela → "Lägg till på hemskärmen". Appen startar sedan i standalone-läge utan Safari-krom, med blå status­bar och Subtrack-ikon.
           </p>
         </div>
       </section>
@@ -345,17 +551,14 @@ export default function About() {
             <DeployRow label="Databas" value="Supabase (EU-region) — managed Postgres + Auth" />
             <DeployRow label="Auth callback" value="/auth/callback — hanterar OAuth-redirect från Google" />
           </div>
-          <p className="text-[12px] text-[var(--c-text-subtle)] leading-relaxed">
-            Eftersom appen är en ren klient-SPA saknas server-side rendering. All data hämtas client-side via Supabase JS-klienten efter autentisering. Vite bygger en optimerad bundle med code splitting — sidorna laddas som separata chunks vid behov.
-          </p>
         </div>
       </section>
 
-      {/* Uppdateringsflöde */}
+      {/* Dataflöde */}
       <section>
         <SectionHeader icon={<RefreshCw size={16} strokeWidth={2} />} title="Dataflöde & cache" />
         <p className="text-[13px] text-[var(--c-text-secondary)] leading-relaxed mt-3">
-          React Query används som server state-lager med en stale time på 5 minuter. Det innebär att data cachas lokalt och inte hämtas om i onödan. Vid varje skrivoperation (lägg till, redigera, ta bort abonnemang, prishistorik etc.) anropas <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">queryClient.invalidateQueries</code> som tvingar en färsk hämtning. Det garanterar att UI alltid reflekterar den senaste databasens tillstånd utan manuell sidladdning.
+          React Query används som server state-lager. Vid varje skrivoperation anropas <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">queryClient.invalidateQueries</code> som tvingar en färsk hämtning — UI reflekterar alltid senaste databasens tillstånd utan manuell sidladdning.
         </p>
         <div className="mt-3 bg-[var(--c-bg-app)] rounded-[10px] border border-[var(--c-border)] p-4 space-y-2 text-[13px] text-[var(--c-text-secondary)]">
           <p className="font-medium text-[var(--c-text-primary)]">Flöde vid dataskrivning:</p>
@@ -374,47 +577,17 @@ export default function About() {
       <section>
         <SectionHeader icon={<MonitorPlay size={16} strokeWidth={2} />} title="Demo-läge" />
         <p className="text-[13px] text-[var(--c-text-secondary)] leading-relaxed mt-3 mb-4">
-          Inloggningssidan erbjuder ett demo-läge för den som vill utforska appen utan att skapa ett konto. All data är hårdkodad och ingen Supabase-trafik sker överhuvudtaget — varken läsning eller skrivning. Läggs ett abonnemang till i demo-läget syns det direkt, men försvinner när fliken stängs.
+          Inloggningssidan erbjuder ett demo-läge för den som vill utforska appen utan att skapa ett konto. All data är hårdkodad och ingen Supabase-trafik sker överhuvudtaget. Läggs ett abonnemang till i demo-läget syns det direkt, men försvinner när fliken stängs.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-          <div className="bg-[var(--c-bg-app)] rounded-[10px] border border-[var(--c-border)] p-4">
-            <p className="text-[12px] font-semibold text-[var(--c-text-primary)] mb-2">Exempeldata som ingår</p>
-            <ul className="space-y-1 text-[12px] text-[var(--c-text-muted)]">
-              <li>Netflix — prishistorik i fyra steg (99 → 139 → 189 → 219 kr)</li>
-              <li>Spotify — prishistorik i tre steg (99 → 119 → 135 kr)</li>
-              <li>Adobe Creative Cloud — 699 kr/mån</li>
-              <li>iCloud+ 50 GB — 12 kr/mån</li>
-              <li>GitHub Pro — 99 kr/mån</li>
-              <li>Microsoft 365 — 1 149 kr/år (familjeplan)</li>
-              <li>Headspace — pausad</li>
-              <li>HBO Max — avslutad</li>
-              <li>Cursor — provperiod utgången (triggar banner)</li>
-              <li>Perplexity — provperiod aktiv, 5 dagar kvar</li>
-            </ul>
-          </div>
-          <div className="bg-[var(--c-bg-app)] rounded-[10px] border border-[var(--c-border)] p-4">
-            <p className="text-[12px] font-semibold text-[var(--c-text-primary)] mb-2">6 kategorier med färger</p>
-            <ul className="space-y-1 text-[12px] text-[var(--c-text-muted)]">
-              <li><span className="inline-block w-2 h-2 rounded-full bg-[#EF4444] mr-1.5" />Streaming</li>
-              <li><span className="inline-block w-2 h-2 rounded-full bg-[#8B5CF6] mr-1.5" />Musik</li>
-              <li><span className="inline-block w-2 h-2 rounded-full bg-[#0EA5E9] mr-1.5" />Lagring</li>
-              <li><span className="inline-block w-2 h-2 rounded-full bg-[#F59E0B] mr-1.5" />Mjukvara</li>
-              <li><span className="inline-block w-2 h-2 rounded-full bg-[#10B981] mr-1.5" />Produktivitet</li>
-              <li><span className="inline-block w-2 h-2 rounded-full bg-[#EC4899] mr-1.5" />Hälsa</li>
-            </ul>
-          </div>
-        </div>
         <div className="bg-[var(--c-bg-app)] rounded-[10px] border border-[var(--c-border)] p-4 space-y-3 text-[13px] text-[var(--c-text-secondary)]">
           <p className="font-medium text-[var(--c-text-primary)]">Teknisk implementation</p>
-          <p>Demo-läget styrs av <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">DemoContext</code> (<code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">src/contexts/DemoContext.tsx</code>) som exponerar <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">isDemoMode</code>, <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">enterDemo()</code> och <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">exitDemo()</code>. Vid aktivering injiceras hårdkodad data direkt i React Query-cachen via <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">queryClient.setQueryData</code>.</p>
           <ul className="space-y-1.5 list-none">
             {[
+              'Demo-läget styrs av DemoContext (src/contexts/DemoContext.tsx) med isDemoMode, enterDemo() och exitDemo()',
               'Datahookarna (useSubscriptions, useCategories) sätter enabled: !isDemoMode — inga Supabase-anrop görs',
-              'Alla mutationer (lägg till, redigera, ta bort) uppdaterar React Query-cachen direkt med setQueryData',
+              'Alla mutationer uppdaterar React Query-cachen direkt med setQueryData',
               'Auth-vakten i AppLayout låter demo-användare passera utan inloggad session',
-              'En amber-banner i topbaren indikerar tydligt att man är i demo-läge',
               'exitDemo() rensar hela cachen och den reaktiva auth-vakten skickar tillbaka till login',
-              'Demo­användaren "Alex Svensson" visas med avatar och namn i topbaren och i inställningars profilkort',
             ].map((item, i) => (
               <li key={i} className="flex gap-2">
                 <span className="text-[var(--c-accent)] font-semibold shrink-0">·</span>
@@ -439,9 +612,7 @@ export default function About() {
             ['Skärmläsarstöd', 'Modaler har role="dialog", aria-modal och aria-labelledby. Felmeddelanden har role="alert" för automatisk uppläsning. Laddningsstatus har role="status".'],
             ['Rubrikhierarki', 'Varje sida har exakt en h1 och sektionsrubriker är h2 — oavsett visuell storlek.'],
             ['Färgkontrast', 'Alla textstorlekar uppfyller kravet på 4,5:1 kontrastförhållande mot bakgrunden, i både ljust och mörkt läge.'],
-            ['ARIA-states', 'Kollapsibla avsnitt har aria-expanded. Filterknappars aktivt läge kommuniceras via aria-pressed. Dekorativa ikoner har aria-hidden="true".'],
             ['Stapeldiagram', 'Varje stapel är ett button-element med aria-label som anger månad och belopp. Diagrambehållaren har role="img" med en beskrivande etikett.'],
-            ['Tabellstruktur', 'Alla tabellrubriker har scope="col" och sorteringsbara kolumner exponerar aria-sort="ascending"/"descending"/"none" — skärmläsare annonserar aktiv sortering automatiskt.'],
             ['Fokusring', 'Synlig fokusring via :focus-visible vid tangentbordsnavigering — men inte vid musklick, för att hålla UI-n rent.'],
           ].map(([title, detail]) => (
             <div key={title} className="flex gap-2">
@@ -458,7 +629,7 @@ export default function About() {
       <section>
         <SectionHeader icon={<Globe size={16} strokeWidth={2} />} title="Designsystem" />
         <p className="text-[13px] text-[var(--c-text-secondary)] leading-relaxed mt-3 mb-4">
-          Subtrack följer ett strikt designsystem definierat i <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">CLAUDE.md</code> — projektets instruktionsfil för AI-assisterad utveckling. Alla färger, typsnitt och radier är fastlagda. Mörkt läge hanteras via CSS-variabler med <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">[data-theme="dark"]</code> på html-elementet.
+          Subtrack följer ett strikt designsystem definierat i <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">CLAUDE.md</code>. Alla färger exponeras som CSS-variabler och Tailwind-klasser refererar till dem via <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">bg-[var(--c-xxx)]</code>. Mörkt läge hanteras via <code className="bg-[var(--c-bg-subtle)] px-1.5 py-0.5 rounded text-[12px]">[data-theme="dark"]</code> på html-elementet.
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           <ColorSwatch hex="#1B4FD8" label="Accent" />
@@ -491,11 +662,24 @@ export default function About() {
   )
 }
 
+// ---------------------------------------------------------------------------
+// Delade hjälpkomponenter
+// ---------------------------------------------------------------------------
+
 function SectionHeader({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
     <div className="flex items-center gap-2 border-b border-[var(--c-border)] pb-2">
       <span className="text-[var(--c-accent)]">{icon}</span>
       <h2 className="text-[15px] font-semibold text-[var(--c-text-primary)] tracking-[-0.3px]">{title}</h2>
+    </div>
+  )
+}
+
+function GuideCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="bg-[var(--c-bg-app)] rounded-[10px] border border-[var(--c-border)] p-4">
+      <p className="text-[13px] font-semibold text-[var(--c-text-primary)] mb-1">{title}</p>
+      <p className="text-[12px] text-[var(--c-text-muted)] leading-relaxed">{children}</p>
     </div>
   )
 }
@@ -621,3 +805,4 @@ function GitHubIcon() {
     </svg>
   )
 }
+
