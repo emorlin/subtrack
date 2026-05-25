@@ -92,15 +92,24 @@ export function calculateTotalPaid(subscription: Subscription): number {
     legacy_amount_paid,
     price_history,
     created_at,
+    status,
+    end_date,
+    updated_at,
   } = subscription
 
   const today = new Date()
+  const cutoff = status === 'cancelled' && end_date
+    ? new Date(end_date)
+    : status === 'paused'
+    ? new Date(updated_at)
+    : today
+
   const start = new Date(start_date)
 
   if (legacy_amount_paid !== null) {
     const sinceAdded = calculatePeriodsBetween(
       new Date(created_at),
-      today,
+      cutoff,
       interval,
       interval_count
     )
@@ -109,7 +118,7 @@ export function calculateTotalPaid(subscription: Subscription): number {
 
   return calculateFromPriceHistory(
     start,
-    today,
+    cutoff,
     price_history ?? [],
     amount,
     interval,
