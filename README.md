@@ -1,6 +1,8 @@
 # Subtrack
 
 > Personlig webb-app för att hålla koll på löpande abonnemang och prenumerationer.
+>
+> Live demo: [https://emorlin-subtrack.vercel.app/](https://emorlin-subtrack.vercel.app/)
 
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white&labelColor=20232A)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)
