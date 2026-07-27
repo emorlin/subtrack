@@ -135,17 +135,16 @@ export function useReactivateSubscription() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: async (id: string) => {
-      const today = new Date().toISOString().slice(0, 10)
       if (isDemoMode) {
         queryClient.setQueryData<Subscription[]>(QUERY_KEY, (old = []) =>
-          old.map(s => s.id === id ? { ...s, status: 'active', end_date: null, start_date: today, updated_at: new Date().toISOString() } : s)
+          old.map(s => s.id === id ? { ...s, status: 'active', end_date: null, updated_at: new Date().toISOString() } : s)
         )
         return {} as Subscription
       }
       const { data: { user } } = await supabase.auth.getUser()
       const { data, error } = await supabase
         .from('subscriptions')
-        .update({ status: 'active', end_date: null, start_date: today })
+        .update({ status: 'active', end_date: null })
         .eq('id', id)
         .eq('user_id', user!.id)
         .select('*, category:categories(*)')

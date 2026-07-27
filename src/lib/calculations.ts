@@ -18,18 +18,30 @@ function calculatePeriodsBetween(
   from: Date,
   to: Date,
   interval: SubscriptionInterval,
-  intervalCount: number
+  intervalCount: number,
+  inclusive = false
 ): number {
-  const msPerDay = 1000 * 60 * 60 * 24
-  const days = (to.getTime() - from.getTime()) / msPerDay
+  let periods = 0
+  let cursor = from
 
-  const daysPerPeriod: Record<SubscriptionInterval, number> = {
-    month: 30.4375,
-    quarter: 91.3125,
-    year: 365.25,
+  while (true) {
+    const next = new Date(cursor)
+    if (interval === 'month') {
+      next.setUTCMonth(next.getUTCMonth() + intervalCount)
+    } else if (interval === 'quarter') {
+      next.setUTCMonth(next.getUTCMonth() + 3 * intervalCount)
+    } else {
+      next.setUTCFullYear(next.getUTCFullYear() + intervalCount)
+    }
+
+    const reached = inclusive ? next <= to : next < to
+    if (!reached) break
+
+    periods++
+    cursor = next
   }
 
-  return Math.floor(days / (daysPerPeriod[interval] * intervalCount))
+  return periods
 }
 
 function calculateFromPriceHistory(
@@ -38,10 +50,11 @@ function calculateFromPriceHistory(
   priceHistory: PriceHistory[],
   currentAmount: number,
   interval: SubscriptionInterval,
-  intervalCount: number
+  intervalCount: number,
+  inclusive = false
 ): number {
   if (!priceHistory || priceHistory.length === 0) {
-    const periods = calculatePeriodsBetween(start, today, interval, intervalCount)
+    const periods = calculatePeriodsBetween(start, today, interval, intervalCount, inclusive)
     return periods * currentAmount
   }
 
@@ -51,7 +64,7 @@ function calculateFromPriceHistory(
     .sort((a, b) => new Date(a.effective_from).getTime() - new Date(b.effective_from).getTime())
 
   if (sorted.length === 0) {
-    const periods = calculatePeriodsBetween(start, today, interval, intervalCount)
+    const periods = calculatePeriodsBetween(start, today, interval, intervalCount, inclusive)
     return periods * currentAmount
   }
 
@@ -76,7 +89,14 @@ function calculateFromPriceHistory(
 
     if (periodStart >= clampedEnd) continue
 
-    const periods = calculatePeriodsBetween(periodStart, clampedEnd, interval, intervalCount)
+    const isLastSegment = i + 1 >= sorted.length
+    const periods = calculatePeriodsBetween(
+      periodStart,
+      clampedEnd,
+      interval,
+      intervalCount,
+      isLastSegment && inclusive
+    )
     total += periods * sorted[i].amount
   }
 
@@ -104,6 +124,11 @@ export function calculateTotalPaid(subscription: Subscription): number {
     ? new Date(updated_at)
     : today
 
+  // A cancelled/paused cutoff is a definitive endpoint — the period ending
+  // exactly on it was fully used and paid. "Today" for an active sub is not:
+  // the day's renewal hasn't happened yet, so that boundary stays exclusive.
+  const inclusive = status !== 'active'
+
   const start = new Date(start_date)
 
   if (legacy_amount_paid !== null) {
@@ -111,7 +136,8 @@ export function calculateTotalPaid(subscription: Subscription): number {
       new Date(created_at),
       cutoff,
       interval,
-      interval_count
+      interval_count,
+      inclusive
     )
     return legacy_amount_paid + sinceAdded * amount
   }
@@ -122,7 +148,8 @@ export function calculateTotalPaid(subscription: Subscription): number {
     price_history ?? [],
     amount,
     interval,
-    interval_count
+    interval_count,
+    inclusive
   )
 }
 

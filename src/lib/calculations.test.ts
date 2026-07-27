@@ -92,7 +92,7 @@ describe('calculateTotalPaid', () => {
     expect(calculateTotalPaid(sub)).toBe(1200)
   })
 
-  it('cancelled sub — stops counting at end_date', () => {
+  it('cancelled sub — stops counting at end_date, inclusive of the final completed period', () => {
     vi.setSystemTime(new Date(2024, 11, 1)) // Dec 1 local
     const sub = makeSub({
       start_date: '2024-01-01',
@@ -100,12 +100,12 @@ describe('calculateTotalPaid', () => {
       interval: 'month',
       interval_count: 1,
       status: 'cancelled',
-      end_date: '2024-05-01', // 121 days from Jan 1 → 3 periods
+      end_date: '2024-05-01', // exactly 4 months elapsed → 4 periods paid
     })
-    expect(calculateTotalPaid(sub)).toBe(300)
+    expect(calculateTotalPaid(sub)).toBe(400)
   })
 
-  it('paused sub — stops counting at updated_at', () => {
+  it('paused sub — stops counting at updated_at, inclusive of the final completed period', () => {
     vi.setSystemTime(new Date(2024, 11, 1)) // Dec 1 local
     const sub = makeSub({
       start_date: '2024-01-01',
@@ -113,9 +113,25 @@ describe('calculateTotalPaid', () => {
       interval: 'month',
       interval_count: 1,
       status: 'paused',
-      updated_at: new Date(2024, 4, 1).toISOString(), // May 1 local → 3 periods
+      updated_at: '2024-05-01T00:00:00.000Z', // exactly 4 months elapsed → 4 periods paid
     })
-    expect(calculateTotalPaid(sub)).toBe(300)
+    expect(calculateTotalPaid(sub)).toBe(400)
+  })
+
+  it('cancelled yearly sub — full year paid shows as paid, not zero', () => {
+    vi.setSystemTime(new Date(2026, 6, 27)) // today doesn't matter once cancelled
+    const sub = makeSub({
+      start_date: '2025-07-10',
+      amount: 469,
+      interval: 'year',
+      interval_count: 1,
+      status: 'cancelled',
+      end_date: '2026-07-10', // exactly one year elapsed → 1 period paid
+      price_history: [
+        { id: 'ph-1', subscription_id: 'sub-1', amount: 469, interval: 'year', effective_from: '2025-07-10', created_at: '' },
+      ],
+    })
+    expect(calculateTotalPaid(sub)).toBe(469)
   })
 
   it('legacy_amount_paid adds periods since created_at', () => {
